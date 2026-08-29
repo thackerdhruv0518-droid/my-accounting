@@ -43,16 +43,12 @@
 
 
 
-    <!-- FORM -->
-
     <div class="transaction-box">
 
 
         <!-- DATE -->
 
-        <label for="transactionDate">
-            Date
-        </label>
+        <label>Date</label>
 
         <input
             type="date"
@@ -63,9 +59,7 @@
 
         <!-- PARTICULARS -->
 
-        <label for="description">
-            Particulars
-        </label>
+        <label>Particulars</label>
 
         <input
             type="text"
@@ -77,9 +71,7 @@
 
         <!-- MAIN CATEGORY -->
 
-        <label for="category">
-            Main Category
-        </label>
+        <label>Main Category</label>
 
         <select
             id="category"
@@ -96,11 +88,12 @@
 
         <!-- SUB CATEGORY -->
 
-        <label for="subCategory">
-            Sub Category
-        </label>
+        <label>Sub Category</label>
 
-        <select id="subCategory">
+        <select
+            id="subCategory"
+            onchange="loadLedgers()"
+        >
 
             <option value="">
                 Select Main Category First
@@ -110,11 +103,23 @@
 
 
 
-        <!-- DEBIT / CREDIT -->
+        <!-- LEDGER -->
 
-        <label for="entryType">
-            Entry Type
-        </label>
+        <label>Ledger Name</label>
+
+        <select id="ledger">
+
+            <option value="">
+                Select Sub Category First
+            </option>
+
+        </select>
+
+
+
+        <!-- ENTRY TYPE -->
+
+        <label>Entry Type</label>
 
         <select id="entryType">
 
@@ -136,9 +141,7 @@
 
         <!-- AMOUNT -->
 
-        <label for="amount">
-            Amount
-        </label>
+        <label>Amount</label>
 
         <input
             type="number"
@@ -152,9 +155,7 @@
 
         <!-- PAYMENT ACCOUNT -->
 
-        <label for="paymentAccount">
-            Cash / Bank / GPay
-        </label>
+        <label>Cash / Bank / GPay</label>
 
         <select id="paymentAccount">
 
@@ -178,16 +179,14 @@
 
 
 
-        <!-- NARRATION -->
+        <!-- NOTES -->
 
-        <label for="notes">
-            Narration
-        </label>
+        <label>Narration</label>
 
         <textarea
             id="notes"
-            placeholder="Enter narration"
             rows="3"
+            placeholder="Enter narration"
         ></textarea>
 
 
@@ -204,25 +203,32 @@
             id="saveButton"
             onclick="saveTransaction()"
         >
+
             SAVE TRANSACTION
+
         </button>
 
 
-        <button onclick="clearForm()">
+        <button
+            onclick="clearForm()"
+        >
+
             CLEAR
+
         </button>
 
 
-        <button onclick="goDashboard()">
+        <button
+            onclick="goDashboard()"
+        >
+
             BACK TO DASHBOARD
+
         </button>
 
 
     </div>
 
-
-
-    <!-- MESSAGE -->
 
     <p
         id="transactionMessage"
@@ -237,158 +243,80 @@
 <script>
 
 
-/* =========================================
-   GLOBAL CATEGORIES
-========================================= */
+/* =====================================
+   TODAY DATE
+===================================== */
 
-let categories = [];
+function setTodayDate() {
 
+    document.getElementById(
+        "transactionDate"
+    ).value =
+        new Date()
+            .toISOString()
+            .split("T")[0];
 
-
-/* =========================================
-   SET TODAY DATE
-========================================= */
-
-document.getElementById(
-    "transactionDate"
-).value =
-    new Date()
-        .toISOString()
-        .split("T")[0];
+}
 
 
 
-/* =========================================
+/* =====================================
    LOAD MAIN CATEGORIES
-========================================= */
+===================================== */
 
 async function loadCategories() {
 
 
-    const categorySelect =
-        document.getElementById(
-            "category"
-        );
+    const select =
+        document.getElementById("category");
 
 
-    categorySelect.innerHTML = `
-
-        <option value="">
-            Loading Categories...
-        </option>
-
-    `;
-
-
-    const {
-
-        data,
-
-        error
-
-    } = await supabaseClient
-
-        .from("categories")
-
-        .select("*")
-
-        .order(
-            "name",
-            {
-                ascending: true
-            }
-        );
+    const { data, error } =
+        await supabaseClient
+            .from("categories")
+            .select("*")
+            .order("name");
 
 
     if (error) {
 
+        console.error(error);
 
-        console.error(
-            "Category Error:",
-            error
-        );
-
-
-        categorySelect.innerHTML = `
-
-            <option value="">
-                Error Loading Categories
-            </option>
-
-        `;
-
+        select.innerHTML =
+            '<option value="">Error Loading Categories</option>';
 
         return;
 
     }
 
 
-    categories =
-        data || [];
+    select.innerHTML =
+        '<option value="">Select Main Category</option>';
 
 
-    categorySelect.innerHTML = `
+    data.forEach(function(category) {
 
-        <option value="">
-            Select Main Category
-        </option>
+        const option =
+            document.createElement("option");
 
-    `;
+        option.value =
+            category.id;
 
+        option.text =
+            category.name;
 
-    if (
-        categories.length === 0
-    ) {
+        select.appendChild(option);
 
-
-        categorySelect.innerHTML += `
-
-            <option value="">
-                No Categories Found
-            </option>
-
-        `;
-
-
-        return;
-
-    }
-
-
-    categories.forEach(
-        function(category) {
-
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                category.id;
-
-
-            option.text =
-                category.name;
-
-
-            categorySelect.appendChild(
-                option
-            );
-
-
-        }
-    );
+    });
 
 
 }
 
 
 
-/* =========================================
+/* =====================================
    LOAD SUB CATEGORIES
-========================================= */
+===================================== */
 
 async function loadSubCategories() {
 
@@ -399,210 +327,166 @@ async function loadSubCategories() {
         ).value;
 
 
-    const subCategorySelect =
+    const subSelect =
         document.getElementById(
             "subCategory"
         );
 
 
-    /* RESET */
-
-    subCategorySelect.innerHTML = `
-
-        <option value="">
-            Loading Sub Categories...
-        </option>
-
-    `;
+    const ledgerSelect =
+        document.getElementById(
+            "ledger"
+        );
 
 
-    /* NO CATEGORY SELECTED */
+    ledgerSelect.innerHTML =
+        '<option value="">Select Sub Category First</option>';
+
 
     if (!categoryId) {
 
-
-        subCategorySelect.innerHTML = `
-
-            <option value="">
-                Select Main Category First
-            </option>
-
-        `;
-
+        subSelect.innerHTML =
+            '<option value="">Select Main Category First</option>';
 
         return;
 
     }
 
 
-    /* GET SUB CATEGORIES */
+    subSelect.innerHTML =
+        '<option value="">Loading...</option>';
 
-    const {
 
-        data,
-
-        error
-
-    } = await supabaseClient
-
-        .from("sub_categories")
-
-        .select("*")
-
-        /*
-        IMPORTANT:
-
-        YOUR DATABASE COLUMN IS:
-
-        catagory_id
-
-        NOT:
-
-        category_id
-        */
-
-        .eq(
-            "catagory_id",
-            categoryId
-        )
-
-        .order(
-            "name",
-            {
-                ascending: true
-            }
-        );
+    const { data, error } =
+        await supabaseClient
+            .from("sub_categories")
+            .select("*")
+            .eq(
+                "category_id",
+                categoryId
+            )
+            .order("name");
 
 
     if (error) {
 
+        console.error(error);
 
-        console.error(
-            "Sub Category Error:",
-            error
-        );
-
-
-        subCategorySelect.innerHTML = `
-
-            <option value="">
-                Error Loading Sub Categories
-            </option>
-
-        `;
-
+        subSelect.innerHTML =
+            '<option value="">Error Loading Sub Categories</option>';
 
         return;
 
     }
 
 
-    subCategorySelect.innerHTML = `
-
-        <option value="">
-            Select Sub Category
-        </option>
-
-    `;
+    subSelect.innerHTML =
+        '<option value="">Select Sub Category</option>';
 
 
-    if (
-        !data ||
-        data.length === 0
-    ) {
+    data.forEach(function(subCategory) {
 
+        const option =
+            document.createElement("option");
 
-        subCategorySelect.innerHTML += `
+        option.value =
+            subCategory.id;
 
-            <option value="">
-                No Sub Categories Found
-            </option>
+        option.text =
+            subCategory.name;
 
-        `;
+        subSelect.appendChild(option);
 
-
-        return;
-
-    }
-
-
-    data.forEach(
-        function(subCategory) {
-
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                subCategory.name;
-
-
-            option.text =
-                subCategory.name;
-
-
-            subCategorySelect.appendChild(
-                option
-            );
-
-
-        }
-    );
+    });
 
 
 }
 
 
 
-/* =========================================
-   GET CATEGORY NAME
-========================================= */
+/* =====================================
+   LOAD LEDGERS
+===================================== */
 
-function getCategoryName() {
+async function loadLedgers() {
 
 
-    const categoryId =
+    const subCategoryId =
         document.getElementById(
-            "category"
+            "subCategory"
         ).value;
 
 
-    const category =
-        categories.find(
-            function(item) {
-
-
-                return (
-                    String(item.id) ===
-                    String(categoryId)
-                );
-
-
-            }
+    const ledgerSelect =
+        document.getElementById(
+            "ledger"
         );
 
 
-    if (category) {
+    if (!subCategoryId) {
 
+        ledgerSelect.innerHTML =
+            '<option value="">Select Sub Category First</option>';
 
-        return category.name;
+        return;
 
     }
 
 
-    return "";
+    ledgerSelect.innerHTML =
+        '<option value="">Loading...</option>';
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("ledgers")
+            .select("*")
+            .eq(
+                "sub_category_id",
+                subCategoryId
+            )
+            .order("name");
+
+
+    if (error) {
+
+        console.error(error);
+
+        ledgerSelect.innerHTML =
+            '<option value="">Error Loading Ledgers</option>';
+
+        return;
+
+    }
+
+
+    ledgerSelect.innerHTML =
+        '<option value="">Select Ledger</option>';
+
+
+    data.forEach(function(ledger) {
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            ledger.name;
+
+        option.text =
+            ledger.name;
+
+        ledgerSelect.appendChild(option);
+
+    });
 
 
 }
 
 
 
-/* =========================================
+/* =====================================
    SAVE TRANSACTION
-========================================= */
+===================================== */
 
 async function saveTransaction() {
 
@@ -619,19 +503,33 @@ async function saveTransaction() {
         ).value.trim();
 
 
-    const category =
-        getCategoryName();
-
-
-    const categoryId =
+    const categorySelect =
         document.getElementById(
             "category"
-        ).value;
+        );
+
+
+    const category =
+        categorySelect
+            .selectedOptions[0]
+            ?.text;
+
+
+    const subCategorySelect =
+        document.getElementById(
+            "subCategory"
+        );
 
 
     const subCategory =
+        subCategorySelect
+            .selectedOptions[0]
+            ?.text;
+
+
+    const ledger =
         document.getElementById(
-            "subCategory"
+            "ledger"
         ).value;
 
 
@@ -673,55 +571,37 @@ async function saveTransaction() {
         );
 
 
-    /* VALIDATION */
-
     if (
+
         !date ||
         !description ||
-        !categoryId ||
-        !category ||
-        !subCategory ||
+        !categorySelect.value ||
+        !subCategorySelect.value ||
+        !ledger ||
         !entryType ||
         !amount ||
         amount <= 0 ||
         !paymentAccount
-    ) {
 
+    ) {
 
         message.innerText =
             "Please fill all required fields.";
-
 
         return;
 
     }
 
 
-    saveButton.disabled =
-        true;
-
+    saveButton.disabled = true;
 
     saveButton.innerText =
         "SAVING...";
 
 
-    message.innerText =
-        "";
-
-
-    try {
-
-
-        const {
-
-            data,
-
-            error
-
-        } = await supabaseClient
-
+    const { error } =
+        await supabaseClient
             .from("transactions")
-
             .insert([
 
                 {
@@ -738,6 +618,9 @@ async function saveTransaction() {
                     sub_category:
                         subCategory,
 
+                    ledger_name:
+                        ledger,
+
                     entry_type:
                         entryType,
 
@@ -752,159 +635,119 @@ async function saveTransaction() {
 
                 }
 
-            ])
-
-            .select();
+            ]);
 
 
-        if (error) {
+    if (error) {
 
-
-            console.error(
-                "Supabase Error:",
-                error
-            );
-
-
-            message.innerText =
-                "Error: " +
-                error.message;
-
-
-            return;
-
-        }
-
-
-        console.log(
-            "Transaction Saved:",
-            data
-        );
-
-
-        clearForm();
-
+        console.error(error);
 
         message.innerText =
-            "Transaction saved successfully!";
-
-
-    }
-
-    catch (error) {
-
-
-        console.error(
-            error
-        );
-
-
-        message.innerText =
-            "Something went wrong. Please try again.";
-
-    }
-
-    finally {
-
+            "Error: " +
+            error.message;
 
         saveButton.disabled =
             false;
 
-
         saveButton.innerText =
             "SAVE TRANSACTION";
+
+        return;
 
     }
 
 
+    clearForm();
+
+
+    message.innerText =
+        "Transaction saved successfully!";
+
+
+    saveButton.disabled =
+        false;
+
+    saveButton.innerText =
+        "SAVE TRANSACTION";
+
+
 }
 
 
 
-/* =========================================
+/* =====================================
    CLEAR FORM
-========================================= */
+===================================== */
 
 function clearForm() {
 
 
-    document.getElementById(
-        "transactionDate"
-    ).value =
-        new Date()
-            .toISOString()
-            .split("T")[0];
+    setTodayDate();
 
 
     document.getElementById(
         "description"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "category"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "subCategory"
-    ).innerHTML = `
+    ).innerHTML =
+        '<option value="">Select Main Category First</option>';
 
-        <option value="">
-            Select Main Category First
-        </option>
 
-    `;
+    document.getElementById(
+        "ledger"
+    ).innerHTML =
+        '<option value="">Select Sub Category First</option>';
 
 
     document.getElementById(
         "entryType"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "amount"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "paymentAccount"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "notes"
-    ).value =
-        "";
-
+    ).value = "";
 
 }
 
 
 
-/* =========================================
-   BACK TO DASHBOARD
-========================================= */
+/* =====================================
+   DASHBOARD
+===================================== */
 
 function goDashboard() {
-
 
     window.location.href =
         "dashboard.html";
 
-
 }
 
 
 
-/* =========================================
+/* =====================================
    START
-========================================= */
+===================================== */
+
+setTodayDate();
 
 loadCategories();
 
