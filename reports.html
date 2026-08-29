@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Reports - My Accounting</title>
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+
+<!-- PDF -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+
+<style>
+
+
+    * {
+
+        box-sizing:
+            border-box;
+
+    }
+
+
+    body {
+
+        margin:
+            0;
+
+        font-family:
+            Arial,
+            sans-serif;
+
+        background:
+            #f4f6f9;
+
+        color:
+            #222;
+
+    }
+
+
+    .reports-page {
+
+        max-width:
+            1000px;
+
+        margin:
+            auto;
+
+        padding:
+            25px;
+
+    }
+
+
+    .header {
+
+        background:
+            white;
+
+        padding:
+            25px;
+
+        border-radius:
+            12px;
+
+        margin-bottom:
+            25px;
+
+        box-shadow:
+            0 2px 10px
+            rgba(0,0,0,0.08);
+
+    }
+
+
+    .header h1 {
+
+        margin:
+            0;
+
+    }
+
+
+    .header p {
+
+        color:
+            #666;
+
+    }
+
+
+    .box {
+
+        background:
+            white;
+
+        padding:
+            25px;
+
+        border-radius:
+            12px;
+
+        margin-bottom:
+            25px;
+
+        box-shadow:
+            0 2px 10px
+            rgba(0,0,0,0.08);
+
+    }
+
+
+    .period-buttons {
+
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                3,
+                1fr
+            );
+
+        gap:
+            15px;
+
+    }
+
+
+    button {
+
+        border:
+            none;
+
+        padding:
+            15px;
+
+        border-radius:
+            8px;
+
+        background:
+            #222;
+
+        color:
+            white;
+
+        font-size:
+            15px;
+
+        font-weight:
+            bold;
+
+        cursor:
+            pointer;
+
+    }
+
+
+    button:hover {
+
+        background:
+            #000;
+
+    }
+
+
+    button.active {
+
+        outline:
+            3px solid
+            #999;
+
+    }
+
+
+    .report-buttons {
+
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                3,
+                1fr
+            );
+
+        gap:
+            15px;
+
+    }
+
+
+    #message {
+
+        margin-top:
+            15px;
+
+        font-weight:
+            bold;
+
+    }
+
+
+    @media (
+        max-width:
+        700px
+    ) {
+
+        .period-buttons,
+
+        .report-buttons {
+
+            grid-template-columns:
+                1fr;
+
+        }
+
+    }
+
+
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="reports-page">
+
+```
+<!-- HEADER -->
+
+<div class="header">
+
+    <h1>
+        MY ACCOUNTING
+    </h1>
+
+    <p>
+        Download Reports
+    </p>
+
+</div>
+
+
+
+<!-- PERIOD -->
+
+<div class="box">
+
+
+    <h2>
+        Select Report Period
+    </h2>
+
+
+    <div class="period-buttons">
+
+
+        <button
+            id="month3"
+            onclick="selectPeriod(3)"
+        >
+            LAST 3 MONTHS
+        </button>
+
+
+        <button
+            id="month6"
+            onclick="selectPeriod(6)"
+        >
+            LAST 6 MONTHS
+        </button>
+
+
+        <button
+            id="month12"
+            onclick="selectPeriod(12)"
+        >
+            LAST 12 MONTHS
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- REPORT DOWNLOAD -->
+
+<div class="box">
+
+
+    <h2>
+        Download Report
+    </h2>
+
+
+    <div class="report-buttons">
+
+
+        <button
+            onclick="downloadTrialBalance()"
+        >
+            TRIAL BALANCE PDF
+        </button>
+
+
+        <button
+            onclick="downloadPNL()"
+        >
+            PROFIT & LOSS PDF
+        </button>
+
+
+        <button
+            onclick="downloadBalanceSheet()"
+        >
+            BALANCE SHEET PDF
+        </button>
+
+
+    </div>
+
+
+    <p id="message"></p>
+
+
+</div>
+
+
+
+<!-- BACK -->
+
+<div class="box">
+
+
+    <button
+        onclick="goDashboard()"
+    >
+        BACK TO DASHBOARD
+    </button>
+
+
+</div>
+```
+
+</div>
+
+<script>
+
+
+/* =====================================
+   GLOBAL DATA
+===================================== */
+
+let selectedMonths =
+    3;
+
+
+let transactions =
+    [];
+
+
+
+/* =====================================
+   SELECT PERIOD
+===================================== */
+
+function selectPeriod(months) {
+
+
+    selectedMonths =
+        months;
+
+
+    document
+        .querySelectorAll(
+            ".period-buttons button"
+        )
+        .forEach(
+            function(button) {
+
+                button.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "month" + months
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    loadTransactions();
+
+
+}
+
+
+
+/* =====================================
+   LOAD TRANSACTIONS
+   FROM SUPABASE
+===================================== */
+
+async function loadTransactions() {
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    message.innerText =
+        "Loading transactions...";
+
+
+    /*
+       CALCULATE START DATE
+
+       Example:
+       Today = August 2026
+
+       3 Months =
+       May 2026 onwards
+    */
+
+    const startDate =
+        new Date();
+
+
+    startDate.setMonth(
+        startDate.getMonth() -
+        selectedMonths
+    );
+
+
+    const formattedStartDate =
+        startDate
+            .toISOString()
+            .split("T")[0];
+
+
+    const {
+
+        data,
+
+        error
+
+    } = await supabaseClient
+
+        .from(
+            "transactions"
+        )
+
+        .select("*")
+
+        .gte(
+            "transaction_date",
+            formattedStartDate
+        )
+
+        .order(
+            "transaction_date",
+            {
+                ascending:
+                    true
+            }
+        );
+
+
+    if (
+        error
+    ) {
+
+
+        console.error(
+            error
+        );
+
+
+        message.innerText =
+            "Error: " +
+            error.message;
+
+
+        return;
+
+    }
+
+
+    transactions =
+        data || [];
+
+
+    message.innerText =
+        transactions.length +
+        " transactions loaded for last " +
+        selectedMonths +
+        " months.";
+
+
+}
+
+
+
+/* =====================================
+   FORMAT RUPEE
+===================================== */
+
+function formatRupee(amount) {
+
+
+    return (
+        "₹" +
+        Number(
+            amount || 0
+        ).toLocaleString(
+            "en-IN",
+            {
+                minimumFractionDigits:
+                    2,
+
+                maximumFractionDigits:
+                    2
+            }
+        )
+    );
+
+
+}
+
+
+
+/* =====================================
+   DOWNLOAD TRIAL BALANCE
+===================================== */
+
+function downloadTrialBalance() {
+
+
+    if (
+        transactions.length === 0
+    ) {
+
+
+        alert(
+            "No transactions found for selected period."
+        );
+
+
+        return;
+
+    }
+
+
+    const accountMap =
+        {};
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            const name =
+                transaction.sub_category ||
+                transaction.description ||
+                "Unknown";
+
+
+            if (
+                !accountMap[name]
+            ) {
+
+
+                accountMap[name] =
+                    {
+                        debit:
+                            0,
+
+                        credit:
+                            0
+                    };
+
+            }
+
+
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
+
+
+            if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+
+                accountMap[name].debit +=
+                    amount;
+
+            }
+
+
+            else if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+
+                accountMap[name].credit +=
+                    amount;
+
+            }
+
+
+        }
+    );
+
+
+    const rows =
+        [];
+
+
+    let totalDebit =
+        0;
+
+
+    let totalCredit =
+        0;
+
+
+    Object.keys(
+        accountMap
+    ).forEach(
+        function(name) {
+
+
+            const account =
+                accountMap[name];
+
+
+            totalDebit +=
+                account.debit;
+
+
+            totalCredit +=
+                account.credit;
+
+
+            rows.push([
+
+                name,
+
+                formatRupee(
+                    account.debit
+                ),
+
+                formatRupee(
+                    account.credit
+                )
+
+            ]);
+
+
+        }
+    );
+
+
+    createPDFTable(
+
+        "Trial Balance",
+
+        [
+
+            "Particulars",
+
+            "Debit",
+
+            "Credit"
+
+        ],
+
+        rows,
+
+        [
+
+            "Total",
+
+            formatRupee(
+                totalDebit
+            ),
+
+            formatRupee(
+                totalCredit
+            )
+
+        ],
+
+        "Trial-Balance-" +
+        selectedMonths +
+        "-Months.pdf"
+
+    );
+
+
+}
+
+
+
+/* =====================================
+   DOWNLOAD PROFIT & LOSS
+===================================== */
+
+function downloadPNL() {
+
+
+    if (
+        transactions.length === 0
+    ) {
+
+
+        alert(
+            "No transactions found for selected period."
+        );
+
+
+        return;
+
+    }
+
+
+    let totalDebit =
+        0;
+
+
+    let totalCredit =
+        0;
+
+
+    const rows =
+        [];
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
+
+
+            if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+
+                totalDebit +=
+                    amount;
+
+
+                rows.push([
+
+                    transaction.sub_category ||
+                    transaction.description,
+
+                    formatRupee(
+                        amount
+                    ),
+
+                    ""
+
+                ]);
+
+            }
+
+
+            else if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+
+                totalCredit +=
+                    amount;
+
+
+                rows.push([
+
+                    transaction.sub_category ||
+                    transaction.description,
+
+                    "",
+
+                    formatRupee(
+                        amount
+                    )
+
+                ]);
+
+            }
+
+
+        }
+    );
+
+
+    const netResult =
+        totalCredit -
+        totalDebit;
+
+
+    rows.push([
+
+        netResult >= 0
+
+            ? "Net Profit"
+
+            : "Net Loss",
+
+        netResult < 0
+
+            ? formatRupee(
+                Math.abs(
+                    netResult
+                )
+            )
+
+            : "",
+
+        netResult >= 0
+
+            ? formatRupee(
+                netResult
+            )
+
+            : ""
+
+    ]);
+
+
+    createPDFTable(
+
+        "Profit & Loss Account",
+
+        [
+
+            "Particulars",
+
+            "Debit",
+
+            "Credit"
+
+        ],
+
+        rows,
+
+        [
+
+            "Total",
+
+            formatRupee(
+                totalDebit
+            ),
+
+            formatRupee(
+                totalCredit
+            )
+
+        ],
+
+        "Profit-Loss-" +
+        selectedMonths +
+        "-Months.pdf"
+
+    );
+
+
+}
+
+
+
+/* =====================================
+   DOWNLOAD BALANCE SHEET
+===================================== */
+
+function downloadBalanceSheet() {
+
+
+    if (
+        transactions.length === 0
+    ) {
+
+
+        alert(
+            "No transactions found for selected period."
+        );
+
+
+        return;
+
+    }
+
+
+    const liabilities =
+        [];
+
+
+    const assets =
+        [];
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            const name =
+                transaction.sub_category ||
+                transaction.description;
+
+
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
+
+
+            /*
+               SIMPLE RULE
+
+               CREDIT =
+               LIABILITY
+
+               DEBIT =
+               ASSET
+            */
+
+            if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+
+                liabilities.push([
+
+                    name,
+
+                    formatRupee(
+                        amount
+                    )
+
+                ]);
+
+            }
+
+
+            else if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+
+                assets.push([
+
+                    name,
+
+                    formatRupee(
+                        amount
+                    )
+
+                ]);
+
+            }
+
+
+        }
+    );
+
+
+    const rows =
+        [];
+
+
+    const maxRows =
+        Math.max(
+
+            liabilities.length,
+
+            assets.length
+
+        );
+
+
+    for (
+        let i = 0;
+
+        i < maxRows;
+
+        i++
+    ) {
+
+
+        rows.push([
+
+            liabilities[i]
+
+                ? liabilities[i][0]
+
+                : "",
+
+
+            liabilities[i]
+
+                ? liabilities[i][1]
+
+                : "",
+
+
+            assets[i]
+
+                ? assets[i][0]
+
+                : "",
+
+
+            assets[i]
+
+                ? assets[i][1]
+
+                : ""
+
+        ]);
+
+
+    }
+
+
+    let liabilityTotal =
+        0;
+
+
+    let assetTotal =
+        0;
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
+
+
+            if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+
+                liabilityTotal +=
+                    amount;
+
+            }
+
+
+            else if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+
+                assetTotal +=
+                    amount;
+
+            }
+
+
+        }
+    );
+
+
+    createPDFTable(
+
+        "Balance Sheet",
+
+        [
+
+            "Liabilities",
+
+            "Amount",
+
+            "Assets",
+
+            "Amount"
+
+        ],
+
+        rows,
+
+        [
+
+            "Total",
+
+            formatRupee(
+                liabilityTotal
+            ),
+
+            "Total",
+
+            formatRupee(
+                assetTotal
+            )
+
+        ],
+
+        "Balance-Sheet-" +
+        selectedMonths +
+        "-Months.pdf"
+
+    );
+
+
+}
+
+
+
+/* =====================================
+   CREATE COMMON PDF
+===================================== */
+
+function createPDFTable(
+
+    title,
+
+    head,
+
+    rows,
+
+    foot,
+
+    fileName
+
+) {
+
+
+    if (
+        !window.jspdf ||
+        !window.jspdf.jsPDF
+    ) {
+
+
+        alert(
+            "PDF library not loaded."
+        );
+
+
+        return;
+
+    }
+
+
+    const {
+
+        jsPDF
+
+    } =
+        window.jspdf;
+
+
+    const pdf =
+        new jsPDF(
+            "landscape",
+            "mm",
+            "a4"
+        );
+
+
+    pdf.setFontSize(
+        18
+    );
+
+
+    pdf.text(
+
+        "MY ACCOUNTING",
+
+        148,
+
+        15,
+
+        {
+
+            align:
+                "center"
+
+        }
+
+    );
+
+
+    pdf.setFontSize(
+        14
+    );
+
+
+    pdf.text(
+
+        title,
+
+        148,
+
+        23,
+
+        {
+
+            align:
+                "center"
+
+        }
+
+    );
+
+
+    pdf.setFontSize(
+        10
+    );
+
+
+    pdf.text(
+
+        "Last " +
+        selectedMonths +
+        " Months Report",
+
+        148,
+
+        30,
+
+        {
+
+            align:
+                "center"
+
+        }
+
+    );
+
+
+    pdf.autoTable({
+
+        startY:
+            38,
+
+
+        head:
+            [head],
+
+
+        body:
+            rows,
+
+
+        foot:
+            [foot],
+
+
+        theme:
+            "grid",
+
+
+        styles: {
+
+            fontSize:
+                9
+
+        },
+
+
+        headStyles: {
+
+            halign:
+                "center"
+
+        },
+
+
+        footStyles: {
+
+            fontStyle:
+                "bold"
+
+        }
+
+    });
+
+
+    pdf.save(
+        fileName
+    );
+
+
+}
+
+
+
+/* =====================================
+   BACK TO DASHBOARD
+===================================== */
+
+function goDashboard() {
+
+
+    window.location.href =
+        "dashboard.html";
+
+
+}
+
+
+
+/* =====================================
+   START
+===================================== */
+
+selectPeriod(
+    3
+);
+
+
+</script>
+
+</body>
+
+</html>

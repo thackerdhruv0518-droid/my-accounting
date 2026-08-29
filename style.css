@@ -1,0 +1,456 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #eeeeee;
+    color: #111;
+    font-family: Arial, sans-serif;
+}
+
+
+/* MAIN BOX */
+
+.tally-report {
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    background: white;
+    border: 1px solid #222;
+    padding: 20px;
+}
+
+
+/* HEADER */
+
+.report-header {
+    text-align: center;
+    border-bottom: 2px solid #222;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+
+.report-header h1 {
+    margin: 0;
+    font-size: 23px;
+}
+
+.report-header h2 {
+    margin: 5px 0;
+    font-size: 19px;
+}
+
+.report-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+}
+
+
+/* ================================
+   ADD TRANSACTION FORM
+================================ */
+
+.transaction-box {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+
+    border: 1px solid #333;
+    padding: 20px;
+
+    display: grid;
+
+    grid-template-columns: 190px 1fr;
+
+    column-gap: 20px;
+    row-gap: 14px;
+
+    align-items: center;
+}
+
+
+/* LABEL */
+
+.transaction-box label {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+}
+
+
+/* ALL INPUTS SAME */
+
+.transaction-box input,
+.transaction-box select,
+.transaction-box textarea {
+
+    width: 100%;
+
+    border: 1px solid #555;
+
+    background: #fff;
+
+    padding: 9px 10px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    color: #111;
+
+    outline: none;
+}
+
+
+/* INPUT + SELECT HEIGHT */
+
+.transaction-box input,
+.transaction-box select {
+
+    height: 40px;
+}
+
+
+/* NARRATION */
+
+.transaction-box textarea {
+
+    min-height: 75px;
+
+    resize: vertical;
+}
+
+
+/* FOCUS */
+
+.transaction-box input:focus,
+.transaction-box select:focus,
+.transaction-box textarea:focus {
+
+    border: 2px solid #222;
+}
+
+
+/* ================================
+   CATEGORY EXACT SAME
+================================ */
+
+#category {
+
+    width: 100% !important;
+
+    height: 40px !important;
+
+    min-height: 40px !important;
+
+    padding: 9px 10px !important;
+
+    border: 1px solid #555 !important;
+
+    background: #fff !important;
+
+    font-family: Arial, sans-serif !important;
+
+    font-size: 14px !important;
+
+    color: #111 !important;
+}
+
+
+/* ================================
+   BUTTONS
+================================ */
+
+.report-buttons {
+
+    width: 100%;
+    max-width: 900px;
+
+    margin: 18px auto 0;
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+.report-buttons button {
+
+    padding: 11px 20px;
+
+    border: 1px solid #222;
+
+    background: #222;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.report-buttons button:hover {
+
+    background: #444;
+}
+
+
+/* MESSAGE */
+
+.transaction-message {
+
+    text-align: center;
+
+    font-weight: bold;
+
+    margin-top: 15px;
+}
+
+
+/* ================================
+   REPORT TABLES
+================================ */
+
+.pnl-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    table-layout: fixed;
+}
+
+.pnl-table th,
+.pnl-table td {
+
+    border: 1px solid #333;
+
+    padding: 9px 10px;
+
+    height: 38px;
+
+    vertical-align: middle;
+}
+
+.pnl-table thead tr:first-child th {
+
+    text-align: center;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    height: 42px;
+}
+
+.pnl-table thead tr:nth-child(2) th {
+
+    text-align: left;
+
+    font-weight: bold;
+}
+
+.pnl-table thead tr:nth-child(2) th:nth-child(2),
+.pnl-table thead tr:nth-child(2) th:nth-child(4) {
+
+    text-align: right;
+}
+
+
+/* AMOUNT */
+
+.amount {
+
+    text-align: right !important;
+
+    white-space: nowrap;
+}
+
+
+/* CATEGORY */
+
+.category {
+
+    display: block;
+
+    font-weight: bold;
+}
+
+
+/* SUB POINT */
+
+.sub-point {
+
+    display: block;
+
+    padding-left: 25px;
+}
+
+
+/* TOTAL */
+
+.pnl-table tfoot th {
+
+    height: 42px;
+
+    font-weight: bold;
+}
+
+.pnl-table tfoot th:nth-child(2),
+.pnl-table tfoot th:nth-child(4) {
+
+    text-align: right;
+}
+
+
+/* ================================
+   DASHBOARD
+================================ */
+
+.dashboard {
+
+    width: 100%;
+    max-width: 900px;
+
+    margin: 20px auto;
+
+    padding: 25px;
+
+    background: white;
+
+    border: 1px solid #333;
+}
+
+.dashboard h1 {
+
+    text-align: center;
+
+    margin-top: 0;
+}
+
+.dashboard p {
+
+    text-align: center;
+}
+
+
+/* DASHBOARD BUTTONS */
+
+.dashboard-container {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-top: 25px;
+}
+
+.dashboard-button {
+
+    min-height: 110px;
+
+    border: 1px solid #333;
+
+    background: white;
+
+    cursor: pointer;
+
+    padding: 20px;
+
+    font-size: 30px;
+
+    font-weight: bold;
+}
+
+.dashboard-button span {
+
+    display: block;
+
+    margin-top: 10px;
+
+    font-size: 15px;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .tally-report {
+        padding: 10px;
+    }
+
+    .transaction-box {
+
+        grid-template-columns: 1fr;
+
+        padding: 15px;
+
+    }
+
+    .transaction-box label {
+
+        margin-top: 4px;
+
+    }
+
+    .report-buttons {
+
+        flex-direction: column;
+
+    }
+
+    .report-buttons button {
+
+        width: 100%;
+
+    }
+
+    .dashboard-container {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+/* ================================
+   PRINT
+================================ */
+
+@media print {
+
+    body {
+
+        background: white;
+
+        padding: 0;
+    }
+
+    .tally-report {
+
+        border: none;
+
+        max-width: none;
+    }
+
+    .report-buttons {
+
+        display: none;
+    }
+
+}

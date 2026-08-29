@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Balance Sheet</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- COMMON DATA -->
+    <script src="data.js"></script>
+
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="tally-report">
+
+
+    <!-- HEADER -->
+
+    <div class="report-header">
+
+        <h1>MY ACCOUNTING</h1>
+
+        <h2>Balance Sheet</h2>
+
+        <p>As on 31-03-2027</p>
+
+    </div>
+
+
+    <!-- TABLE -->
+
+    <table class="pnl-table">
+
+        <colgroup>
+
+            <col class="debit-particular">
+            <col class="debit-amount">
+
+            <col class="credit-particular">
+            <col class="credit-amount">
+
+        </colgroup>
+
+
+        <thead>
+
+            <tr>
+
+                <th colspan="2">
+                    Liabilities
+                </th>
+
+                <th colspan="2">
+                    Assets
+                </th>
+
+            </tr>
+
+
+            <tr>
+
+                <th>
+                    Particulars
+                </th>
+
+                <th>
+                    Amount
+                </th>
+
+                <th>
+                    Particulars
+                </th>
+
+                <th>
+                    Amount
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="balanceBody"></tbody>
+
+
+        <tfoot>
+
+            <tr>
+
+                <th>
+                    Total
+                </th>
+
+                <th id="liabilityTotal"
+                    class="amount">
+                    ₹0.00
+                </th>
+
+                <th>
+                    Total
+                </th>
+
+                <th id="assetTotal"
+                    class="amount">
+                    ₹0.00
+                </th>
+
+            </tr>
+
+        </tfoot>
+
+    </table>
+
+
+    <!-- BUTTONS -->
+
+    <div class="report-buttons">
+
+        <button onclick="downloadPDF()">
+            DOWNLOAD PDF
+        </button>
+
+        <button onclick="goDashboard()">
+            BACK TO DASHBOARD
+        </button>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================
+   DATA FROM data.js
+========================================= */
+
+const liabilities =
+    accountingData.liabilities;
+
+
+const assets =
+    accountingData.assets;
+
+
+/* =========================================
+   GROUP BY CATEGORY
+========================================= */
+
+function groupByCategory(accounts) {
+
+    const groups = [];
+
+
+    accounts.forEach(function(account) {
+
+        let group =
+            groups.find(function(item) {
+
+                return item.category ===
+                       account.category;
+
+            });
+
+
+        if (!group) {
+
+            group = {
+
+                category:
+                    account.category,
+
+                items: []
+
+            };
+
+            groups.push(group);
+
+        }
+
+
+        group.items.push({
+
+            name:
+                account.name,
+
+            amount:
+                Number(account.amount)
+
+        });
+
+    });
+
+
+    return groups;
+
+}
+
+
+/* =========================================
+   TOTAL
+========================================= */
+
+function getTotal(groups) {
+
+    let total = 0;
+
+
+    groups.forEach(function(group) {
+
+        group.items.forEach(function(item) {
+
+            total += Number(item.amount);
+
+        });
+
+    });
+
+
+    return total;
+
+}
+
+
+/* =========================================
+   CREATE ROWS
+========================================= */
+
+function createRows(groups) {
+
+    const rows = [];
+
+
+    groups.forEach(function(group) {
+
+
+        /* MAIN CATEGORY */
+
+        rows.push({
+
+            type: "category",
+
+            name:
+                group.category,
+
+            amount: ""
+
+        });
+
+
+        /* SUB POINTS */
+
+        group.items.forEach(function(item) {
+
+            rows.push({
+
+                type: "item",
+
+                name:
+                    item.name,
+
+                amount:
+                    Number(item.amount)
+
+            });
+
+        });
+
+    });
+
+
+    return rows;
+
+}
+
+
+/* =========================================
+   SHOW BALANCE SHEET
+========================================= */
+
+function showBalanceSheet() {
+
+
+    const body =
+        document.getElementById(
+            "balanceBody"
+        );
+
+
+    body.innerHTML = "";
+
+
+    const liabilityGroups =
+        groupByCategory(
+            liabilities
+        );
+
+
+    const assetGroups =
+        groupByCategory(
+            assets
+        );
+
+
+    let liabilityTotal =
+        getTotal(
+            liabilityGroups
+        );
+
+
+    let assetTotal =
+        getTotal(
+            assetGroups
+        );
+
+
+    let liabilityRows =
+        createRows(
+            liabilityGroups
+        );
+
+
+    let assetRows =
+        createRows(
+            assetGroups
+        );
+
+
+    /* =================================
+       BALANCE DIFFERENCE
+    ================================= */
+
+    if (liabilityTotal < assetTotal) {
+
+        const difference =
+            assetTotal - liabilityTotal;
+
+
+        liabilityRows.push({
+
+            type: "balance",
+
+            name: "Balance Difference",
+
+            amount: difference
+
+        });
+
+
+        liabilityTotal += difference;
+
+    }
+
+
+    else if (assetTotal < liabilityTotal) {
+
+        const difference =
+            liabilityTotal - assetTotal;
+
+
+        assetRows.push({
+
+            type: "balance",
+
+            name: "Balance Difference",
+
+            amount: difference
+
+        });
+
+
+        assetTotal += difference;
+
+    }
+
+
+    /* =================================
+       TABLE ROWS
+    ================================= */
+
+    const maxRows =
+        Math.max(
+            liabilityRows.length,
+            assetRows.length
+        );
+
+
+    for (
+        let i = 0;
+        i < maxRows;
+        i++
+    ) {
+
+
+        const row =
+            document.createElement("tr");
+
+
+        let leftHTML = "";
+
+        let leftAmount = "";
+
+
+        let rightHTML = "";
+
+        let rightAmount = "";
+
+
+        /* =============================
+           LIABILITIES
+        ============================== */
+
+        if (liabilityRows[i]) {
+
+
+            if (
+                liabilityRows[i].type ===
+                "category"
+            ) {
+
+                leftHTML = `
+
+                    <span class="category">
+                        ${liabilityRows[i].name}
+                    </span>
+
+                `;
+
+            }
+
+            else {
+
+                leftHTML = `
+
+                    <span class="sub-point">
+                        ${liabilityRows[i].name}
+                    </span>
+
+                `;
+
+
+                leftAmount =
+                    "₹" +
+                    Number(
+                        liabilityRows[i].amount
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        /* =============================
+           ASSETS
+        ============================== */
+
+        if (assetRows[i]) {
+
+
+            if (
+                assetRows[i].type ===
+                "category"
+            ) {
+
+                rightHTML = `
+
+                    <span class="category">
+                        ${assetRows[i].name}
+                    </span>
+
+                `;
+
+            }
+
+            else {
+
+                rightHTML = `
+
+                    <span class="sub-point">
+                        ${assetRows[i].name}
+                    </span>
+
+                `;
+
+
+                rightAmount =
+                    "₹" +
+                    Number(
+                        assetRows[i].amount
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        row.innerHTML = `
+
+            <td>
+                ${leftHTML}
+            </td>
+
+            <td class="amount">
+                ${leftAmount}
+            </td>
+
+            <td>
+                ${rightHTML}
+            </td>
+
+            <td class="amount">
+                ${rightAmount}
+            </td>
+
+        `;
+
+
+        body.appendChild(row);
+
+    }
+
+
+    /* TOTALS */
+
+    document.getElementById(
+        "liabilityTotal"
+    ).innerText =
+        "₹" +
+        liabilityTotal.toFixed(2);
+
+
+    document.getElementById(
+        "assetTotal"
+    ).innerText =
+        "₹" +
+        assetTotal.toFixed(2);
+
+}
+
+
+/* =========================================
+   DOWNLOAD PDF
+========================================= */
+
+function downloadPDF() {
+
+
+    if (
+        !window.jspdf ||
+        !window.jspdf.jsPDF
+    ) {
+
+        alert(
+            "PDF library is not loaded."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const pdf =
+        new jsPDF(
+            "landscape",
+            "mm",
+            "a4"
+        );
+
+
+    /* HEADER */
+
+    pdf.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    pdf.setFontSize(18);
+
+    pdf.text(
+        "MY ACCOUNTING",
+        148,
+        14,
+        {
+            align: "center"
+        }
+    );
+
+
+    pdf.setFontSize(14);
+
+    pdf.text(
+        "Balance Sheet",
+        148,
+        22,
+        {
+            align: "center"
+        }
+    );
+
+
+    pdf.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    pdf.setFontSize(9);
+
+    pdf.text(
+        "As on 31-03-2027",
+        148,
+        29,
+        {
+            align: "center"
+        }
+    );
+
+
+    /* DATA */
+
+    const liabilityGroups =
+        groupByCategory(
+            liabilities
+        );
+
+
+    const assetGroups =
+        groupByCategory(
+            assets
+        );
+
+
+    let liabilityTotal =
+        getTotal(
+            liabilityGroups
+        );
+
+
+    let assetTotal =
+        getTotal(
+            assetGroups
+        );
+
+
+    let liabilityRows =
+        createRows(
+            liabilityGroups
+        );
+
+
+    let assetRows =
+        createRows(
+            assetGroups
+        );
+
+
+    /* BALANCE */
+
+    if (liabilityTotal < assetTotal) {
+
+        const difference =
+            assetTotal - liabilityTotal;
+
+
+        liabilityRows.push({
+
+            type: "balance",
+
+            name: "Balance Difference",
+
+            amount: difference
+
+        });
+
+
+        liabilityTotal += difference;
+
+    }
+
+
+    else if (assetTotal < liabilityTotal) {
+
+        const difference =
+            liabilityTotal - assetTotal;
+
+
+        assetRows.push({
+
+            type: "balance",
+
+            name: "Balance Difference",
+
+            amount: difference
+
+        });
+
+
+        assetTotal += difference;
+
+    }
+
+
+    const rows = [];
+
+
+    const maxRows =
+        Math.max(
+            liabilityRows.length,
+            assetRows.length
+        );
+
+
+    for (
+        let i = 0;
+        i < maxRows;
+        i++
+    ) {
+
+
+        let leftName = "";
+
+        let leftAmount = "";
+
+
+        let rightName = "";
+
+        let rightAmount = "";
+
+
+        if (liabilityRows[i]) {
+
+            leftName =
+                liabilityRows[i].type ===
+                "category"
+
+                    ? liabilityRows[i].name
+
+                    : "    " +
+                      liabilityRows[i].name;
+
+
+            if (
+                liabilityRows[i].type !==
+                "category"
+            ) {
+
+                leftAmount =
+                    "₹" +
+                    Number(
+                        liabilityRows[i].amount
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        if (assetRows[i]) {
+
+            rightName =
+                assetRows[i].type ===
+                "category"
+
+                    ? assetRows[i].name
+
+                    : "    " +
+                      assetRows[i].name;
+
+
+            if (
+                assetRows[i].type !==
+                "category"
+            ) {
+
+                rightAmount =
+                    "₹" +
+                    Number(
+                        assetRows[i].amount
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        rows.push([
+
+            leftName,
+
+            leftAmount,
+
+            rightName,
+
+            rightAmount
+
+        ]);
+
+    }
+
+
+    /* PDF TABLE */
+
+    pdf.autoTable({
+
+        startY: 35,
+
+        margin: {
+
+            left: 10,
+
+            right: 10
+
+        },
+
+        tableWidth: 277,
+
+
+        head: [[
+
+            "Liabilities",
+
+            "Amount",
+
+            "Assets",
+
+            "Amount"
+
+        ]],
+
+
+        body: rows,
+
+
+        foot: [[
+
+            "Total",
+
+            "₹" +
+            liabilityTotal.toFixed(2),
+
+            "Total",
+
+            "₹" +
+            assetTotal.toFixed(2)
+
+        ]],
+
+
+        theme: "grid",
+
+
+        styles: {
+
+            font: "helvetica",
+
+            fontSize: 9,
+
+            cellPadding: 3.5,
+
+            lineWidth: 0.3,
+
+            valign: "middle"
+
+        },
+
+
+        headStyles: {
+
+            fontStyle: "bold",
+
+            halign: "center"
+
+        },
+
+
+        footStyles: {
+
+            fontStyle: "bold"
+
+        },
+
+
+        columnStyles: {
+
+            0: {
+                cellWidth: 70
+            },
+
+            1: {
+                cellWidth: 35,
+                halign: "right"
+            },
+
+            2: {
+                cellWidth: 70
+            },
+
+            3: {
+                cellWidth: 35,
+                halign: "right"
+            }
+
+        }
+
+    });
+
+
+    pdf.save(
+        "Balance-Sheet-Tally-Format.pdf"
+    );
+
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+function goDashboard() {
+
+    window.location.href =
+        "dashboard.html";
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+showBalanceSheet();
+
+</script>
+
+
+</body>
+
+</html>

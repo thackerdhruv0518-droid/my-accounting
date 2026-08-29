@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>GPay Statement</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <h1>GPay Statement</h1>
+
+    <p>Upload your daily GPay PDF statement</p>
+
+    <input
+        type="file"
+        id="statementFile"
+        accept=".pdf,application/pdf"
+    >
+
+    <button onclick="uploadStatement()">
+        READ PDF
+    </button>
+
+    <p id="gpayMessage"></p>
+
+    <div id="transactionList"></div>
+
+    <button onclick="goDashboard()">
+        BACK TO DASHBOARD
+    </button>
+
+</div>
+
+
+<script>
+
+let gpayTransactions = [];
+
+
+/* =========================
+   PDF SETUP
+========================= */
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+/* =========================
+   UPLOAD PDF
+========================= */
+
+async function uploadStatement() {
+
+    const file =
+        document.getElementById("statementFile").files[0];
+
+    const message =
+        document.getElementById("gpayMessage");
+
+
+    if (!file) {
+
+        message.innerText =
+            "Please select a GPay PDF.";
+
+        return;
+    }
+
+
+    if (file.type !== "application/pdf") {
+
+        message.innerText =
+            "Please select PDF only.";
+
+        return;
+    }
+
+
+    message.innerText =
+        "Reading PDF...";
+
+
+    try {
+
+        const arrayBuffer =
+            await file.arrayBuffer();
+
+
+        const pdf =
+            await pdfjsLib.getDocument({
+                data: arrayBuffer
+            }).promise;
+
+
+        let completeText = "";
+
+
+        for (
+            let pageNumber = 1;
+            pageNumber <= pdf.numPages;
+            pageNumber++
+        ) {
+
+            const page =
+                await pdf.getPage(pageNumber);
+
+
+            const content =
+                await page.getTextContent();
+
+
+            const pageText =
+                content.items
+                    .map(item => item.str)
+                    .join(" ");
+
+
+            completeText +=
+                pageText + "\n";
+
+        }
+
+
+        console.log(completeText);
+
+
+        parseGPayText(completeText);
+
+
+    } catch (error) {
+
+        message.innerText =
+            "PDF reading error: " + error.message;
+
+    }
+
+}
+
+
+/* =========================
+   SAMPLE GPay PARSER
+========================= */
+
+function parseGPayText(text) {
+
+    /*
+       Sample parser.
+
+       Expected transaction pattern:
+
+       28-08-2026 Paid to Rahul 500
+
+       28-08-2026 Received from Amit 1000
+    */
+
+
+    const lines =
+        text
+            .split("\n")
+            .map(line => line.trim())
+            .filter(line => line !== "");
+
+
+    gpayTransactions = [];
+
+
+    lines.forEach(function(line, index) {
+
+        const dateMatch =
+            line.match(
+                /\b(\d{2}[-\/]\d{2}[-\/]\d{4})\b/
+            );
+
+
+        if (!dateMatch) {
+            return;
+        }
+
+
+        const date =
+            dateMatch[1];
+
+
+        const amountMatch =
+            line.match(
+                /(?:₹|Rs\.?|INR)?\s?([\d,]+(?:\.\d{1,2})?)/
+            );
+
+
+        if (!amountMatch) {
+            return;
+        }
+
+
+        const amount =
+            parseFloat(
+                amountMatch[1].replace(/,/g, "")
+            );
+
+
+        let type = "Expense";
+
+
+        if (
+            line.toLowerCase().includes("received") ||
+            line.toLowerCase().includes("credited") ||
+            line.toLowerCase().includes("credit")
+        ) {
+
+            type = "Income";
+
+        }
+
+
+        let description =
+            line
+                .replace(dateMatch[0], "")
+                .replace(amountMatch[0], "")
+                .trim();
+
+
+        if (description === "") {
+
+            description =
+                "GPay Transaction";
+
+        }
+
+
+        gpayTransactions.push({
+
+            id: index + 1,
+
+            date: date,
+
+            description: description,
+
+            amount: amount,
+
+            type: type,
+
+            category: ""
+
+        });
+
+    });
+
+
+    removeDuplicates();
+
+
+    showTransactions();
+
+
+    document.getElementById("gpayMessage").innerText =
+        gpayTransactions.length +
+        " transaction(s) found.";
+
+}
+
+
+/* =========================
+   DUPLICATE CHECK
+========================= */
+
+function removeDuplicates() {
+
+    const unique = [];
+
+    const seen = new Set();
+
+
+    gpayTransactions.forEach(function(transaction) {
+
+        const key =
+            transaction.date +
+            "|" +
+            transaction.description +
+            "|" +
+            transaction.amount +
+            "|" +
+            transaction.type;
+
+
+        if (!seen.has(key)) {
+
+            seen.add(key);
+
+            unique.push(transaction);
+
+        }
+
+    });
+
+
+    gpayTransactions = unique;
+
+}
+
+
+/* =========================
+   SHOW TRANSACTIONS
+========================= */
+
+function showTransactions() {
+
+    const list =
+        document.getElementById("transactionList");
+
+
+    list.innerHTML = "";
+
+
+    if (gpayTransactions.length === 0) {
+
+        list.innerHTML =
+            "<p>No transactions found.</p>";
+
+        return;
+    }
+
+
+    gpayTransactions.forEach(function(transaction) {
+
+        const box =
+            document.createElement("div");
+
+
+        box.style.border =
+            "1px solid #ddd";
+
+        box.style.padding =
+            "15px";
+
+        box.style.marginTop =
+            "10px";
+
+        box.style.background =
+            "white";
+
+        box.style.borderRadius =
+            "8px";
+
+
+        box.innerHTML = `
+
+            <strong>
+                ${transaction.description}
+            </strong>
+
+            <br><br>
+
+            Date:
+            ${transaction.date}
+
+            <br>
+
+            Type:
+            ${transaction.type}
+
+            <br>
+
+            Amount:
+            ₹${transaction.amount.toFixed(2)}
+
+            <br><br>
+
+            <select
+                onchange="
+                    setCategory(
+                        ${transaction.id},
+                        this.value
+                    )
+                "
+            >
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option value="Food">
+                    Food
+                </option>
+
+                <option value="Rent">
+                    Rent
+                </option>
+
+                <option value="Travel">
+                    Travel
+                </option>
+
+                <option value="Shopping">
+                    Shopping
+                </option>
+
+                <option value="Salary">
+                    Salary
+                </option>
+
+                <option value="Office Expense">
+                    Office Expense
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <button
+                onclick="
+                    deleteTransaction(
+                        ${transaction.id}
+                    )
+                "
+            >
+                DELETE
+            </button>
+
+        `;
+
+
+        list.appendChild(box);
+
+    });
+
+}
+
+
+/* =========================
+   CATEGORY
+========================= */
+
+function setCategory(id, category) {
+
+    const transaction =
+        gpayTransactions.find(
+            item => item.id === id
+        );
+
+
+    if (transaction) {
+
+        transaction.category =
+            category;
+
+    }
+
+}
+
+
+/* =========================
+   DELETE DUPLICATE / TRANSACTION
+========================= */
+
+function deleteTransaction(id) {
+
+    gpayTransactions =
+        gpayTransactions.filter(
+            item => item.id !== id
+        );
+
+
+    showTransactions();
+
+
+    document.getElementById("gpayMessage").innerText =
+        "Transaction deleted.";
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function goDashboard() {
+
+    window.location.href =
+        "dashboard.html";
+
+}
+
+</script>
+
+</body>
+
+</html>

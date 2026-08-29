@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Trial Balance</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
+    <!-- PDF -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+
+
+
+<body>
+
+
+<div class="tally-report">
+
+
+    <!-- HEADER -->
+
+    <div class="report-header">
+
+        <h1>MY ACCOUNTING</h1>
+
+        <h2>Trial Balance</h2>
+
+        <p>
+            All Transactions
+        </p>
+
+    </div>
+
+
+
+    <!-- TRIAL BALANCE TABLE -->
+
+    <table class="pnl-table">
+
+
+        <colgroup>
+
+            <col class="debit-particular">
+
+            <col class="debit-amount">
+
+            <col class="credit-particular">
+
+            <col class="credit-amount">
+
+        </colgroup>
+
+
+
+        <thead>
+
+
+            <tr>
+
+                <th colspan="2">
+                    Debit (Dr.)
+                </th>
+
+                <th colspan="2">
+                    Credit (Cr.)
+                </th>
+
+            </tr>
+
+
+
+            <tr>
+
+                <th>
+                    Particulars
+                </th>
+
+                <th>
+                    Amount
+                </th>
+
+                <th>
+                    Particulars
+                </th>
+
+                <th>
+                    Amount
+                </th>
+
+            </tr>
+
+
+        </thead>
+
+
+
+        <tbody id="trialBody">
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Loading...
+                </td>
+
+            </tr>
+
+        </tbody>
+
+
+
+        <tfoot>
+
+            <tr>
+
+                <th>
+                    Total
+                </th>
+
+                <th
+                    id="debitTotal"
+                    class="amount"
+                >
+                    ₹0.00
+                </th>
+
+                <th>
+                    Total
+                </th>
+
+                <th
+                    id="creditTotal"
+                    class="amount"
+                >
+                    ₹0.00
+                </th>
+
+            </tr>
+
+        </tfoot>
+
+
+    </table>
+
+
+
+    <!-- BUTTONS -->
+
+    <div class="report-buttons">
+
+
+        <button onclick="downloadPDF()">
+
+            DOWNLOAD PDF
+
+        </button>
+
+
+
+        <button onclick="goDashboard()">
+
+            BACK TO DASHBOARD
+
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+/* =========================================
+   FORMAT MONEY
+========================================= */
+
+function formatMoney(amount) {
+
+
+    return (
+
+        "₹" +
+
+        Number(amount || 0)
+            .toFixed(2)
+
+    );
+
+
+}
+
+
+
+/* =========================================
+   GROUP ACCOUNTS
+========================================= */
+
+function groupAccounts(transactions) {
+
+
+    const accounts = {};
+
+
+    transactions.forEach(function(transaction) {
+
+
+        const accountName =
+
+            transaction.sub_category ||
+
+            transaction.category ||
+
+            "Uncategorized";
+
+
+        if (!accounts[accountName]) {
+
+
+            accounts[accountName] = {
+
+                debit: 0,
+
+                credit: 0
+
+            };
+
+        }
+
+
+        const amount =
+
+            Number(transaction.amount) ||
+
+            0;
+
+
+        if (
+
+            transaction.entry_type ===
+            "debit"
+
+        ) {
+
+
+            accounts[accountName].debit +=
+
+                amount;
+
+        }
+
+
+        else if (
+
+            transaction.entry_type ===
+            "credit"
+
+        ) {
+
+
+            accounts[accountName].credit +=
+
+                amount;
+
+        }
+
+
+    });
+
+
+    return accounts;
+
+
+}
+
+
+
+/* =========================================
+   OPEN LEDGER
+========================================= */
+
+function openLedger(accountName) {
+
+
+    window.location.href =
+
+        "ledger.html?account=" +
+
+        encodeURIComponent(
+            accountName
+        );
+
+
+}
+
+
+
+/* =========================================
+   LOAD TRIAL BALANCE
+========================================= */
+
+async function loadTrialBalance() {
+
+
+    const body =
+
+        document.getElementById(
+            "trialBody"
+        );
+
+
+    body.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="4"
+                style="text-align:center;"
+            >
+                Loading...
+            </td>
+
+        </tr>
+
+    `;
+
+
+    const {
+
+        data,
+
+        error
+
+    } = await supabaseClient
+
+        .from("transactions")
+
+        .select("*")
+
+        .order(
+            "transaction_date",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+
+        console.error(error);
+
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Error loading Trial Balance
+                </td>
+
+            </tr>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    if (
+
+        !data ||
+
+        data.length === 0
+
+    ) {
+
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    No transactions found
+                </td>
+
+            </tr>
+
+        `;
+
+
+        document.getElementById(
+            "debitTotal"
+        ).innerText = "₹0.00";
+
+
+        document.getElementById(
+            "creditTotal"
+        ).innerText = "₹0.00";
+
+
+        return;
+
+    }
+
+
+
+    /* =====================================
+       GROUP TRANSACTIONS BY ACCOUNT
+    ===================================== */
+
+    const accounts =
+
+        groupAccounts(
+            data
+        );
+
+
+
+    /* =====================================
+       SEPARATE DEBIT AND CREDIT
+    ===================================== */
+
+    const debitRows = [];
+
+    const creditRows = [];
+
+
+    Object.keys(accounts)
+
+        .sort()
+
+        .forEach(function(accountName) {
+
+
+            const account =
+
+                accounts[
+                    accountName
+                ];
+
+
+            const balance =
+
+                account.debit -
+
+                account.credit;
+
+
+
+            /* =============================
+               DEBIT BALANCE
+            ============================= */
+
+            if (balance > 0) {
+
+
+                debitRows.push({
+
+                    name:
+
+                        accountName,
+
+                    amount:
+
+                        balance
+
+                });
+
+            }
+
+
+
+            /* =============================
+               CREDIT BALANCE
+            ============================= */
+
+            else if (balance < 0) {
+
+
+                creditRows.push({
+
+                    name:
+
+                        accountName,
+
+                    amount:
+
+                        Math.abs(
+                            balance
+                        )
+
+                });
+
+            }
+
+
+        });
+
+
+
+    /* =====================================
+       TOTALS
+    ===================================== */
+
+    let debitTotal = 0;
+
+    let creditTotal = 0;
+
+
+    debitRows.forEach(
+        function(account) {
+
+
+            debitTotal +=
+
+                Number(
+                    account.amount
+                );
+
+
+        }
+    );
+
+
+    creditRows.forEach(
+        function(account) {
+
+
+            creditTotal +=
+
+                Number(
+                    account.amount
+                );
+
+
+        }
+    );
+
+
+
+    /* =====================================
+       CLEAR TABLE
+    ===================================== */
+
+    body.innerHTML = "";
+
+
+
+    /* =====================================
+       CREATE TABLE ROWS
+    ===================================== */
+
+    const maxRows =
+
+        Math.max(
+
+            debitRows.length,
+
+            creditRows.length
+
+        );
+
+
+    for (
+
+        let i = 0;
+
+        i < maxRows;
+
+        i++
+
+    ) {
+
+
+        const row =
+
+            document.createElement(
+                "tr"
+            );
+
+
+        let debitName = "";
+
+        let debitAmount = "";
+
+
+        let creditName = "";
+
+        let creditAmount = "";
+
+
+        /* =============================
+           DEBIT
+        ============================= */
+
+        if (debitRows[i]) {
+
+
+            const name =
+
+                debitRows[i].name;
+
+
+            debitName = `
+
+                <span
+                    class="sub-point ledger-link"
+                    data-account="${encodeURIComponent(name)}"
+                >
+
+                    ${name}
+
+                </span>
+
+            `;
+
+
+            debitAmount =
+
+                formatMoney(
+
+                    debitRows[i].amount
+
+                );
+
+
+        }
+
+
+
+        /* =============================
+           CREDIT
+        ============================= */
+
+        if (creditRows[i]) {
+
+
+            const name =
+
+                creditRows[i].name;
+
+
+            creditName = `
+
+                <span
+                    class="sub-point ledger-link"
+                    data-account="${encodeURIComponent(name)}"
+                >
+
+                    ${name}
+
+                </span>
+
+            `;
+
+
+            creditAmount =
+
+                formatMoney(
+
+                    creditRows[i].amount
+
+                );
+
+
+        }
+
+
+
+        row.innerHTML = `
+
+
+            <td>
+
+                ${debitName}
+
+            </td>
+
+
+            <td class="amount">
+
+                ${debitAmount}
+
+            </td>
+
+
+            <td>
+
+                ${creditName}
+
+            </td>
+
+
+            <td class="amount">
+
+                ${creditAmount}
+
+            </td>
+
+
+        `;
+
+
+        body.appendChild(
+            row
+        );
+
+
+    }
+
+
+
+    /* =====================================
+       TOTALS SHOW
+    ===================================== */
+
+    document.getElementById(
+        "debitTotal"
+    ).innerText =
+
+        formatMoney(
+            debitTotal
+        );
+
+
+    document.getElementById(
+        "creditTotal"
+    ).innerText =
+
+        formatMoney(
+            creditTotal
+        );
+
+
+
+    /* =====================================
+       MAKE LEDGER CLICKABLE
+    ===================================== */
+
+    document
+
+        .querySelectorAll(
+            ".ledger-link"
+        )
+
+        .forEach(
+            function(item) {
+
+
+                item.addEventListener(
+
+                    "click",
+
+                    function() {
+
+
+                        const accountName =
+
+                            decodeURIComponent(
+
+                                this.dataset.account
+
+                            );
+
+
+                        openLedger(
+                            accountName
+                        );
+
+
+                    }
+
+                );
+
+
+            }
+
+        );
+
+
+}
+
+
+
+/* =========================================
+   DOWNLOAD PDF
+========================================= */
+
+async function downloadPDF() {
+
+
+    if (
+
+        !window.jspdf ||
+
+        !window.jspdf.jsPDF
+
+    ) {
+
+
+        alert(
+            "PDF library is not loaded."
+        );
+
+
+        return;
+
+    }
+
+
+
+    const {
+
+        jsPDF
+
+    } = window.jspdf;
+
+
+
+    const pdf =
+
+        new jsPDF(
+
+            "landscape",
+
+            "mm",
+
+            "a4"
+
+        );
+
+
+
+    /* HEADER */
+
+
+    pdf.setFont(
+
+        "helvetica",
+
+        "bold"
+
+    );
+
+
+    pdf.setFontSize(18);
+
+
+    pdf.text(
+
+        "MY ACCOUNTING",
+
+        148,
+
+        14,
+
+        {
+
+            align: "center"
+
+        }
+
+    );
+
+
+
+    pdf.setFontSize(14);
+
+
+    pdf.text(
+
+        "Trial Balance",
+
+        148,
+
+        22,
+
+        {
+
+            align: "center"
+
+        }
+
+    );
+
+
+
+    pdf.setFont(
+
+        "helvetica",
+
+        "normal"
+
+    );
+
+
+    pdf.setFontSize(9);
+
+
+    pdf.text(
+
+        "All Transactions",
+
+        148,
+
+        29,
+
+        {
+
+            align: "center"
+
+        }
+
+    );
+
+
+
+    /* GET DATA AGAIN */
+
+
+    const {
+
+        data,
+
+        error
+
+    } = await supabaseClient
+
+        .from("transactions")
+
+        .select("*");
+
+
+    if (error) {
+
+
+        alert(
+            "Error loading data for PDF"
+        );
+
+
+        return;
+
+    }
+
+
+
+    const accounts =
+
+        groupAccounts(
+            data || []
+        );
+
+
+    const debitRows = [];
+
+    const creditRows = [];
+
+
+    Object.keys(accounts)
+
+        .sort()
+
+        .forEach(function(accountName) {
+
+
+            const account =
+
+                accounts[
+                    accountName
+                ];
+
+
+            const balance =
+
+                account.debit -
+
+                account.credit;
+
+
+            if (balance > 0) {
+
+
+                debitRows.push({
+
+                    name:
+
+                        accountName,
+
+                    amount:
+
+                        balance
+
+                });
+
+            }
+
+
+            else if (balance < 0) {
+
+
+                creditRows.push({
+
+                    name:
+
+                        accountName,
+
+                    amount:
+
+                        Math.abs(
+                            balance
+                        )
+
+                });
+
+            }
+
+
+        });
+
+
+
+    let debitTotal = 0;
+
+    let creditTotal = 0;
+
+
+    debitRows.forEach(
+        function(item) {
+
+
+            debitTotal +=
+
+                Number(
+                    item.amount
+                );
+
+
+        }
+    );
+
+
+    creditRows.forEach(
+        function(item) {
+
+
+            creditTotal +=
+
+                Number(
+                    item.amount
+                );
+
+
+        }
+    );
+
+
+
+    const rows = [];
+
+
+    const maxRows =
+
+        Math.max(
+
+            debitRows.length,
+
+            creditRows.length
+
+        );
+
+
+    for (
+
+        let i = 0;
+
+        i < maxRows;
+
+        i++
+
+    ) {
+
+
+        rows.push([
+
+
+            debitRows[i]
+
+                ? debitRows[i].name
+
+                : "",
+
+
+            debitRows[i]
+
+                ? formatMoney(
+                    debitRows[i].amount
+                )
+
+                : "",
+
+
+            creditRows[i]
+
+                ? creditRows[i].name
+
+                : "",
+
+
+            creditRows[i]
+
+                ? formatMoney(
+                    creditRows[i].amount
+                )
+
+                : ""
+
+
+        ]);
+
+
+    }
+
+
+
+    pdf.autoTable({
+
+
+        startY: 35,
+
+
+        margin: {
+
+            left: 10,
+
+            right: 10
+
+        },
+
+
+        tableWidth: 277,
+
+
+        head: [[
+
+            "Debit Particulars",
+
+            "Amount",
+
+            "Credit Particulars",
+
+            "Amount"
+
+        ]],
+
+
+        body:
+
+            rows,
+
+
+        foot: [[
+
+            "Total",
+
+            formatMoney(
+                debitTotal
+            ),
+
+            "Total",
+
+            formatMoney(
+                creditTotal
+            )
+
+        ]],
+
+
+        theme:
+
+            "grid",
+
+
+        styles: {
+
+            font:
+
+                "helvetica",
+
+            fontSize:
+
+                9,
+
+            cellPadding:
+
+                3.5,
+
+            lineWidth:
+
+                0.3,
+
+            valign:
+
+                "middle"
+
+        },
+
+
+        headStyles: {
+
+            fontStyle:
+
+                "bold",
+
+            halign:
+
+                "center"
+
+        },
+
+
+        footStyles: {
+
+            fontStyle:
+
+                "bold"
+
+        },
+
+
+        columnStyles: {
+
+
+            0: {
+
+                cellWidth:
+
+                    70
+
+            },
+
+
+            1: {
+
+                cellWidth:
+
+                    35,
+
+                halign:
+
+                    "right"
+
+            },
+
+
+            2: {
+
+                cellWidth:
+
+                    70
+
+            },
+
+
+            3: {
+
+                cellWidth:
+
+                    35,
+
+                halign:
+
+                    "right"
+
+            }
+
+
+        }
+
+
+    });
+
+
+
+    pdf.save(
+
+        "Trial-Balance.pdf"
+
+    );
+
+
+}
+
+
+
+/* =========================================
+   BACK TO DASHBOARD
+========================================= */
+
+function goDashboard() {
+
+
+    window.location.href =
+
+        "dashboard.html";
+
+
+}
+
+
+
+/* =========================================
+   START
+========================================= */
+
+loadTrialBalance();
+
+
+</script>
+
+
+</body>
+
+</html>

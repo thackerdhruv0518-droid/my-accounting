@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profit & Loss Account</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+
+
+<body>
+
+
+<div class="tally-report">
+
+
+    <div class="report-header">
+
+        <h1>MY ACCOUNTING</h1>
+
+        <h2>Profit &amp; Loss A/c</h2>
+
+        <p>
+            From 01-04-2026 To 31-03-2027
+        </p>
+
+    </div>
+
+
+    <table class="pnl-table">
+
+        <colgroup>
+
+            <col class="debit-particular">
+            <col class="debit-amount">
+
+            <col class="credit-particular">
+            <col class="credit-amount">
+
+        </colgroup>
+
+
+        <thead>
+
+            <tr>
+
+                <th colspan="2">
+                    Dr.
+                </th>
+
+                <th colspan="2">
+                    Cr.
+                </th>
+
+            </tr>
+
+
+            <tr>
+
+                <th>Particulars</th>
+                <th>Amount</th>
+
+                <th>Particulars</th>
+                <th>Amount</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="pnlBody">
+
+        </tbody>
+
+
+        <tfoot>
+
+            <tr>
+
+                <th>
+                    Total
+                </th>
+
+                <th
+                    id="debitTotal"
+                    class="amount"
+                >
+                    ₹0.00
+                </th>
+
+
+                <th>
+                    Total
+                </th>
+
+                <th
+                    id="creditTotal"
+                    class="amount"
+                >
+                    ₹0.00
+                </th>
+
+            </tr>
+
+        </tfoot>
+
+    </table>
+
+
+    <div class="report-buttons">
+
+        <button onclick="downloadPDF()">
+            DOWNLOAD PDF
+        </button>
+
+        <button onclick="goDashboard()">
+            BACK TO DASHBOARD
+        </button>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================
+   GLOBAL DATA
+========================================= */
+
+let debitAccounts = [];
+
+let creditAccounts = [];
+
+
+/* =========================================
+   LOAD TRANSACTIONS FROM SUPABASE
+========================================= */
+
+async function loadTransactions() {
+
+
+    const body =
+        document.getElementById(
+            "pnlBody"
+        );
+
+
+    body.innerHTML = `
+
+        <tr>
+
+            <td colspan="4"
+                style="text-align:center;"
+            >
+                Loading...
+            </td>
+
+        </tr>
+
+    `;
+
+
+    const {
+
+        data,
+
+        error
+
+    } = await supabaseClient
+
+        .from("transactions")
+
+        .select("*")
+
+        .order(
+            "transaction_date",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="4"
+                    style="text-align:center;"
+                >
+                    Error loading transactions
+                </td>
+
+            </tr>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    debitAccounts = [];
+
+    creditAccounts = [];
+
+
+    data.forEach(
+        function(transaction) {
+
+
+            const account = {
+
+                category:
+                    transaction.category,
+
+                name:
+                    transaction.sub_category ||
+                    transaction.description,
+
+                amount:
+                    Number(
+                        transaction.amount
+                    )
+
+            };
+
+
+            /* DEBIT */
+
+            if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+                debitAccounts.push(
+                    account
+                );
+
+            }
+
+
+            /* CREDIT */
+
+            else if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+                creditAccounts.push(
+                    account
+                );
+
+            }
+
+
+        }
+    );
+
+
+    showPNL();
+
+}
+
+
+/* =========================================
+   GROUP BY CATEGORY
+========================================= */
+
+function groupByCategory(accounts) {
+
+
+    const groups = [];
+
+
+    accounts.forEach(
+        function(account) {
+
+
+            let existing =
+                groups.find(
+                    function(group) {
+
+                        return (
+                            group.category ===
+                            account.category
+                        );
+
+                    }
+                );
+
+
+            if (!existing) {
+
+                existing = {
+
+                    category:
+                        account.category,
+
+                    items: []
+
+                };
+
+
+                groups.push(
+                    existing
+                );
+
+            }
+
+
+            existing.items.push({
+
+                name:
+                    account.name,
+
+                amount:
+                    Number(
+                        account.amount
+                    )
+
+            });
+
+        }
+    );
+
+
+    return groups;
+
+}
+
+
+/* =========================================
+   TOTAL
+========================================= */
+
+function getTotal(groups) {
+
+
+    let total = 0;
+
+
+    groups.forEach(
+        function(group) {
+
+
+            group.items.forEach(
+                function(item) {
+
+                    total +=
+                        Number(
+                            item.amount
+                        );
+
+                }
+            );
+
+        }
+    );
+
+
+    return total;
+
+}
+
+
+/* =========================================
+   CREATE ROWS
+========================================= */
+
+function createRows(groups) {
+
+
+    const rows = [];
+
+
+    groups.forEach(
+        function(group) {
+
+
+            /* CATEGORY */
+
+            rows.push({
+
+                type:
+                    "category",
+
+                name:
+                    group.category,
+
+                amount:
+                    ""
+
+            });
+
+
+            /* SUB CATEGORY */
+
+            group.items.forEach(
+                function(item) {
+
+
+                    rows.push({
+
+                        type:
+                            "item",
+
+                        name:
+                            item.name,
+
+                        amount:
+                            Number(
+                                item.amount
+                            )
+
+                    });
+
+                }
+            );
+
+        }
+    );
+
+
+    return rows;
+
+}
+
+
+/* =========================================
+   SHOW P&L
+========================================= */
+
+function showPNL() {
+
+
+    const body =
+        document.getElementById(
+            "pnlBody"
+        );
+
+
+    body.innerHTML = "";
+
+
+    const debitGroups =
+        groupByCategory(
+            debitAccounts
+        );
+
+
+    const creditGroups =
+        groupByCategory(
+            creditAccounts
+        );
+
+
+    let debitTotal =
+        getTotal(
+            debitGroups
+        );
+
+
+    let creditTotal =
+        getTotal(
+            creditGroups
+        );
+
+
+    let debitRows =
+        createRows(
+            debitGroups
+        );
+
+
+    let creditRows =
+        createRows(
+            creditGroups
+        );
+
+
+    /* =====================================
+       NET PROFIT
+    ===================================== */
+
+    if (
+        creditTotal >
+        debitTotal
+    ) {
+
+
+        const netProfit =
+            creditTotal -
+            debitTotal;
+
+
+        debitRows.push({
+
+            type:
+                "profit",
+
+            name:
+                "Net Profit",
+
+            amount:
+                netProfit
+
+        });
+
+
+        debitTotal +=
+            netProfit;
+
+    }
+
+
+    /* =====================================
+       NET LOSS
+    ===================================== */
+
+    else if (
+        debitTotal >
+        creditTotal
+    ) {
+
+
+        const netLoss =
+            debitTotal -
+            creditTotal;
+
+
+        creditRows.push({
+
+            type:
+                "loss",
+
+            name:
+                "Net Loss",
+
+            amount:
+                netLoss
+
+        });
+
+
+        creditTotal +=
+            netLoss;
+
+    }
+
+
+    /* =====================================
+       NO DATA
+    ===================================== */
+
+    if (
+        debitRows.length === 0 &&
+        creditRows.length === 0
+    ) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="4"
+                    style="text-align:center;"
+                >
+                    No transactions found
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    /* =====================================
+       CREATE TABLE
+    ===================================== */
+
+    const maxRows =
+        Math.max(
+
+            debitRows.length,
+
+            creditRows.length
+
+        );
+
+
+    for (
+        let i = 0;
+
+        i < maxRows;
+
+        i++
+    ) {
+
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        let debitHTML = "";
+
+        let debitAmount = "";
+
+
+        let creditHTML = "";
+
+        let creditAmount = "";
+
+
+        /* DEBIT */
+
+        if (
+            debitRows[i]
+        ) {
+
+
+            if (
+                debitRows[i].type ===
+                "category"
+            ) {
+
+
+                debitHTML = `
+
+                    <span class="category">
+
+                        ${debitRows[i].name}
+
+                    </span>
+
+                `;
+
+            }
+
+
+            else {
+
+
+                debitHTML = `
+
+                    <span class="sub-point">
+
+                        ${debitRows[i].name}
+
+                    </span>
+
+                `;
+
+
+                debitAmount =
+                    "₹" +
+                    Number(
+                        debitRows[i].amount
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        /* CREDIT */
+
+        if (
+            creditRows[i]
+        ) {
+
+
+            if (
+                creditRows[i].type ===
+                "category"
+            ) {
+
+
+                creditHTML = `
+
+                    <span class="category">
+
+                        ${creditRows[i].name}
+
+                    </span>
+
+                `;
+
+            }
+
+
+            else {
+
+
+                creditHTML = `
+
+                    <span class="sub-point">
+
+                        ${creditRows[i].name}
+
+                    </span>
+
+                `;
+
+
+                creditAmount =
+                    "₹" +
+                    Number(
+                        creditRows[i].amount
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        row.innerHTML = `
+
+            <td>
+                ${debitHTML}
+            </td>
+
+
+            <td class="amount">
+                ${debitAmount}
+            </td>
+
+
+            <td>
+                ${creditHTML}
+            </td>
+
+
+            <td class="amount">
+                ${creditAmount}
+            </td>
+
+        `;
+
+
+        body.appendChild(
+            row
+        );
+
+    }
+
+
+    /* TOTAL */
+
+    document.getElementById(
+        "debitTotal"
+    ).innerText =
+
+        "₹" +
+        debitTotal.toFixed(2);
+
+
+    document.getElementById(
+        "creditTotal"
+    ).innerText =
+
+        "₹" +
+        creditTotal.toFixed(2);
+
+}
+
+
+/* =========================================
+   PDF DOWNLOAD
+========================================= */
+
+function downloadPDF() {
+
+
+    const {
+
+        jsPDF
+
+    } = window.jspdf;
+
+
+    const pdf =
+        new jsPDF(
+            "landscape",
+            "mm",
+            "a4"
+        );
+
+
+    pdf.setFontSize(18);
+
+    pdf.text(
+        "MY ACCOUNTING",
+        148,
+        15,
+        {
+            align:
+                "center"
+        }
+    );
+
+
+    pdf.setFontSize(14);
+
+    pdf.text(
+        "Profit & Loss A/c",
+        148,
+        23,
+        {
+            align:
+                "center"
+        }
+    );
+
+
+    const table =
+        document.querySelector(
+            ".pnl-table"
+        );
+
+
+    pdf.autoTable({
+
+        html:
+            table,
+
+        startY:
+            30,
+
+        theme:
+            "grid",
+
+        styles: {
+
+            fontSize:
+                8
+
+        }
+
+    });
+
+
+    pdf.save(
+        "Profit-Loss-Account.pdf"
+    );
+
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+function goDashboard() {
+
+    window.location.href =
+        "dashboard.html";
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadTransactions();
+
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>My Accounting - Dashboard</title>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+
+<!-- DASHBOARD ONLY CSS -->
+
+<style>
+
+
+    * {
+        box-sizing: border-box;
+    }
+
+
+    body {
+
+        margin: 0;
+
+        padding: 0;
+
+        font-family:
+            Arial,
+            sans-serif;
+
+        background:
+            #f4f6f9;
+
+        color:
+            #222;
+
+    }
+
+
+
+    /* =====================================
+       MAIN DASHBOARD
+    ===================================== */
+
+    .dashboard-page {
+
+        max-width:
+            1200px;
+
+        margin:
+            auto;
+
+        padding:
+            25px;
+
+    }
+
+
+
+    /* =====================================
+       HEADER
+    ===================================== */
+
+    .dashboard-header {
+
+        background:
+            #ffffff;
+
+        padding:
+            25px;
+
+        border-radius:
+            12px;
+
+        margin-bottom:
+            25px;
+
+        box-shadow:
+            0 2px 10px
+            rgba(0, 0, 0, 0.08);
+
+    }
+
+
+    .dashboard-header h1 {
+
+        margin:
+            0;
+
+        font-size:
+            28px;
+
+    }
+
+
+    .dashboard-header p {
+
+        margin:
+            8px 0 0;
+
+        color:
+            #666;
+
+    }
+
+
+
+    /* =====================================
+       SUMMARY CARDS
+    ===================================== */
+
+    .summary-grid {
+
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                4,
+                1fr
+            );
+
+        gap:
+            20px;
+
+        margin-bottom:
+            25px;
+
+    }
+
+
+    .summary-card {
+
+        background:
+            white;
+
+        padding:
+            20px;
+
+        border-radius:
+            12px;
+
+        box-shadow:
+            0 2px 10px
+            rgba(0, 0, 0, 0.08);
+
+        border-left:
+            5px solid
+            #333;
+
+    }
+
+
+    .summary-card h3 {
+
+        margin:
+            0 0 12px;
+
+        font-size:
+            14px;
+
+        color:
+            #666;
+
+    }
+
+
+    .summary-card p {
+
+        margin:
+            0;
+
+        font-size:
+            22px;
+
+        font-weight:
+            bold;
+
+    }
+
+
+
+    /* =====================================
+       QUICK ACTIONS
+    ===================================== */
+
+    .quick-actions {
+
+        background:
+            white;
+
+        padding:
+            25px;
+
+        border-radius:
+            12px;
+
+        margin-bottom:
+            25px;
+
+        box-shadow:
+            0 2px 10px
+            rgba(0, 0, 0, 0.08);
+
+    }
+
+
+    .section-title {
+
+        margin:
+            0 0 20px;
+
+        font-size:
+            20px;
+
+    }
+
+
+    .action-grid {
+
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                3,
+                1fr
+            );
+
+        gap:
+            15px;
+
+    }
+
+
+    .action-button {
+
+        border:
+            none;
+
+        padding:
+            16px;
+
+        font-size:
+            15px;
+
+        font-weight:
+            bold;
+
+        cursor:
+            pointer;
+
+        background:
+            #222;
+
+        color:
+            white;
+
+        border-radius:
+            8px;
+
+        transition:
+            0.2s;
+
+    }
+
+
+    .action-button:hover {
+
+        transform:
+            translateY(-2px);
+
+        background:
+            #000;
+
+    }
+
+
+
+    /* =====================================
+       RECENT TRANSACTIONS
+    ===================================== */
+
+    .recent-box {
+
+        background:
+            white;
+
+        padding:
+            25px;
+
+        border-radius:
+            12px;
+
+        box-shadow:
+            0 2px 10px
+            rgba(0, 0, 0, 0.08);
+
+        overflow-x:
+            auto;
+
+    }
+
+
+    .recent-table {
+
+        width:
+            100%;
+
+        border-collapse:
+            collapse;
+
+    }
+
+
+    .recent-table th {
+
+        text-align:
+            left;
+
+        padding:
+            14px;
+
+        background:
+            #222;
+
+        color:
+            white;
+
+    }
+
+
+    .recent-table td {
+
+        padding:
+            14px;
+
+        border-bottom:
+            1px solid
+            #eee;
+
+    }
+
+
+    .recent-table tr:hover {
+
+        background:
+            #f7f7f7;
+
+    }
+
+
+    .amount {
+
+        text-align:
+            right;
+
+        font-weight:
+            bold;
+
+    }
+
+
+
+    /* =====================================
+       MOBILE
+    ===================================== */
+
+    @media (
+        max-width:
+        900px
+    ) {
+
+        .summary-grid {
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    1fr
+                );
+
+        }
+
+
+        .action-grid {
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    1fr
+                );
+
+        }
+
+    }
+
+
+
+    @media (
+        max-width:
+        600px
+    ) {
+
+        .dashboard-page {
+
+            padding:
+                15px;
+
+        }
+
+
+        .summary-grid {
+
+            grid-template-columns:
+                1fr;
+
+        }
+
+
+        .action-grid {
+
+            grid-template-columns:
+                1fr;
+
+        }
+
+
+        .dashboard-header h1 {
+
+            font-size:
+                23px;
+
+        }
+
+    }
+
+
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+```
+<!-- HEADER -->
+
+<div class="dashboard-header">
+
+    <h1>
+        MY ACCOUNTING
+    </h1>
+
+    <p>
+        Personal Accounting Dashboard
+    </p>
+
+</div>
+
+
+
+<!-- SUMMARY -->
+
+<div class="summary-grid">
+
+
+    <div class="summary-card">
+
+        <h3>
+            TOTAL INCOME
+        </h3>
+
+        <p id="totalIncome">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+
+    <div class="summary-card">
+
+        <h3>
+            TOTAL EXPENSE
+        </h3>
+
+        <p id="totalExpense">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+
+    <div class="summary-card">
+
+        <h3>
+            NET PROFIT / LOSS
+        </h3>
+
+        <p id="netProfit">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+
+    <div class="summary-card">
+
+        <h3>
+            TOTAL TRANSACTIONS
+        </h3>
+
+        <p id="totalTransactions">
+            0
+        </p>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- QUICK ACTIONS -->
+
+<div class="quick-actions">
+
+
+    <h2 class="section-title">
+        Quick Actions
+    </h2>
+
+
+    <div class="action-grid">
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('add-transaction.html')"
+        >
+            ADD TRANSACTION
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('trial-balance.html')"
+        >
+            TRIAL BALANCE
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('balance-sheet.html')"
+        >
+            BALANCE SHEET
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('profit-loss.html')"
+        >
+            PROFIT & LOSS
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('add-category.html')"
+        >
+            ADD CATEGORY
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('gpay-statement.html')"
+        >
+            GPAY STATEMENT
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('ledger.html')"
+        >
+            LEDGER
+        </button>
+
+
+        <!-- NEW REPORT BUTTON -->
+
+        <button
+            class="action-button"
+            onclick="goToPage('reports.html')"
+        >
+            REPORTS
+        </button>
+
+
+
+        <button
+            class="action-button"
+            onclick="goToPage('settings.html')"
+        >
+            SETTINGS
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- RECENT TRANSACTIONS -->
+
+<div class="recent-box">
+
+
+    <h2 class="section-title">
+        Recent Transactions
+    </h2>
+
+
+    <table class="recent-table">
+
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Date
+                </th>
+
+                <th>
+                    Particulars
+                </th>
+
+                <th>
+                    Category
+                </th>
+
+                <th
+                    style="text-align:right;"
+                >
+                    Amount
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+
+        <tbody
+            id="recentTransactions"
+        >
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Loading...
+                </td>
+
+            </tr>
+
+        </tbody>
+
+
+    </table>
+
+
+</div>
+```
+
+</div>
+
+<script>
+
+
+/* =====================================
+   FORMAT AMOUNT
+===================================== */
+
+function formatAmount(amount) {
+
+    return (
+        "₹" +
+        Number(amount || 0)
+            .toFixed(2)
+    );
+
+}
+
+
+
+/* =====================================
+   OPEN PAGE
+===================================== */
+
+function goToPage(page) {
+
+    window.location.href =
+        page;
+
+}
+
+
+
+/* =====================================
+   LOAD DASHBOARD
+===================================== */
+
+async function loadDashboard() {
+
+
+    const recentBody =
+        document.getElementById(
+            "recentTransactions"
+        );
+
+
+    try {
+
+
+        const {
+
+            data,
+
+            error
+
+        } = await supabaseClient
+
+            .from("transactions")
+
+            .select("*")
+
+            .order(
+                "transaction_date",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+
+
+            console.error(
+                "Dashboard Error:",
+                error
+            );
+
+
+            recentBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        style="text-align:center;"
+                    >
+                        Error loading transactions
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            return;
+
+        }
+
+
+
+        const transactions =
+            data || [];
+
+
+        let totalIncome =
+            0;
+
+
+        let totalExpense =
+            0;
+
+
+
+        /* CALCULATE TOTALS */
+
+        transactions.forEach(
+            function(transaction) {
+
+
+                const amount =
+                    Number(
+                        transaction.amount
+                    ) || 0;
+
+
+
+                if (
+                    transaction.entry_type ===
+                    "credit"
+                ) {
+
+                    totalIncome +=
+                        amount;
+
+                }
+
+
+                else if (
+                    transaction.entry_type ===
+                    "debit"
+                ) {
+
+                    totalExpense +=
+                        amount;
+
+                }
+
+
+            }
+        );
+
+
+
+        const netProfit =
+            totalIncome -
+            totalExpense;
+
+
+
+        /* SHOW SUMMARY */
+
+        document.getElementById(
+            "totalIncome"
+        ).innerText =
+            formatAmount(
+                totalIncome
+            );
+
+
+
+        document.getElementById(
+            "totalExpense"
+        ).innerText =
+            formatAmount(
+                totalExpense
+            );
+
+
+
+        document.getElementById(
+            "netProfit"
+        ).innerText =
+            formatAmount(
+                netProfit
+            );
+
+
+
+        document.getElementById(
+            "totalTransactions"
+        ).innerText =
+            transactions.length;
+
+
+
+        /* RECENT 5 TRANSACTIONS */
+
+        recentBody.innerHTML =
+            "";
+
+
+        const recentTransactions =
+            transactions.slice(
+                0,
+                5
+            );
+
+
+
+        if (
+            recentTransactions.length ===
+            0
+        ) {
+
+
+            recentBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        style="text-align:center;"
+                    >
+                        No transactions found
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            return;
+
+        }
+
+
+
+        recentTransactions.forEach(
+            function(transaction) {
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${transaction.transaction_date || ""}
+                    </td>
+
+
+                    <td>
+                        ${
+                            transaction.description ||
+                            transaction.sub_category ||
+                            ""
+                        }
+                    </td>
+
+
+                    <td>
+                        ${transaction.category || ""}
+                    </td>
+
+
+                    <td class="amount">
+                        ${formatAmount(transaction.amount)}
+                    </td>
+
+                `;
+
+
+
+                recentBody.appendChild(
+                    row
+                );
+
+
+            }
+        );
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            error
+        );
+
+
+        recentBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Something went wrong
+                </td>
+
+            </tr>
+
+        `;
+
+
+    }
+
+
+}
+
+
+
+/* =====================================
+   START
+===================================== */
+
+loadDashboard();
+
+
+</script>
+
+</body>
+
+</html>
