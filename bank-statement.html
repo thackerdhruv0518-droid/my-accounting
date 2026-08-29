@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Bank & Cash Statement - My Accounting</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        .header,
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .header h2 {
+            font-weight: normal;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            border: none;
+            background: #222;
+            color: white;
+            padding: 13px 20px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .summary-card {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .summary-card h3 {
+            margin-top: 0;
+            font-size: 14px;
+        }
+
+        .summary-card p {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        .table-box {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #222;
+            color: white;
+            text-align: left;
+            padding: 14px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .amount {
+            text-align: right;
+        }
+
+        .back-button {
+            width: 100%;
+        }
+
+        @media (max-width: 700px) {
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-container {
+                padding: 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page-container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>MY ACCOUNTING</h1>
+
+        <h2>Bank & Cash Statement</h2>
+
+        <p>
+            Opening Balance → Transactions → Closing Balance
+        </p>
+
+    </div>
+
+
+
+    <!-- ACCOUNT SELECT -->
+
+    <div class="box">
+
+        <label>Select Cash / Bank Account</label>
+
+        <select
+            id="accountSelect"
+            onchange="loadStatement()"
+        >
+            <option value="">
+                Loading Accounts...
+            </option>
+        </select>
+
+    </div>
+
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <h3>OPENING BALANCE</h3>
+
+            <p id="openingBalance">
+                ₹0.00
+            </p>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>TOTAL INCOME</h3>
+
+            <p id="totalIncome">
+                ₹0.00
+            </p>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>TOTAL EXPENSE</h3>
+
+            <p id="totalExpense">
+                ₹0.00
+            </p>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>CLOSING BALANCE</h3>
+
+            <p id="closingBalance">
+                ₹0.00
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TRANSACTIONS -->
+
+    <div class="box table-box">
+
+        <h3>Account Transactions</h3>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Particulars</th>
+
+                    <th>Ledger</th>
+
+                    <th>Income</th>
+
+                    <th>Expense</th>
+
+                    <th>Balance</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="statementBody">
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        style="text-align:center;"
+                    >
+                        Select an account
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <button
+        class="back-button"
+        onclick="goDashboard()"
+    >
+        BACK TO DASHBOARD
+    </button>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================
+   GET CURRENT USER
+===================================== */
+
+async function getCurrentUser() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (
+        error ||
+        !data.user
+    ) {
+
+        window.location.href =
+            "index.html";
+
+        return null;
+
+    }
+
+
+    return data.user;
+
+}
+
+
+
+/* =====================================
+   FORMAT AMOUNT
+===================================== */
+
+function formatAmount(amount) {
+
+    return (
+        "₹" +
+        Number(amount || 0).toFixed(2)
+    );
+
+}
+
+
+
+/* =====================================
+   LOAD ACCOUNTS
+===================================== */
+
+async function loadAccounts() {
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+
+        return;
+
+    }
+
+
+    const select =
+        document.getElementById(
+            "accountSelect"
+        );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        select.innerHTML =
+            '<option value="">Error Loading Accounts</option>';
+
+        return;
+
+    }
+
+
+    select.innerHTML =
+        '<option value="">Select Account</option>';
+
+
+    data.forEach(
+        function(account) {
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                account.id;
+
+
+            option.text =
+                account.account_type === "cash"
+
+                    ? "💵 " + account.name
+
+                    : "🏦 " + account.name;
+
+
+            option.dataset.openingBalance =
+                account.opening_balance || 0;
+
+
+            select.appendChild(
+                option
+            );
+
+
+        }
+    );
+
+
+}
+
+
+
+/* =====================================
+   LOAD STATEMENT
+===================================== */
+
+async function loadStatement() {
+
+
+    const accountSelect =
+        document.getElementById(
+            "accountSelect"
+        );
+
+
+    const accountId =
+        accountSelect.value;
+
+
+    const body =
+        document.getElementById(
+            "statementBody"
+        );
+
+
+    if (!accountId) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    style="text-align:center;"
+                >
+                    Select an account
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    const selectedOption =
+        accountSelect.selectedOptions[0];
+
+
+    const openingBalance =
+        Number(
+            selectedOption.dataset.openingBalance
+        ) || 0;
+
+
+    document.getElementById(
+        "openingBalance"
+    ).innerText =
+        formatAmount(
+            openingBalance
+        );
+
+
+    body.innerHTML = `
+        <tr>
+            <td colspan="6"
+                style="text-align:center;"
+            >
+                Loading...
+            </td>
+        </tr>
+    `;
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("transactions")
+            .select("*")
+            .eq(
+                "account_id",
+                accountId
+            )
+            .order(
+                "transaction_date",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    style="text-align:center;"
+                >
+                    Error loading transactions
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    let totalIncome =
+        0;
+
+    let totalExpense =
+        0;
+
+    let runningBalance =
+        openingBalance;
+
+
+    body.innerHTML =
+        "";
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    style="text-align:center;"
+                >
+                    No transactions found
+                </td>
+            </tr>
+        `;
+
+    }
+
+
+    else {
+
+
+        data.forEach(
+            function(transaction) {
+
+
+                const amount =
+                    Number(
+                        transaction.amount
+                    ) || 0;
+
+
+                let income =
+                    0;
+
+
+                let expense =
+                    0;
+
+
+                if (
+                    transaction.entry_type ===
+                    "credit"
+                ) {
+
+                    income =
+                        amount;
+
+                    totalIncome +=
+                        amount;
+
+                    runningBalance +=
+                        amount;
+
+                }
+
+
+                else if (
+                    transaction.entry_type ===
+                    "debit"
+                ) {
+
+                    expense =
+                        amount;
+
+                    totalExpense +=
+                        amount;
+
+                    runningBalance -=
+                        amount;
+
+                }
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${transaction.transaction_date || ""}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            transaction.description
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            transaction.ledger_name
+                        )}
+                    </td>
+
+                    <td class="amount">
+                        ${
+                            income > 0
+                                ? formatAmount(income)
+                                : "-"
+                        }
+                    </td>
+
+                    <td class="amount">
+                        ${
+                            expense > 0
+                                ? formatAmount(expense)
+                                : "-"
+                        }
+                    </td>
+
+                    <td class="amount">
+                        ${formatAmount(
+                            runningBalance
+                        )}
+                    </td>
+
+                `;
+
+
+                body.appendChild(
+                    row
+                );
+
+
+            }
+        );
+
+
+    }
+
+
+    const closingBalance =
+        runningBalance;
+
+
+    document.getElementById(
+        "totalIncome"
+    ).innerText =
+        formatAmount(
+            totalIncome
+        );
+
+
+    document.getElementById(
+        "totalExpense"
+    ).innerText =
+        formatAmount(
+            totalExpense
+        );
+
+
+    document.getElementById(
+        "closingBalance"
+    ).innerText =
+        formatAmount(
+            closingBalance
+        );
+
+
+}
+
+
+
+/* =====================================
+   ESCAPE HTML
+===================================== */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.innerText =
+        text || "";
+
+
+    return div.innerHTML;
+
+}
+
+
+
+/* =====================================
+   DASHBOARD
+===================================== */
+
+function goDashboard() {
+
+    window.location.href =
+        "dashboard.html";
+
+}
+
+
+
+/* =====================================
+   START
+===================================== */
+
+loadAccounts();
+
+
+</script>
+
+
+</body>
+
+</html>
