@@ -5,14 +5,17 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Categories - My Accounting</title>
+    <title>Add Category - My Accounting</title>
 
     <link rel="stylesheet" href="style.css">
 
     <!-- SUPABASE -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="supabase.js"></script>
@@ -25,38 +28,142 @@
 
 <div class="tally-report">
 
+
+    <!-- HEADER -->
+
     <div class="report-header">
 
         <h1>MY ACCOUNTING</h1>
 
-        <h2>Categories</h2>
+        <h2>Category Management</h2>
 
-        <p>Create Main Category and Sub Category</p>
+        <p>
+            Main Category → Sub Category → Ledger Name
+        </p>
 
     </div>
 
 
-    <!-- ADD MAIN CATEGORY -->
+
+    <!-- =========================
+         ADD MAIN CATEGORY
+    ========================== -->
 
     <div class="transaction-box">
 
-        <label>
-            Main Category
-        </label>
+        <h3>Add Main Category</h3>
+
+        <label>Main Category Name</label>
 
         <input
             type="text"
-            id="categoryName"
-            placeholder="Example: Monthly Expense"
+            id="mainCategoryName"
+            placeholder="Example: Expenses"
         >
+
+        <button onclick="addMainCategory()">
+            ADD MAIN CATEGORY
+        </button>
 
     </div>
 
 
+
+    <!-- =========================
+         ADD SUB CATEGORY
+    ========================== -->
+
+    <div class="transaction-box">
+
+        <h3>Add Sub Category</h3>
+
+        <label>Main Category</label>
+
+        <select id="subMainCategory">
+
+            <option value="">
+                Loading Categories...
+            </option>
+
+        </select>
+
+
+        <label>Sub Category Name</label>
+
+        <input
+            type="text"
+            id="subCategoryName"
+            placeholder="Example: Office Expenses"
+        >
+
+
+        <button onclick="addSubCategory()">
+            ADD SUB CATEGORY
+        </button>
+
+    </div>
+
+
+
+    <!-- =========================
+         ADD LEDGER
+    ========================== -->
+
+    <div class="transaction-box">
+
+        <h3>Add Ledger Name</h3>
+
+
+        <label>Main Category</label>
+
+        <select
+            id="ledgerMainCategory"
+            onchange="loadLedgerSubCategories()"
+        >
+
+            <option value="">
+                Select Main Category
+            </option>
+
+        </select>
+
+
+        <label>Sub Category</label>
+
+        <select id="ledgerSubCategory">
+
+            <option value="">
+                Select Main Category First
+            </option>
+
+        </select>
+
+
+        <label>Ledger Name</label>
+
+        <input
+            type="text"
+            id="ledgerName"
+            placeholder="Example: Rent"
+        >
+
+
+        <button onclick="addLedger()">
+            ADD LEDGER
+        </button>
+
+    </div>
+
+
+
+    <!-- =========================
+         BACK BUTTON
+    ========================== -->
+
     <div class="report-buttons">
 
-        <button onclick="addCategory()">
-            ADD MAIN CATEGORY
+        <button onclick="goDashboard()">
+            BACK TO DASHBOARD
         </button>
 
     </div>
@@ -68,60 +175,6 @@
     ></p>
 
 
-    <!-- ADD SUB CATEGORY -->
-
-    <div class="transaction-box">
-
-        <label>
-            Select Main Category
-        </label>
-
-        <select id="parentCategory">
-
-            <option value="">
-                Select Main Category
-            </option>
-
-        </select>
-
-
-        <label>
-            Sub Category
-        </label>
-
-        <input
-            type="text"
-            id="subCategoryName"
-            placeholder="Example: Rent"
-        >
-
-    </div>
-
-
-    <div class="report-buttons">
-
-        <button onclick="addSubCategory()">
-            ADD SUB CATEGORY
-        </button>
-
-        <button onclick="goDashboard()">
-            BACK TO DASHBOARD
-        </button>
-
-    </div>
-
-
-    <p
-        id="subCategoryMessage"
-        class="transaction-message"
-    ></p>
-
-
-    <!-- CATEGORY LIST -->
-
-    <div id="categoryList"></div>
-
-
 </div>
 
 
@@ -129,372 +182,397 @@
 <script>
 
 
-/* =========================================
-   GLOBAL DATA
-========================================= */
+/* =====================================
+   MESSAGE
+===================================== */
 
-let categories = [];
+function showMessage(text) {
+
+    document.getElementById(
+        "categoryMessage"
+    ).innerText = text;
+
+}
 
 
-/* =========================================
-   LOAD CATEGORIES
-========================================= */
+
+/* =====================================
+   LOAD MAIN CATEGORIES
+===================================== */
 
 async function loadCategories() {
 
 
-    const {
-        data,
-        error
-    } = await supabaseClient
+    const subSelect =
+        document.getElementById(
+            "subMainCategory"
+        );
 
-        .from("categories")
 
-        .select("*")
+    const ledgerSelect =
+        document.getElementById(
+            "ledgerMainCategory"
+        );
 
-        .order("name");
+
+    const { data, error } =
+        await supabaseClient
+            .from("categories")
+            .select("*")
+            .order("name");
 
 
     if (error) {
 
         console.error(error);
 
+        showMessage(
+            "Error loading categories: " +
+            error.message
+        );
+
         return;
 
     }
 
 
-    categories = data;
+    subSelect.innerHTML =
+        '<option value="">Select Main Category</option>';
 
 
-    const select =
-        document.getElementById(
-            "parentCategory"
-        );
+    ledgerSelect.innerHTML =
+        '<option value="">Select Main Category</option>';
 
 
-    select.innerHTML =
-        `<option value="">
-            Select Main Category
-        </option>`;
+    data.forEach(function(category) {
 
 
-    categories.forEach(
-        function(category) {
+        const option1 =
+            document.createElement("option");
+
+        option1.value = category.id;
+        option1.text = category.name;
+
+        subSelect.appendChild(option1);
 
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+
+        const option2 =
+            document.createElement("option");
+
+        option2.value = category.id;
+        option2.text = category.name;
+
+        ledgerSelect.appendChild(option2);
 
 
-            option.value =
-                category.id;
+    });
 
-
-            option.text =
-                category.name;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    showCategories();
 
 }
 
 
-/* =========================================
-   ADD MAIN CATEGORY
-========================================= */
 
-async function addCategory() {
+/* =====================================
+   ADD MAIN CATEGORY
+===================================== */
+
+async function addMainCategory() {
+
+
+    const input =
+        document.getElementById(
+            "mainCategoryName"
+        );
 
 
     const name =
-        document.getElementById(
-            "categoryName"
-        ).value.trim();
-
-
-    const message =
-        document.getElementById(
-            "categoryMessage"
-        );
+        input.value.trim();
 
 
     if (!name) {
 
-        message.innerText =
-            "Please enter category name.";
+        showMessage(
+            "Please enter Main Category name."
+        );
 
         return;
 
     }
 
 
-    const {
-        error
-    } = await supabaseClient
-
-        .from("categories")
-
-        .insert([
-
-            {
-                name: name
-            }
-
-        ]);
+    const { error } =
+        await supabaseClient
+            .from("categories")
+            .insert([
+                {
+                    name: name
+                }
+            ]);
 
 
     if (error) {
 
-        console.error(error);
-
-        message.innerText =
+        showMessage(
             "Error: " +
-            error.message;
+            error.message
+        );
 
         return;
 
     }
 
 
-    message.innerText =
-        "Main Category added successfully!";
+    input.value = "";
 
 
-    document.getElementById(
-        "categoryName"
-    ).value = "";
+    showMessage(
+        "Main Category added successfully!"
+    );
 
 
     loadCategories();
 
+
 }
 
 
-/* =========================================
+
+/* =====================================
    ADD SUB CATEGORY
-========================================= */
+===================================== */
 
 async function addSubCategory() {
 
 
     const categoryId =
         document.getElementById(
-            "parentCategory"
+            "subMainCategory"
         ).value;
 
 
-    const name =
+    const input =
         document.getElementById(
             "subCategoryName"
-        ).value.trim();
-
-
-    const message =
-        document.getElementById(
-            "subCategoryMessage"
         );
 
 
-    if (
-        !categoryId ||
-        !name
-    ) {
+    const name =
+        input.value.trim();
 
-        message.innerText =
-            "Select Main Category and enter Sub Category.";
+
+    if (!categoryId || !name) {
+
+        showMessage(
+            "Select Main Category and enter Sub Category."
+        );
 
         return;
 
     }
 
 
-    const {
-        error
-    } = await supabaseClient
-
-        .from("sub_categories")
-
-        .insert([
-
-            {
-                category_id:
-                    categoryId,
-
-                name:
-                    name
-            }
-
-        ]);
+    const { error } =
+        await supabaseClient
+            .from("sub_categories")
+            .insert([
+                {
+                    category_id: categoryId,
+                    name: name
+                }
+            ]);
 
 
     if (error) {
 
-        console.error(error);
-
-        message.innerText =
+        showMessage(
             "Error: " +
-            error.message;
+            error.message
+        );
 
         return;
 
     }
 
 
-    message.innerText =
-        "Sub Category added successfully!";
+    input.value = "";
 
 
-    document.getElementById(
-        "subCategoryName"
-    ).value = "";
+    showMessage(
+        "Sub Category added successfully!"
+    );
 
-
-    showCategories();
 
 }
 
 
-/* =========================================
-   SHOW CATEGORY LIST
-========================================= */
 
-async function showCategories() {
+/* =====================================
+   LOAD SUB CATEGORIES
+===================================== */
+
+async function loadLedgerSubCategories() {
 
 
-    const list =
+    const categoryId =
         document.getElementById(
-            "categoryList"
+            "ledgerMainCategory"
+        ).value;
+
+
+    const select =
+        document.getElementById(
+            "ledgerSubCategory"
         );
 
 
-    list.innerHTML = "";
+    if (!categoryId) {
 
+        select.innerHTML =
+            '<option value="">Select Main Category First</option>';
 
-    for (
-        const category
-        of categories
-    ) {
-
-
-        const {
-            data: subCategories,
-            error
-        } = await supabaseClient
-
-            .from("sub_categories")
-
-            .select("*")
-
-            .eq(
-                "category_id",
-                category.id
-            )
-
-            .order("name");
-
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-
-        box.style.marginTop =
-            "20px";
-
-
-        box.style.border =
-            "1px solid #333";
-
-
-        box.style.padding =
-            "15px";
-
-
-        let html = `
-
-            <strong>
-                ${category.name}
-            </strong>
-
-        `;
-
-
-        if (
-            subCategories &&
-            subCategories.length > 0
-        ) {
-
-
-            html +=
-                "<ul>";
-
-
-            subCategories.forEach(
-                function(sub) {
-
-
-                    html += `
-
-                        <li>
-                            ${sub.name}
-                        </li>
-
-                    `;
-
-                }
-            );
-
-
-            html +=
-                "</ul>";
-
-        }
-
-        else {
-
-
-            html += `
-
-                <p>
-                    No Sub Categories
-                </p>
-
-            `;
-
-        }
-
-
-        box.innerHTML =
-            html;
-
-
-        list.appendChild(
-            box
-        );
+        return;
 
     }
 
+
+    select.innerHTML =
+        '<option value="">Loading...</option>';
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("sub_categories")
+            .select("*")
+            .eq(
+                "category_id",
+                categoryId
+            )
+            .order("name");
+
+
+    if (error) {
+
+        showMessage(
+            "Error: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    select.innerHTML =
+        '<option value="">Select Sub Category</option>';
+
+
+    if (data.length === 0) {
+
+        select.innerHTML =
+            '<option value="">No Sub Categories Found</option>';
+
+        return;
+
+    }
+
+
+    data.forEach(function(subCategory) {
+
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            subCategory.id;
+
+        option.text =
+            subCategory.name;
+
+        select.appendChild(option);
+
+
+    });
+
+
 }
 
 
-/* =========================================
-   BACK
-========================================= */
+
+/* =====================================
+   ADD LEDGER
+===================================== */
+
+async function addLedger() {
+
+
+    const subCategoryId =
+        document.getElementById(
+            "ledgerSubCategory"
+        ).value;
+
+
+    const input =
+        document.getElementById(
+            "ledgerName"
+        );
+
+
+    const name =
+        input.value.trim();
+
+
+    if (!subCategoryId || !name) {
+
+        showMessage(
+            "Select Sub Category and enter Ledger Name."
+        );
+
+        return;
+
+    }
+
+
+    const { error } =
+        await supabaseClient
+            .from("ledgers")
+            .insert([
+                {
+                    sub_category_id: subCategoryId,
+                    name: name
+                }
+            ]);
+
+
+    if (error) {
+
+        showMessage(
+            "Error: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    input.value = "";
+
+
+    showMessage(
+        "Ledger added successfully!"
+    );
+
+
+}
+
+
+
+/* =====================================
+   BACK TO DASHBOARD
+===================================== */
 
 function goDashboard() {
-
 
     window.location.href =
         "dashboard.html";
@@ -502,9 +580,10 @@ function goDashboard() {
 }
 
 
-/* =========================================
+
+/* =====================================
    START
-========================================= */
+===================================== */
 
 loadCategories();
 
