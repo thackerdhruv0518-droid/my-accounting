@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,68 +11,652 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>GPay Statement</title>
+    <title>GPay Statement - My Accounting</title>
 
-    <link rel="stylesheet" href="style.css">
 
     <!-- PDF.js -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+
+    <!-- PAGE ONLY CSS -->
+
+    <style>
+
+
+        * {
+
+            box-sizing:
+                border-box;
+
+        }
+
+
+        body {
+
+            margin:
+                0;
+
+            padding:
+                0;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            background:
+                #f4f6f9;
+
+            color:
+                #222;
+
+        }
+
+
+        /* =====================================
+           MAIN PAGE
+        ===================================== */
+
+        .gpay-page {
+
+            max-width:
+                1200px;
+
+            margin:
+                auto;
+
+            padding:
+                25px;
+
+        }
+
+
+        /* =====================================
+           HEADER
+        ===================================== */
+
+        .gpay-header {
+
+            background:
+                white;
+
+            padding:
+                25px;
+
+            border-radius:
+                12px;
+
+            margin-bottom:
+                25px;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        .gpay-header h1 {
+
+            margin:
+                0;
+
+            font-size:
+                28px;
+
+        }
+
+
+        .gpay-header p {
+
+            margin:
+                8px 0 0;
+
+            color:
+                #666;
+
+        }
+
+
+        /* =====================================
+           UPLOAD BOX
+        ===================================== */
+
+        .upload-box {
+
+            background:
+                white;
+
+            padding:
+                25px;
+
+            border-radius:
+                12px;
+
+            margin-bottom:
+                25px;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        .section-title {
+
+            margin:
+                0 0 20px;
+
+            font-size:
+                20px;
+
+        }
+
+
+        .upload-box label {
+
+            display:
+                block;
+
+            margin-bottom:
+                10px;
+
+            font-weight:
+                bold;
+
+        }
+
+
+        .upload-box input[type="file"] {
+
+            width:
+                100%;
+
+            padding:
+                12px;
+
+            border:
+                1px solid
+                #ddd;
+
+            border-radius:
+                8px;
+
+            margin-bottom:
+                15px;
+
+        }
+
+
+        /* =====================================
+           BUTTON
+        ===================================== */
+
+        button {
+
+            border:
+                none;
+
+            padding:
+                14px 20px;
+
+            font-size:
+                14px;
+
+            font-weight:
+                bold;
+
+            cursor:
+                pointer;
+
+            background:
+                #222;
+
+            color:
+                white;
+
+            border-radius:
+                8px;
+
+            transition:
+                0.2s;
+
+        }
+
+
+        button:hover {
+
+            background:
+                #000;
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        /* =====================================
+           MESSAGE
+        ===================================== */
+
+        #gpayMessage {
+
+            margin:
+                15px 0 0;
+
+            font-size:
+                14px;
+
+            font-weight:
+                bold;
+
+        }
+
+
+        /* =====================================
+           TRANSACTIONS BOX
+        ===================================== */
+
+        .transactions-box {
+
+            background:
+                white;
+
+            padding:
+                25px;
+
+            border-radius:
+                12px;
+
+            margin-bottom:
+                25px;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        /* =====================================
+           TRANSACTION ITEM
+        ===================================== */
+
+        .transaction-item {
+
+            border:
+                1px solid
+                #e5e5e5;
+
+            padding:
+                18px;
+
+            margin-top:
+                15px;
+
+            border-radius:
+                10px;
+
+            background:
+                #fafafa;
+
+        }
+
+
+        .transaction-item h3 {
+
+            margin:
+                0 0 15px;
+
+            font-size:
+                17px;
+
+        }
+
+
+        .transaction-details {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    4,
+                    1fr
+                );
+
+            gap:
+                15px;
+
+            margin-bottom:
+                15px;
+
+        }
+
+
+        .transaction-detail {
+
+            font-size:
+                14px;
+
+        }
+
+
+        .transaction-detail span {
+
+            display:
+                block;
+
+            color:
+                #777;
+
+            font-size:
+                12px;
+
+            margin-bottom:
+                5px;
+
+        }
+
+
+        .transaction-detail strong {
+
+            font-size:
+                15px;
+
+        }
+
+
+        .transaction-actions {
+
+            display:
+                flex;
+
+            gap:
+                10px;
+
+            flex-wrap:
+                wrap;
+
+        }
+
+
+        .transaction-actions select {
+
+            flex:
+                1;
+
+            min-width:
+                200px;
+
+            padding:
+                12px;
+
+            border:
+                1px solid
+                #ddd;
+
+            border-radius:
+                8px;
+
+            background:
+                white;
+
+            font-size:
+                14px;
+
+        }
+
+
+        .delete-button {
+
+            background:
+                #b71c1c;
+
+        }
+
+
+        .delete-button:hover {
+
+            background:
+                #8e0000;
+
+        }
+
+
+        /* =====================================
+           FOOTER BUTTON
+        ===================================== */
+
+        .bottom-buttons {
+
+            margin-top:
+                20px;
+
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (
+            max-width:
+            800px
+        ) {
+
+            .transaction-details {
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        1fr
+                    );
+
+            }
+
+        }
+
+
+        @media (
+            max-width:
+            600px
+        ) {
+
+            .gpay-page {
+
+                padding:
+                    15px;
+
+            }
+
+
+            .gpay-header h1 {
+
+                font-size:
+                    23px;
+
+            }
+
+
+            .transaction-details {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .transaction-actions {
+
+                flex-direction:
+                    column;
+
+            }
+
+
+            .transaction-actions select {
+
+                width:
+                    100%;
+
+            }
+
+        }
+
+
+    </style>
 
 </head>
 
+
 <body>
 
-<div class="dashboard">
 
-    <h1>GPay Statement</h1>
+<div class="gpay-page">
 
-    <p>Upload your daily GPay PDF statement</p>
 
-    <input
-        type="file"
-        id="statementFile"
-        accept=".pdf,application/pdf"
-    >
+    <!-- =====================================
+         HEADER
+    ====================================== -->
 
-    <button onclick="uploadStatement()">
-        READ PDF
-    </button>
+    <div class="gpay-header">
 
-    <p id="gpayMessage"></p>
+        <h1>
+            MY ACCOUNTING
+        </h1>
 
-    <div id="transactionList"></div>
+        <p>
+            GPay Statement
+        </p>
 
-    <button onclick="goDashboard()">
-        BACK TO DASHBOARD
-    </button>
+    </div>
+
+
+
+    <!-- =====================================
+         UPLOAD PDF
+    ====================================== -->
+
+    <div class="upload-box">
+
+        <h2 class="section-title">
+            Upload GPay Statement
+        </h2>
+
+
+        <label>
+            Select GPay PDF Statement
+        </label>
+
+
+        <input
+            type="file"
+            id="statementFile"
+            accept=".pdf,application/pdf"
+        >
+
+
+        <button onclick="uploadStatement()">
+
+            READ PDF
+
+        </button>
+
+
+        <p id="gpayMessage"></p>
+
+
+    </div>
+
+
+
+    <!-- =====================================
+         TRANSACTIONS
+    ====================================== -->
+
+    <div class="transactions-box">
+
+        <h2 class="section-title">
+
+            Transactions
+
+        </h2>
+
+
+        <div id="transactionList">
+
+            <p>
+                Upload a GPay PDF to view transactions.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================
+         BACK BUTTON
+    ====================================== -->
+
+    <div class="bottom-buttons">
+
+        <button onclick="goDashboard()">
+
+            BACK TO DASHBOARD
+
+        </button>
+
+    </div>
+
 
 </div>
 
 
+
 <script>
+
+
+/* =====================================
+   GLOBAL TRANSACTIONS
+===================================== */
 
 let gpayTransactions = [];
 
 
-/* =========================
+
+/* =====================================
    PDF SETUP
-========================= */
+===================================== */
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
+
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 
-/* =========================
+
+/* =====================================
    UPLOAD PDF
-========================= */
+===================================== */
 
 async function uploadStatement() {
 
+
     const file =
-        document.getElementById("statementFile").files[0];
+
+        document.getElementById(
+            "statementFile"
+        ).files[0];
+
 
     const message =
-        document.getElementById("gpayMessage");
+
+        document.getElementById(
+            "gpayMessage"
+        );
 
 
     if (!file) {
@@ -79,6 +665,7 @@ async function uploadStatement() {
             "Please select a GPay PDF.";
 
         return;
+
     }
 
 
@@ -88,6 +675,7 @@ async function uploadStatement() {
             "Please select PDF only.";
 
         return;
+
     }
 
 
@@ -97,13 +685,19 @@ async function uploadStatement() {
 
     try {
 
+
         const arrayBuffer =
+
             await file.arrayBuffer();
 
 
         const pdf =
+
             await pdfjsLib.getDocument({
-                data: arrayBuffer
+
+                data:
+                    arrayBuffer
+
             }).promise;
 
 
@@ -111,22 +705,34 @@ async function uploadStatement() {
 
 
         for (
+
             let pageNumber = 1;
+
             pageNumber <= pdf.numPages;
+
             pageNumber++
+
         ) {
 
+
             const page =
-                await pdf.getPage(pageNumber);
+
+                await pdf.getPage(
+                    pageNumber
+                );
 
 
             const content =
+
                 await page.getTextContent();
 
 
             const pageText =
+
                 content.items
-                    .map(item => item.str)
+                    .map(
+                        item => item.str
+                    )
                     .join(" ");
 
 
@@ -136,129 +742,193 @@ async function uploadStatement() {
         }
 
 
-        console.log(completeText);
+        console.log(
+            completeText
+        );
 
 
-        parseGPayText(completeText);
+        parseGPayText(
+            completeText
+        );
 
-
-    } catch (error) {
-
-        message.innerText =
-            "PDF reading error: " + error.message;
 
     }
+
+    catch (error) {
+
+
+        console.error(
+            error
+        );
+
+
+        message.innerText =
+
+            "PDF reading error: " +
+
+            error.message;
+
+    }
+
 
 }
 
 
-/* =========================
-   SAMPLE GPay PARSER
-========================= */
+
+/* =====================================
+   PARSE GPAY TEXT
+===================================== */
 
 function parseGPayText(text) {
 
-    /*
-       Sample parser.
-
-       Expected transaction pattern:
-
-       28-08-2026 Paid to Rahul 500
-
-       28-08-2026 Received from Amit 1000
-    */
-
 
     const lines =
+
         text
             .split("\n")
-            .map(line => line.trim())
-            .filter(line => line !== "");
+            .map(
+                line => line.trim()
+            )
+            .filter(
+                line => line !== ""
+            );
 
 
     gpayTransactions = [];
 
 
-    lines.forEach(function(line, index) {
-
-        const dateMatch =
-            line.match(
-                /\b(\d{2}[-\/]\d{2}[-\/]\d{4})\b/
-            );
+    lines.forEach(
+        function(line, index) {
 
 
-        if (!dateMatch) {
-            return;
+            const dateMatch =
+
+                line.match(
+
+                    /\b(\d{2}[-\/]\d{2}[-\/]\d{4})\b/
+
+                );
+
+
+            if (!dateMatch) {
+
+                return;
+
+            }
+
+
+            const date =
+                dateMatch[1];
+
+
+            const amountMatch =
+
+                line.match(
+
+                    /(?:₹|Rs\.?|INR)?\s*([\d,]+(?:\.\d{1,2})?)/
+
+                );
+
+
+            if (!amountMatch) {
+
+                return;
+
+            }
+
+
+            const amount =
+
+                parseFloat(
+
+                    amountMatch[1]
+                        .replace(
+                            /,/g,
+                            ""
+                        )
+
+                );
+
+
+            let type =
+                "Expense";
+
+
+            const lowerLine =
+                line.toLowerCase();
+
+
+            if (
+
+                lowerLine.includes(
+                    "received"
+                ) ||
+
+                lowerLine.includes(
+                    "credited"
+                ) ||
+
+                lowerLine.includes(
+                    "credit"
+                )
+
+            ) {
+
+                type =
+                    "Income";
+
+            }
+
+
+            let description =
+
+                line
+                    .replace(
+                        dateMatch[0],
+                        ""
+                    )
+                    .replace(
+                        amountMatch[0],
+                        ""
+                    )
+                    .trim();
+
+
+            if (
+                description === ""
+            ) {
+
+                description =
+                    "GPay Transaction";
+
+            }
+
+
+            gpayTransactions.push({
+
+                id:
+                    index + 1,
+
+                date:
+                    date,
+
+                description:
+                    description,
+
+                amount:
+                    amount,
+
+                type:
+                    type,
+
+                category:
+                    ""
+
+            });
+
+
         }
-
-
-        const date =
-            dateMatch[1];
-
-
-        const amountMatch =
-            line.match(
-                /(?:₹|Rs\.?|INR)?\s?([\d,]+(?:\.\d{1,2})?)/
-            );
-
-
-        if (!amountMatch) {
-            return;
-        }
-
-
-        const amount =
-            parseFloat(
-                amountMatch[1].replace(/,/g, "")
-            );
-
-
-        let type = "Expense";
-
-
-        if (
-            line.toLowerCase().includes("received") ||
-            line.toLowerCase().includes("credited") ||
-            line.toLowerCase().includes("credit")
-        ) {
-
-            type = "Income";
-
-        }
-
-
-        let description =
-            line
-                .replace(dateMatch[0], "")
-                .replace(amountMatch[0], "")
-                .trim();
-
-
-        if (description === "") {
-
-            description =
-                "GPay Transaction";
-
-        }
-
-
-        gpayTransactions.push({
-
-            id: index + 1,
-
-            date: date,
-
-            description: description,
-
-            amount: amount,
-
-            type: type,
-
-            category: ""
-
-        });
-
-    });
+    );
 
 
     removeDuplicates();
@@ -267,229 +937,320 @@ function parseGPayText(text) {
     showTransactions();
 
 
-    document.getElementById("gpayMessage").innerText =
+    document.getElementById(
+        "gpayMessage"
+    ).innerText =
+
         gpayTransactions.length +
+
         " transaction(s) found.";
+
 
 }
 
 
-/* =========================
-   DUPLICATE CHECK
-========================= */
+
+/* =====================================
+   REMOVE DUPLICATES
+===================================== */
 
 function removeDuplicates() {
 
+
     const unique = [];
 
-    const seen = new Set();
+    const seen =
+        new Set();
 
 
-    gpayTransactions.forEach(function(transaction) {
-
-        const key =
-            transaction.date +
-            "|" +
-            transaction.description +
-            "|" +
-            transaction.amount +
-            "|" +
-            transaction.type;
+    gpayTransactions.forEach(
+        function(transaction) {
 
 
-        if (!seen.has(key)) {
+            const key =
 
-            seen.add(key);
+                transaction.date +
 
-            unique.push(transaction);
+                "|" +
+
+                transaction.description +
+
+                "|" +
+
+                transaction.amount +
+
+                "|" +
+
+                transaction.type;
+
+
+            if (
+                !seen.has(key)
+            ) {
+
+                seen.add(
+                    key
+                );
+
+
+                unique.push(
+                    transaction
+                );
+
+            }
+
 
         }
+    );
 
-    });
 
+    gpayTransactions =
+        unique;
 
-    gpayTransactions = unique;
 
 }
 
 
-/* =========================
+
+/* =====================================
    SHOW TRANSACTIONS
-========================= */
+===================================== */
 
 function showTransactions() {
 
+
     const list =
-        document.getElementById("transactionList");
+
+        document.getElementById(
+            "transactionList"
+        );
 
 
-    list.innerHTML = "";
+    list.innerHTML =
+        "";
 
 
-    if (gpayTransactions.length === 0) {
+    if (
+        gpayTransactions.length === 0
+    ) {
 
         list.innerHTML =
+
             "<p>No transactions found.</p>";
 
         return;
+
     }
 
 
-    gpayTransactions.forEach(function(transaction) {
-
-        const box =
-            document.createElement("div");
+    gpayTransactions.forEach(
+        function(transaction) {
 
 
-        box.style.border =
-            "1px solid #ddd";
+            const box =
 
-        box.style.padding =
-            "15px";
-
-        box.style.marginTop =
-            "10px";
-
-        box.style.background =
-            "white";
-
-        box.style.borderRadius =
-            "8px";
+                document.createElement(
+                    "div"
+                );
 
 
-        box.innerHTML = `
-
-            <strong>
-                ${transaction.description}
-            </strong>
-
-            <br><br>
-
-            Date:
-            ${transaction.date}
-
-            <br>
-
-            Type:
-            ${transaction.type}
-
-            <br>
-
-            Amount:
-            ₹${transaction.amount.toFixed(2)}
-
-            <br><br>
-
-            <select
-                onchange="
-                    setCategory(
-                        ${transaction.id},
-                        this.value
-                    )
-                "
-            >
-
-                <option value="">
-                    Select Category
-                </option>
-
-                <option value="Food">
-                    Food
-                </option>
-
-                <option value="Rent">
-                    Rent
-                </option>
-
-                <option value="Travel">
-                    Travel
-                </option>
-
-                <option value="Shopping">
-                    Shopping
-                </option>
-
-                <option value="Salary">
-                    Salary
-                </option>
-
-                <option value="Office Expense">
-                    Office Expense
-                </option>
-
-                <option value="Other">
-                    Other
-                </option>
-
-            </select>
+            box.className =
+                "transaction-item";
 
 
-            <button
-                onclick="
-                    deleteTransaction(
-                        ${transaction.id}
-                    )
-                "
-            >
-                DELETE
-            </button>
+            box.innerHTML = `
 
-        `;
+                <h3>
+                    ${transaction.description}
+                </h3>
 
 
-        list.appendChild(box);
+                <div class="transaction-details">
 
-    });
+
+                    <div class="transaction-detail">
+
+                        <span>Date</span>
+
+                        <strong>
+                            ${transaction.date}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="transaction-detail">
+
+                        <span>Type</span>
+
+                        <strong>
+                            ${transaction.type}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="transaction-detail">
+
+                        <span>Amount</span>
+
+                        <strong>
+                            ₹${transaction.amount.toFixed(2)}
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="transaction-actions">
+
+
+                    <select
+                        onchange="
+                            setCategory(
+                                ${transaction.id},
+                                this.value
+                            )
+                        "
+                    >
+
+                        <option value="">
+                            Select Category
+                        </option>
+
+                        <option value="Food">
+                            Food
+                        </option>
+
+                        <option value="Rent">
+                            Rent
+                        </option>
+
+                        <option value="Travel">
+                            Travel
+                        </option>
+
+                        <option value="Shopping">
+                            Shopping
+                        </option>
+
+                        <option value="Salary">
+                            Salary
+                        </option>
+
+                        <option value="Office Expense">
+                            Office Expense
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        class="delete-button"
+                        onclick="
+                            deleteTransaction(
+                                ${transaction.id}
+                            )
+                        "
+                    >
+
+                        DELETE
+
+                    </button>
+
+
+                </div>
+
+            `;
+
+
+            list.appendChild(
+                box
+            );
+
+
+        }
+    );
+
 
 }
 
 
-/* =========================
-   CATEGORY
-========================= */
 
-function setCategory(id, category) {
+/* =====================================
+   SET CATEGORY
+===================================== */
+
+function setCategory(
+    id,
+    category
+) {
+
 
     const transaction =
+
         gpayTransactions.find(
-            item => item.id === id
+
+            item =>
+                item.id === id
+
         );
 
 
-    if (transaction) {
+    if (
+        transaction
+    ) {
 
         transaction.category =
             category;
 
     }
 
+
 }
 
 
-/* =========================
-   DELETE DUPLICATE / TRANSACTION
-========================= */
+
+/* =====================================
+   DELETE TRANSACTION
+===================================== */
 
 function deleteTransaction(id) {
 
+
     gpayTransactions =
+
         gpayTransactions.filter(
-            item => item.id !== id
+
+            item =>
+                item.id !== id
+
         );
 
 
     showTransactions();
 
 
-    document.getElementById("gpayMessage").innerText =
+    document.getElementById(
+        "gpayMessage"
+    ).innerText =
+
         "Transaction deleted.";
+
 
 }
 
 
-/* =========================
+
+/* =====================================
    DASHBOARD
-========================= */
+===================================== */
 
 function goDashboard() {
 
@@ -498,7 +1259,9 @@ function goDashboard() {
 
 }
 
+
 </script>
+
 
 </body>
 
