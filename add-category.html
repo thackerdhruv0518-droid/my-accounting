@@ -157,6 +157,24 @@
 
 
     <!-- =========================
+         CURRENT CATEGORIES
+    ========================== -->
+
+    <div class="transaction-box">
+
+        <h3>Current Categories</h3>
+
+        <div id="categoryList">
+
+            Loading Categories...
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
          BACK BUTTON
     ========================== -->
 
@@ -250,20 +268,29 @@ async function loadCategories() {
         const option1 =
             document.createElement("option");
 
-        option1.value = category.id;
-        option1.text = category.name;
+        option1.value =
+            category.id;
 
-        subSelect.appendChild(option1);
+        option1.text =
+            category.name;
 
+        subSelect.appendChild(
+            option1
+        );
 
 
         const option2 =
             document.createElement("option");
 
-        option2.value = category.id;
-        option2.text = category.name;
+        option2.value =
+            category.id;
 
-        ledgerSelect.appendChild(option2);
+        option2.text =
+            category.name;
+
+        ledgerSelect.appendChild(
+            option2
+        );
 
 
     });
@@ -333,6 +360,8 @@ async function addMainCategory() {
 
     loadCategories();
 
+    loadCategoryList();
+
 
 }
 
@@ -377,8 +406,11 @@ async function addSubCategory() {
             .from("sub_categories")
             .insert([
                 {
-                    category_id: categoryId,
-                    name: name
+                    category_id:
+                        categoryId,
+
+                    name:
+                        name
                 }
             ]);
 
@@ -401,6 +433,9 @@ async function addSubCategory() {
     showMessage(
         "Sub Category added successfully!"
     );
+
+
+    loadCategoryList();
 
 
 }
@@ -483,13 +518,18 @@ async function loadLedgerSubCategories() {
         const option =
             document.createElement("option");
 
+
         option.value =
             subCategory.id;
+
 
         option.text =
             subCategory.name;
 
-        select.appendChild(option);
+
+        select.appendChild(
+            option
+        );
 
 
     });
@@ -538,8 +578,11 @@ async function addLedger() {
             .from("ledgers")
             .insert([
                 {
-                    sub_category_id: subCategoryId,
-                    name: name
+                    sub_category_id:
+                        subCategoryId,
+
+                    name:
+                        name
                 }
             ]);
 
@@ -564,6 +607,559 @@ async function addLedger() {
     );
 
 
+    loadCategoryList();
+
+
+}
+
+
+
+/* =====================================
+   LOAD CURRENT CATEGORY LIST
+===================================== */
+
+async function loadCategoryList() {
+
+
+    const list =
+        document.getElementById(
+            "categoryList"
+        );
+
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+
+        data: categories,
+
+        error: categoryError
+
+    } =
+        await supabaseClient
+            .from("categories")
+            .select("*")
+            .order("name");
+
+
+    if (categoryError) {
+
+        list.innerHTML =
+            "Error loading categories.";
+
+        return;
+
+    }
+
+
+    if (categories.length === 0) {
+
+        list.innerHTML =
+            "<p>No categories found.</p>";
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        "";
+
+
+    for (
+        const category of categories
+    ) {
+
+
+        const categoryBox =
+            document.createElement("div");
+
+
+        categoryBox.style.marginTop =
+            "15px";
+
+
+        categoryBox.style.padding =
+            "15px";
+
+
+        categoryBox.style.border =
+            "1px solid #ddd";
+
+
+        categoryBox.style.borderRadius =
+            "8px";
+
+
+        categoryBox.innerHTML =
+
+            "<strong>Main Category: " +
+
+            category.name +
+
+            "</strong> " +
+
+            '<button onclick="deleteMainCategory(\'' +
+
+            category.id +
+
+            "')\">DELETE</button>";
+
+
+        list.appendChild(
+            categoryBox
+        );
+
+
+        const {
+
+            data: subCategories,
+
+            error: subError
+
+        } =
+            await supabaseClient
+                .from("sub_categories")
+                .select("*")
+                .eq(
+                    "category_id",
+                    category.id
+                )
+                .order("name");
+
+
+        if (subError) {
+
+            continue;
+
+        }
+
+
+        if (
+            subCategories.length === 0
+        ) {
+
+            const noSub =
+                document.createElement("p");
+
+
+            noSub.innerText =
+                "No Sub Categories";
+
+
+            categoryBox.appendChild(
+                noSub
+            );
+
+
+        }
+
+
+        for (
+            const subCategory of subCategories
+        ) {
+
+
+            const subBox =
+                document.createElement("div");
+
+
+            subBox.style.marginTop =
+                "10px";
+
+
+            subBox.style.marginLeft =
+                "20px";
+
+
+            subBox.innerHTML =
+
+                "↳ <strong>Sub Category: " +
+
+                subCategory.name +
+
+                "</strong> " +
+
+                '<button onclick="deleteSubCategory(\'' +
+
+                subCategory.id +
+
+                "')\">DELETE</button>";
+
+
+            categoryBox.appendChild(
+                subBox
+            );
+
+
+            const {
+
+                data: ledgers,
+
+                error: ledgerError
+
+            } =
+                await supabaseClient
+                    .from("ledgers")
+                    .select("*")
+                    .eq(
+                        "sub_category_id",
+                        subCategory.id
+                    )
+                    .order("name");
+
+
+            if (ledgerError) {
+
+                continue;
+
+            }
+
+
+            if (
+                ledgers.length === 0
+            ) {
+
+                const noLedger =
+                    document.createElement("p");
+
+
+                noLedger.style.marginLeft =
+                    "20px";
+
+
+                noLedger.innerText =
+                    "No Ledgers";
+
+
+                subBox.appendChild(
+                    noLedger
+                );
+
+
+            }
+
+
+            ledgers.forEach(
+                function(ledger) {
+
+
+                    const ledgerBox =
+                        document.createElement("div");
+
+
+                    ledgerBox.style.marginTop =
+                        "8px";
+
+
+                    ledgerBox.style.marginLeft =
+                        "20px";
+
+
+                    ledgerBox.innerHTML =
+
+                        "↳ Ledger: <strong>" +
+
+                        ledger.name +
+
+                        "</strong> " +
+
+                        '<button onclick="deleteLedger(\'' +
+
+                        ledger.id +
+
+                        "')\">DELETE</button>";
+
+
+                    subBox.appendChild(
+                        ledgerBox
+                    );
+
+
+                }
+            );
+
+
+        }
+
+
+    }
+
+
+}
+
+
+
+/* =====================================
+   DELETE LEDGER
+===================================== */
+
+async function deleteLedger(id) {
+
+
+    if (
+        !confirm(
+            "Delete this Ledger?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const { error } =
+        await supabaseClient
+            .from("ledgers")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Error deleting Ledger: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Ledger deleted successfully!"
+    );
+
+
+    loadCategoryList();
+
+
+}
+
+
+
+/* =====================================
+   DELETE SUB CATEGORY
+===================================== */
+
+async function deleteSubCategory(id) {
+
+
+    if (
+        !confirm(
+            "Delete this Sub Category and all its Ledgers?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    /* DELETE LEDGERS FIRST */
+
+    const { error: ledgerError } =
+        await supabaseClient
+            .from("ledgers")
+            .delete()
+            .eq(
+                "sub_category_id",
+                id
+            );
+
+
+    if (ledgerError) {
+
+        showMessage(
+            "Error deleting Ledgers: " +
+            ledgerError.message
+        );
+
+        return;
+
+    }
+
+
+    /* DELETE SUB CATEGORY */
+
+    const { error } =
+        await supabaseClient
+            .from("sub_categories")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Error deleting Sub Category: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Sub Category deleted successfully!"
+    );
+
+
+    loadCategoryList();
+
+
+}
+
+
+
+/* =====================================
+   DELETE MAIN CATEGORY
+===================================== */
+
+async function deleteMainCategory(id) {
+
+
+    if (
+        !confirm(
+            "Delete this Main Category, all Sub Categories and all Ledgers?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    /* GET SUB CATEGORIES */
+
+    const {
+
+        data: subCategories,
+
+        error: subError
+
+    } =
+        await supabaseClient
+            .from("sub_categories")
+            .select("id")
+            .eq(
+                "category_id",
+                id
+            );
+
+
+    if (subError) {
+
+        showMessage(
+            "Error loading Sub Categories: " +
+            subError.message
+        );
+
+        return;
+
+    }
+
+
+    /* DELETE ALL LEDGERS */
+
+    for (
+        const subCategory of subCategories
+    ) {
+
+
+        const { error: ledgerError } =
+            await supabaseClient
+                .from("ledgers")
+                .delete()
+                .eq(
+                    "sub_category_id",
+                    subCategory.id
+                );
+
+
+        if (ledgerError) {
+
+            showMessage(
+                "Error deleting Ledgers: " +
+                ledgerError.message
+            );
+
+            return;
+
+        }
+
+
+    }
+
+
+    /* DELETE SUB CATEGORIES */
+
+    const { error: deleteSubError } =
+        await supabaseClient
+            .from("sub_categories")
+            .delete()
+            .eq(
+                "category_id",
+                id
+            );
+
+
+    if (deleteSubError) {
+
+        showMessage(
+            "Error deleting Sub Categories: " +
+            deleteSubError.message
+        );
+
+        return;
+
+    }
+
+
+    /* DELETE MAIN CATEGORY */
+
+    const { error } =
+        await supabaseClient
+            .from("categories")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Error deleting Main Category: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Main Category deleted successfully!"
+    );
+
+
+    loadCategories();
+
+    loadCategoryList();
+
+
 }
 
 
@@ -586,6 +1182,8 @@ function goDashboard() {
 ===================================== */
 
 loadCategories();
+
+loadCategoryList();
 
 
 </script>
