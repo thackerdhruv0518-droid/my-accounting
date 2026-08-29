@@ -4,445 +4,451 @@
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Login - My Accounting</title>
+    <title>Login - My Accounting</title>
 
 
-<!-- SUPABASE -->
+    <!-- SUPABASE -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="supabase.js"></script>
+    <script src="supabase.js"></script>
 
 
-<!-- LOGIN PAGE CSS -->
+    <!-- LOGIN PAGE CSS -->
 
-<style>
+    <style>
 
+        * {
 
-    * {
+            box-sizing:
+                border-box;
 
-        box-sizing:
-            border-box;
+        }
 
-    }
 
+        body {
 
-    body {
+            margin:
+                0;
 
-        margin:
-            0;
+            min-height:
+                100vh;
 
-        min-height:
-            100vh;
+            display:
+                flex;
 
-        display:
-            flex;
+            justify-content:
+                center;
 
-        justify-content:
-            center;
+            align-items:
+                center;
 
-        align-items:
-            center;
+            font-family:
+                Arial,
+                sans-serif;
 
-        font-family:
-            Arial,
-            sans-serif;
+            background:
+                #f4f6f9;
 
-        background:
-            #f4f6f9;
+            color:
+                #222;
 
-        color:
-            #222;
+        }
 
-    }
-
-
-
-    /* =====================================
-       LOGIN CONTAINER
-    ===================================== */
-
-    .login-container {
-
-        width:
-            100%;
-
-        max-width:
-            420px;
-
-        padding:
-            20px;
-
-    }
-
-
-
-    /* =====================================
-       LOGIN BOX
-    ===================================== */
-
-    .login-box {
-
-        background:
-            #ffffff;
-
-        padding:
-            40px 35px;
-
-        border-radius:
-            15px;
-
-        box-shadow:
-            0 5px 25px
-            rgba(0, 0, 0, 0.12);
-
-    }
-
-
-
-    /* =====================================
-       HEADER
-    ===================================== */
-
-    .login-header {
-
-        text-align:
-            center;
-
-        margin-bottom:
-            30px;
-
-    }
-
-
-    .login-header h1 {
-
-        margin:
-            0;
-
-        font-size:
-            30px;
-
-        letter-spacing:
-            1px;
-
-        color:
-            #222;
-
-    }
-
-
-    .login-header p {
-
-        margin:
-            10px 0 0;
-
-        color:
-            #777;
-
-        font-size:
-            14px;
-
-    }
-
-
-
-    /* =====================================
-       FORM
-    ===================================== */
-
-    .form-group {
-
-        margin-bottom:
-            20px;
-
-    }
-
-
-    label {
-
-        display:
-            block;
-
-        margin-bottom:
-            8px;
-
-        font-size:
-            14px;
-
-        font-weight:
-            bold;
-
-        color:
-            #333;
-
-    }
-
-
-    input {
-
-        width:
-            100%;
-
-        padding:
-            14px;
-
-        border:
-            1px solid
-            #ddd;
-
-        border-radius:
-            8px;
-
-        font-size:
-            15px;
-
-        outline:
-            none;
-
-        transition:
-            0.2s;
-
-    }
-
-
-    input:focus {
-
-        border-color:
-            #222;
-
-        box-shadow:
-            0 0 0 3px
-            rgba(0, 0, 0, 0.05);
-
-    }
-
-
-
-    /* =====================================
-       LOGIN BUTTON
-    ===================================== */
-
-    .login-button {
-
-        width:
-            100%;
-
-        border:
-            none;
-
-        padding:
-            15px;
-
-        background:
-            #222;
-
-        color:
-            white;
-
-        border-radius:
-            8px;
-
-        font-size:
-            15px;
-
-        font-weight:
-            bold;
-
-        cursor:
-            pointer;
-
-        transition:
-            0.2s;
-
-    }
-
-
-    .login-button:hover {
-
-        background:
-            #000;
-
-        transform:
-            translateY(-1px);
-
-    }
-
-
-    .login-button:disabled {
-
-        opacity:
-            0.6;
-
-        cursor:
-            not-allowed;
-
-        transform:
-            none;
-
-    }
-
-
-
-    /* =====================================
-       MESSAGE
-    ===================================== */
-
-    #loginMessage {
-
-        text-align:
-            center;
-
-        margin-top:
-            18px;
-
-        margin-bottom:
-            0;
-
-        font-size:
-            14px;
-
-        min-height:
-            20px;
-
-        color:
-            #c62828;
-
-    }
-
-
-
-    /* =====================================
-       MOBILE
-    ===================================== */
-
-    @media (
-        max-width:
-        480px
-    ) {
 
         .login-container {
 
+            width:
+                100%;
+
+            max-width:
+                420px;
+
             padding:
-                15px;
+                20px;
 
         }
 
 
         .login-box {
 
+            background:
+                #ffffff;
+
             padding:
-                30px 22px;
+                40px 35px;
+
+            border-radius:
+                15px;
+
+            box-shadow:
+                0 5px 25px
+                rgba(0, 0, 0, 0.12);
+
+        }
+
+
+        .login-header {
+
+            text-align:
+                center;
+
+            margin-bottom:
+                30px;
 
         }
 
 
         .login-header h1 {
 
+            margin:
+                0;
+
             font-size:
-                25px;
+                30px;
+
+            letter-spacing:
+                1px;
+
+            color:
+                #222;
 
         }
 
-    }
+
+        .login-header p {
+
+            margin:
+                10px 0 0;
+
+            color:
+                #777;
+
+            font-size:
+                14px;
+
+        }
 
 
-</style>
-```
+        .form-group {
+
+            margin-bottom:
+                20px;
+
+        }
+
+
+        label {
+
+            display:
+                block;
+
+            margin-bottom:
+                8px;
+
+            font-size:
+                14px;
+
+            font-weight:
+                bold;
+
+            color:
+                #333;
+
+        }
+
+
+        input {
+
+            width:
+                100%;
+
+            padding:
+                14px;
+
+            border:
+                1px solid
+                #ddd;
+
+            border-radius:
+                8px;
+
+            font-size:
+                15px;
+
+            outline:
+                none;
+
+        }
+
+
+        input:focus {
+
+            border-color:
+                #222;
+
+        }
+
+
+        /* REMEMBER ME */
+
+        .remember-box {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            margin-bottom:
+                20px;
+
+        }
+
+
+        .remember-box input {
+
+            width:
+                auto;
+
+            padding:
+                0;
+
+            cursor:
+                pointer;
+
+        }
+
+
+        .remember-box label {
+
+            margin:
+                0;
+
+            font-size:
+                14px;
+
+            cursor:
+                pointer;
+
+        }
+
+
+        .login-button {
+
+            width:
+                100%;
+
+            border:
+                none;
+
+            padding:
+                15px;
+
+            background:
+                #222;
+
+            color:
+                white;
+
+            border-radius:
+                8px;
+
+            font-size:
+                15px;
+
+            font-weight:
+                bold;
+
+            cursor:
+                pointer;
+
+        }
+
+
+        .login-button:hover {
+
+            background:
+                #000;
+
+        }
+
+
+        .login-button:disabled {
+
+            opacity:
+                0.6;
+
+            cursor:
+                not-allowed;
+
+        }
+
+
+        #loginMessage {
+
+            text-align:
+                center;
+
+            margin-top:
+                18px;
+
+            margin-bottom:
+                0;
+
+            font-size:
+                14px;
+
+            min-height:
+                20px;
+
+            color:
+                #c62828;
+
+        }
+
+
+        @media (
+            max-width:
+            480px
+        ) {
+
+            .login-container {
+
+                padding:
+                    15px;
+
+            }
+
+
+            .login-box {
+
+                padding:
+                    30px 22px;
+
+            }
+
+
+            .login-header h1 {
+
+                font-size:
+                    25px;
+
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
+
 
 <div class="login-container">
 
-```
-<div class="login-box">
+    <div class="login-box">
 
 
-    <!-- HEADER -->
+        <!-- HEADER -->
 
-    <div class="login-header">
+        <div class="login-header">
 
-        <h1>
-            MY ACCOUNTING
-        </h1>
+            <h1>
+                MY ACCOUNTING
+            </h1>
 
-        <p>
-            Login to your personal accounting system
-        </p>
+            <p>
+                Login to your personal accounting system
+            </p>
 
-    </div>
+        </div>
 
 
+        <!-- EMAIL -->
 
-    <!-- EMAIL -->
+        <div class="form-group">
 
-    <div class="form-group">
+            <label for="email">
+                Email Address
+            </label>
 
-        <label for="email">
-            Email Address
-        </label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+            >
 
-        <input
-            type="email"
-            id="email"
-            placeholder="Enter your email"
-            autocomplete="email"
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+            >
+
+        </div>
+
+
+        <!-- REMEMBER ME -->
+
+        <div class="remember-box">
+
+            <input
+                type="checkbox"
+                id="rememberMe"
+                checked
+            >
+
+            <label for="rememberMe">
+                Remember me
+            </label>
+
+        </div>
+
+
+        <!-- LOGIN BUTTON -->
+
+        <button
+            id="loginButton"
+            class="login-button"
+            onclick="login()"
         >
+            LOGIN
+        </button>
+
+
+        <!-- MESSAGE -->
+
+        <p id="loginMessage"></p>
+
 
     </div>
-
-
-
-    <!-- PASSWORD -->
-
-    <div class="form-group">
-
-        <label for="password">
-            Password
-        </label>
-
-        <input
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-        >
-
-    </div>
-
-
-
-    <!-- LOGIN BUTTON -->
-
-    <button
-        id="loginButton"
-        class="login-button"
-        onclick="login()"
-    >
-        LOGIN
-    </button>
-
-
-
-    <!-- MESSAGE -->
-
-    <p id="loginMessage"></p>
-
 
 </div>
-```
 
-</div>
 
 <script>
 
@@ -463,21 +469,24 @@ async function checkLogin() {
     } = await supabaseClient.auth.getSession();
 
 
-    if (
-        error
-    ) {
+    if (error) {
 
-        console.error(
-            error
-        );
+        console.error(error);
 
         return;
 
     }
 
 
+    const rememberMe =
+        localStorage.getItem(
+            "rememberMe"
+        );
+
+
     if (
-        data.session
+        data.session &&
+        rememberMe === "true"
     ) {
 
         window.location.href =
@@ -509,6 +518,12 @@ async function login() {
         ).value;
 
 
+    const rememberMe =
+        document.getElementById(
+            "rememberMe"
+        ).checked;
+
+
     const message =
         document.getElementById(
             "loginMessage"
@@ -521,26 +536,17 @@ async function login() {
         );
 
 
-
-    /* VALIDATION */
-
     if (
         !email ||
         !password
     ) {
 
-        message.style.color =
-            "#c62828";
-
-
         message.innerText =
             "Please enter email and password.";
-
 
         return;
 
     }
-
 
 
     loginButton.disabled =
@@ -553,7 +559,6 @@ async function login() {
 
     message.innerText =
         "";
-
 
 
     try {
@@ -576,33 +581,37 @@ async function login() {
         });
 
 
-
-        if (
-            error
-        ) {
-
-            console.error(
-                error
-            );
-
-
-            message.style.color =
-                "#c62828";
-
+        if (error) {
 
             message.innerText =
                 error.message;
-
 
             return;
 
         }
 
 
+        /* SAVE REMEMBER SETTING */
 
-        if (
-            data.user
-        ) {
+        if (rememberMe) {
+
+            localStorage.setItem(
+                "rememberMe",
+                "true"
+            );
+
+        }
+
+        else {
+
+            localStorage.removeItem(
+                "rememberMe"
+            );
+
+        }
+
+
+        if (data.user) {
 
             message.style.color =
                 "#2e7d32";
@@ -627,59 +636,38 @@ async function login() {
 
     }
 
+    catch (error) {
 
-    catch (
-        error
-    ) {
-
-
-        console.error(
-            error
-        );
-
-
-        message.style.color =
-            "#c62828";
-
+        console.error(error);
 
         message.innerText =
             "Something went wrong. Please try again.";
 
     }
 
-
     finally {
-
 
         loginButton.disabled =
             false;
-
 
         loginButton.innerText =
             "LOGIN";
 
     }
 
-
 }
 
 
-
-/* =====================================
-   ENTER KEY LOGIN
-===================================== */
+/* ENTER KEY */
 
 document
-    .getElementById(
-        "password"
-    )
+    .getElementById("password")
     .addEventListener(
         "keypress",
         function(event) {
 
             if (
-                event.key ===
-                "Enter"
+                event.key === "Enter"
             ) {
 
                 login();
@@ -690,15 +678,13 @@ document
     );
 
 
-
-/* =====================================
-   START
-===================================== */
+/* START */
 
 checkLogin();
 
 
 </script>
+
 
 </body>
 
