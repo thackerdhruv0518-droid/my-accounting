@@ -10,12 +10,10 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Account Statement - My Accounting</title>
+    <title>Request Access - My Accounting</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="supabase.js"></script>
-
 
     <style>
 
@@ -23,112 +21,80 @@
             box-sizing: border-box;
         }
 
-
         body {
             margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: Arial, sans-serif;
             background: #f4f6f9;
-            color: #222;
+            padding: 20px;
         }
 
-
-        .page-container {
-            max-width: 1000px;
-            margin: auto;
-            padding: 25px;
-        }
-
-
-        .header,
         .box {
+            width: 100%;
+            max-width: 450px;
             background: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow:
-                0 2px 10px
-                rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
 
-
-        .header {
+        h1 {
+            margin-top: 0;
             text-align: center;
         }
 
-
-        .header h1 {
-            margin: 0;
-        }
-
-
-        .header p {
+        p {
             color: #666;
+            text-align: center;
         }
 
-
-        .balance-box {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-
-        th {
-            background: #222;
-            color: white;
-            text-align: left;
-            padding: 12px;
-        }
-
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-
-        .amount {
-            text-align: right;
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
             font-weight: bold;
         }
 
-
-        .back-button {
+        input {
             width: 100%;
-            border: none;
-            background: #222;
-            color: white;
-            padding: 15px;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
             font-size: 15px;
-            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
             border-radius: 8px;
+            background: #222;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
         }
 
+        button:hover {
+            background: #000;
+        }
 
-        @media (max-width: 600px) {
+        button:disabled {
+            opacity: 0.6;
+        }
 
-            .page-container {
-                padding: 15px;
-            }
+        #message {
+            margin-top: 18px;
+            text-align: center;
+            font-weight: bold;
+        }
 
-
-            .header,
-            .box {
-                padding: 18px;
-            }
-
-
-            table {
-                font-size: 13px;
-            }
-
+        .login-link {
+            margin-top: 20px;
+            text-align: center;
         }
 
     </style>
@@ -139,487 +105,235 @@
 <body>
 
 
-<div class="page-container">
+<div class="box">
+
+    <h1>🔐 MY ACCOUNTING</h1>
+
+    <p>
+        Request access to create your own
+        personal accounting workspace.
+    </p>
 
 
-    <div class="header">
+    <label>Your Name</label>
 
-        <h1>
-            MY ACCOUNTING
-        </h1>
-
-        <p id="accountName">
-            Loading Account...
-        </p>
-
-    </div>
+    <input
+        type="text"
+        id="fullName"
+        placeholder="Enter your name"
+    >
 
 
-    <div class="box">
+    <label>Email Address</label>
 
-        <div
-            id="openingBalance"
-            class="balance-box"
-        >
-            Opening Balance: ₹0.00
-        </div>
-
-
-        <div
-            id="currentBalance"
-            class="balance-box"
-        >
-            Current Balance: ₹0.00
-        </div>
-
-    </div>
-
-
-    <div class="box">
-
-        <h2>
-            Account Statement
-        </h2>
-
-
-        <div style="overflow-x:auto;">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Date</th>
-
-                        <th>Particulars</th>
-
-                        <th>Type</th>
-
-                        <th style="text-align:right;">
-                            Amount
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="statementBody">
-
-                    <tr>
-
-                        <td
-                            colspan="4"
-                            style="text-align:center;"
-                        >
-                            Loading...
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
+    <input
+        type="email"
+        id="email"
+        placeholder="Enter your email"
+    >
 
 
     <button
-        class="back-button"
-        onclick="goBack()"
+        id="requestButton"
+        onclick="requestAccess()"
     >
-        BACK TO ACCOUNTS
+        REQUEST ACCESS
     </button>
 
 
+    <div id="message"></div>
+
+
+    <div class="login-link">
+
+        Already have access?
+
+        <br><br>
+
+        <button onclick="goLogin()">
+            LOGIN
+        </button>
+
+    </div>
+
 </div>
+
 
 
 <script>
 
 
-/* =====================================
-   GET CURRENT USER
-===================================== */
+async function requestAccess() {
 
-async function getCurrentUser() {
-
-    const { data, error } =
-        await supabaseClient
-            .auth
-            .getUser();
+    const fullName =
+        document
+            .getElementById("fullName")
+            .value
+            .trim();
 
 
-    if (error || !data.user) {
-
-        window.location.href =
-            "index.html";
-
-        return null;
-
-    }
+    const email =
+        document
+            .getElementById("email")
+            .value
+            .trim()
+            .toLowerCase();
 
 
-    return data.user;
-
-}
-
-
-/* =====================================
-   FORMAT MONEY
-===================================== */
-
-function formatMoney(amount) {
-
-    return (
-        "₹" +
-        Number(amount || 0).toFixed(2)
-    );
-
-}
+    const message =
+        document.getElementById("message");
 
 
-/* =====================================
-   GET ACCOUNT ID FROM URL
-===================================== */
-
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+    const requestButton =
+        document.getElementById("requestButton");
 
 
-const accountId =
-    params.get("account");
+    if (!fullName || !email) {
 
-
-/* =====================================
-   LOAD STATEMENT
-===================================== */
-
-async function loadStatement() {
-
-
-    const body =
-        document.getElementById(
-            "statementBody"
-        );
-
-
-    if (!accountId) {
-
-        body.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    style="text-align:center;"
-                >
-                    Account not selected.
-                </td>
-
-            </tr>
-
-        `;
+        message.innerText =
+            "Please enter your name and email.";
 
         return;
 
     }
 
 
-    const user =
-        await getCurrentUser();
+    requestButton.disabled = true;
+
+    requestButton.innerText =
+        "SENDING...";
 
 
-    if (!user) {
-        return;
-    }
+    try {
+
+        /* CHECK EXISTING REQUEST */
+
+        const {
+            data: existingRequest,
+            error: checkError
+        } = await supabaseClient
+
+            .from("access_requests")
+
+            .select("id, status")
+
+            .eq("email", email)
+
+            .limit(1);
 
 
-    /* LOAD ACCOUNT */
+        if (checkError) {
 
-    const {
-        data: account,
-        error: accountError
-    } =
-        await supabaseClient
-            .from("accounts")
-            .select("*")
-            .eq(
-                "id",
-                accountId
-            )
-            .eq(
-                "user_id",
-                user.id
-            )
-            .single();
+            throw checkError;
+
+        }
 
 
-    if (accountError || !account) {
+        if (
+            existingRequest &&
+            existingRequest.length > 0
+        ) {
 
-        console.error(accountError);
-
-        body.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    style="text-align:center;"
-                >
-                    Account not found.
-                </td>
-
-            </tr>
-
-        `;
-
-        return;
-
-    }
+            const status =
+                existingRequest[0].status;
 
 
-    document.getElementById(
-        "accountName"
-    ).innerText =
-        account.name;
+            if (status === "pending") {
 
+                message.innerText =
+                    "⏳ Your access request is already pending.";
 
-    const opening =
-        Number(
-            account.opening_balance
-        ) || 0;
-
-
-    document.getElementById(
-        "openingBalance"
-    ).innerText =
-        "Opening Balance: " +
-        formatMoney(opening);
-
-
-    /* LOAD TRANSACTIONS */
-
-    const {
-        data: transactions,
-        error: transactionError
-    } =
-        await supabaseClient
-            .from("transactions")
-            .select("*")
-            .eq(
-                "user_id",
-                user.id
-            )
-            .eq(
-                "payment_account",
-                account.name
-            )
-            .order(
-                "transaction_date",
-                {
-                    ascending: false
-                }
-            );
-
-
-    if (transactionError) {
-
-        console.error(transactionError);
-
-        body.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    style="text-align:center;"
-                >
-                    Error loading transactions.
-                </td>
-
-            </tr>
-
-        `;
-
-        return;
-
-    }
-
-
-    let currentBalance =
-        opening;
-
-
-    (transactions || []).forEach(
-        function(transaction) {
-
-            const amount =
-                Number(
-                    transaction.amount
-                ) || 0;
-
-
-            if (
-                transaction.entry_type ===
-                "credit"
-            ) {
-
-                currentBalance +=
-                    amount;
+                return;
 
             }
 
-            else if (
-                transaction.entry_type ===
-                "debit"
-            ) {
 
-                currentBalance -=
-                    amount;
+            if (status === "approved") {
+
+                message.innerText =
+                    "✅ Your access is approved. Please login.";
+
+                return;
 
             }
 
         }
-    );
 
 
-    document.getElementById(
-        "currentBalance"
-    ).innerText =
-        "Current Balance: " +
-        formatMoney(
-            currentBalance
-        );
+        /* INSERT REQUEST */
+
+        const {
+            error
+        } = await supabaseClient
+
+            .from("access_requests")
+
+            .insert({
+
+                full_name: fullName,
+
+                email: email,
+
+                status: "pending"
+
+            });
 
 
-    body.innerHTML = "";
+        if (error) {
+
+            throw error;
+
+        }
 
 
-    if (
-        !transactions ||
-        transactions.length === 0
-    ) {
+        message.innerText =
+            "✅ Request sent successfully! Please wait for approval.";
 
-        body.innerHTML = `
 
-            <tr>
+        document
+            .getElementById("fullName")
+            .value = "";
 
-                <td
-                    colspan="4"
-                    style="text-align:center;"
-                >
-                    No transactions found.
-                </td>
 
-            </tr>
+        document
+            .getElementById("email")
+            .value = "";
 
-        `;
-
-        return;
 
     }
 
+    catch (error) {
 
-    transactions.forEach(
-        function(transaction) {
+        console.error(error);
 
-            const row =
-                document.createElement(
-                    "tr"
-                );
+        message.innerText =
+            "❌ Error: " +
+            error.message;
 
+    }
 
-            row.innerHTML = `
+    finally {
 
-                <td>
-                    ${transaction.transaction_date || ""}
-                </td>
+        requestButton.disabled = false;
 
+        requestButton.innerText =
+            "REQUEST ACCESS";
 
-                <td>
-                    ${escapeHtml(
-                        transaction.description ||
-                        transaction.ledger_name ||
-                        ""
-                    )}
-                </td>
-
-
-                <td>
-                    ${
-                        transaction.entry_type === "credit"
-                            ? "Credit (Received)"
-                            : "Debit (Paid)"
-                    }
-                </td>
-
-
-                <td class="amount">
-                    ${formatMoney(transaction.amount)}
-                </td>
-
-            `;
-
-
-            body.appendChild(
-                row
-            );
-
-        }
-    );
+    }
 
 }
 
 
-/* =====================================
-   ESCAPE HTML
-===================================== */
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.innerText =
-        text || "";
-
-
-    return div.innerHTML;
-
-}
-
-
-/* =====================================
-   BACK
-===================================== */
-
-function goBack() {
+function goLogin() {
 
     window.location.href =
-        "add-account.html";
+        "index.html";
 
 }
-
-
-/* =====================================
-   START
-===================================== */
-
-loadStatement();
 
 
 </script>
 
 
 </body>
-
 </html>
