@@ -5,13 +5,10 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>My Accounting - Dashboard</title>
-
+    <title>Dashboard - My Accounting</title>
 
     <!-- SUPABASE -->
 
@@ -31,174 +28,183 @@
 
             margin: 0;
 
-            padding: 0;
+            font-family: Arial, sans-serif;
 
-            font-family:
-                Arial,
-                sans-serif;
+            background: #f4f6f9;
 
-            background:
-                #f4f6f9;
-
-            color:
-                #222;
+            color: #222;
 
         }
 
 
-        /* ===============================
-           MAIN DASHBOARD
-        =============================== */
+        /* =========================
+           PAGE
+        ========================= */
 
-        .dashboard-page {
+        .page-container {
 
-            max-width:
-                1200px;
+            max-width: 1200px;
 
-            margin:
-                auto;
+            margin: auto;
 
-            padding:
-                25px;
+            padding: 25px;
 
         }
 
 
-        /* ===============================
+        /* =========================
            HEADER
-        =============================== */
+        ========================= */
 
-        .dashboard-header {
+        .header {
 
-            background:
-                #ffffff;
+            background: white;
 
-            padding:
-                25px;
+            padding: 25px;
 
-            border-radius:
-                12px;
+            border-radius: 12px;
 
-            margin-bottom:
-                25px;
+            margin-bottom: 20px;
 
             box-shadow:
                 0 2px 10px
                 rgba(0, 0, 0, 0.08);
 
-        }
+            display: flex;
 
+            justify-content: space-between;
 
-        .dashboard-header h1 {
-
-            margin:
-                0;
-
-            font-size:
-                28px;
+            align-items: center;
 
         }
 
 
-        .dashboard-header p {
+        .header h1 {
 
-            margin:
-                8px 0 0;
-
-            color:
-                #666;
+            margin: 0;
 
         }
 
 
-        /* ===============================
-           SUMMARY CARDS
-        =============================== */
+        .header p {
 
-        .summary-grid {
+            color: #666;
 
-            display:
-                grid;
+            margin-bottom: 0;
+
+        }
+
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        button {
+
+            border: none;
+
+            background: #222;
+
+            color: white;
+
+            padding: 12px 18px;
+
+            border-radius: 7px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        button:hover {
+
+            background: #000;
+
+        }
+
+
+        .logout-button {
+
+            background: #b71c1c;
+
+        }
+
+
+        .logout-button:hover {
+
+            background: #7f0000;
+
+        }
+
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .dashboard-grid {
+
+            display: grid;
 
             grid-template-columns:
                 repeat(4, 1fr);
 
-            gap:
-                20px;
+            gap: 15px;
 
-            margin-bottom:
-                25px;
+            margin-bottom: 20px;
 
         }
 
 
         .summary-card {
 
-            background:
-                white;
+            background: white;
 
-            padding:
-                20px;
+            padding: 20px;
 
-            border-radius:
-                12px;
+            border-radius: 12px;
 
             box-shadow:
                 0 2px 10px
                 rgba(0, 0, 0, 0.08);
 
-            border-left:
-                5px solid
-                #222;
+        }
+
+
+        .summary-title {
+
+            font-size: 14px;
+
+            color: #666;
 
         }
 
 
-        .summary-card h3 {
+        .summary-amount {
 
-            margin:
-                0 0 12px;
+            font-size: 26px;
 
-            font-size:
-                14px;
+            font-weight: bold;
 
-            color:
-                #666;
+            margin-top: 10px;
 
         }
 
 
-        .summary-card p {
-
-            margin:
-                0;
-
-            font-size:
-                22px;
-
-            font-weight:
-                bold;
-
-        }
-
-
-        /* ===============================
+        /* =========================
            QUICK ACTIONS
-        =============================== */
+        ========================= */
 
-        .quick-actions {
+        .box {
 
-            background:
-                white;
+            background: white;
 
-            padding:
-                25px;
+            padding: 25px;
 
-            border-radius:
-                12px;
+            border-radius: 12px;
 
-            margin-bottom:
-                25px;
+            margin-bottom: 20px;
 
             box-shadow:
                 0 2px 10px
@@ -207,176 +213,34 @@
         }
 
 
-        .section-title {
+        .quick-buttons {
 
-            margin:
-                0 0 20px;
-
-            font-size:
-                20px;
-
-        }
-
-
-        .action-grid {
-
-            display:
-                grid;
+            display: grid;
 
             grid-template-columns:
-                repeat(3, 1fr);
+                repeat(2, 1fr);
 
-            gap:
-                15px;
-
-        }
-
-
-        .action-button {
-
-            border:
-                none;
-
-            padding:
-                16px;
-
-            font-size:
-                15px;
-
-            font-weight:
-                bold;
-
-            cursor:
-                pointer;
-
-            background:
-                #222;
-
-            color:
-                white;
-
-            border-radius:
-                8px;
-
-            transition:
-                0.2s;
+            gap: 12px;
 
         }
 
 
-        .action-button:hover {
+        .quick-buttons button {
 
-            transform:
-                translateY(-2px);
+            padding: 18px;
 
-            background:
-                #000;
+            font-size: 15px;
 
         }
 
 
-        /* ===============================
-           RECENT TRANSACTIONS
-        =============================== */
-
-        .recent-box {
-
-            background:
-                white;
-
-            padding:
-                25px;
-
-            border-radius:
-                12px;
-
-            box-shadow:
-                0 2px 10px
-                rgba(0, 0, 0, 0.08);
-
-            overflow-x:
-                auto;
-
-        }
-
-
-        .recent-table {
-
-            width:
-                100%;
-
-            border-collapse:
-                collapse;
-
-        }
-
-
-        .recent-table th {
-
-            text-align:
-                left;
-
-            padding:
-                14px;
-
-            background:
-                #222;
-
-            color:
-                white;
-
-        }
-
-
-        .recent-table td {
-
-            padding:
-                14px;
-
-            border-bottom:
-                1px solid
-                #eee;
-
-        }
-
-
-        .recent-table tr:hover {
-
-            background:
-                #f7f7f7;
-
-        }
-
-
-        .amount {
-
-            text-align:
-                right;
-
-            font-weight:
-                bold;
-
-        }
-
-
-        /* ===============================
+        /* =========================
            MOBILE
-        =============================== */
+        ========================= */
 
-        @media (
-            max-width:
-            900px
-        ) {
+        @media(max-width:800px) {
 
-            .summary-grid {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-            }
-
-
-            .action-grid {
+            .dashboard-grid {
 
                 grid-template-columns:
                     repeat(2, 1fr);
@@ -386,20 +250,32 @@
         }
 
 
-        @media (
-            max-width:
-            600px
-        ) {
+        @media(max-width:600px) {
 
-            .dashboard-page {
+            .page-container {
 
-                padding:
-                    15px;
+                padding: 15px;
 
             }
 
 
-            .summary-grid {
+            .header {
+
+                display: block;
+
+            }
+
+
+            .logout-button {
+
+                width: 100%;
+
+                margin-top: 15px;
+
+            }
+
+
+            .dashboard-grid {
 
                 grid-template-columns:
                     1fr;
@@ -407,7 +283,7 @@
             }
 
 
-            .action-grid {
+            .quick-buttons {
 
                 grid-template-columns:
                     1fr;
@@ -415,10 +291,9 @@
             }
 
 
-            .dashboard-header h1 {
+            .box {
 
-                font-size:
-                    23px;
+                padding: 18px;
 
             }
 
@@ -432,234 +307,210 @@
 <body>
 
 
-<div class="dashboard-page">
+<div class="page-container">
 
 
-    <!-- HEADER -->
+    <!-- =========================
+         HEADER
+    ========================= -->
 
-    <div class="dashboard-header">
-
-        <h1>
-            MY ACCOUNTING
-        </h1>
-
-        <p>
-            Personal Accounting Dashboard
-        </p>
-
-    </div>
+    <div class="header">
 
 
-    <!-- SUMMARY -->
+        <div>
 
-    <div class="summary-grid">
+            <h1>
+                MY ACCOUNTING
+            </h1>
 
-
-        <div class="summary-card">
-
-            <h3>
-                TOTAL INCOME
-            </h3>
-
-            <p id="totalIncome">
-                ₹0.00
+            <p>
+                Financial Dashboard
             </p>
 
         </div>
 
 
-        <div class="summary-card">
-
-            <h3>
-                TOTAL EXPENSE
-            </h3>
-
-            <p id="totalExpense">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>
-                NET PROFIT / LOSS
-            </h3>
-
-            <p id="netProfit">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>
-                TOTAL TRANSACTIONS
-            </h3>
-
-            <p id="totalTransactions">
-                0
-            </p>
-
-        </div>
+        <button
+            class="logout-button"
+            onclick="logout()"
+        >
+            LOGOUT
+        </button>
 
 
     </div>
 
 
-    <!-- QUICK ACTIONS -->
 
-    <div class="quick-actions">
+    <!-- =========================
+         SUMMARY
+    ========================= -->
+
+    <div class="dashboard-grid">
 
 
-        <h2 class="section-title">
-            Quick Actions
+        <!-- TOTAL INCOME -->
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+
+                💰 TOTAL INCOME
+
+            </div>
+
+
+            <div
+                class="summary-amount"
+                id="totalIncome"
+            >
+
+                ₹0.00
+
+            </div>
+
+        </div>
+
+
+
+        <!-- TOTAL EXPENSE -->
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+
+                💸 TOTAL EXPENSE
+
+            </div>
+
+
+            <div
+                class="summary-amount"
+                id="totalExpense"
+            >
+
+                ₹0.00
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CASH BALANCE -->
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+
+                💵 CASH BALANCE
+
+            </div>
+
+
+            <div
+                class="summary-amount"
+                id="cashBalance"
+            >
+
+                ₹0.00
+
+            </div>
+
+        </div>
+
+
+
+        <!-- BANK BALANCE -->
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+
+                🏦 BANK BALANCE
+
+            </div>
+
+
+            <div
+                class="summary-amount"
+                id="bankBalance"
+            >
+
+                ₹0.00
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         QUICK ACTIONS
+    ========================= -->
+
+    <div class="box">
+
+
+        <h2>
+            ⚡ Quick Actions
         </h2>
 
 
-        <div class="action-grid">
+        <div class="quick-buttons">
 
 
-            <button
-                class="action-button"
-                onclick="goToPage('add-transaction.html')"
-            >
-                ADD TRANSACTION
+            <button onclick="openLedger()">
+
+                📒 LEDGERS
+
             </button>
 
 
-            <button
-                class="action-button"
-                onclick="goToPage('add-account.html')"
-            >
-                CASH & BANK ACCOUNTS
+
+            <button onclick="openAccounts()">
+
+                🏦 CASH / BANK ACCOUNTS
+
             </button>
 
 
-            <button
-                class="action-button"
-                onclick="goToPage('trial-balance.html')"
-            >
-                TRIAL BALANCE
+
+            <button onclick="openLoans()">
+
+                💰 LOAN ACCOUNTS
+
             </button>
 
 
-            <button
-                class="action-button"
-                onclick="goToPage('balance-sheet.html')"
-            >
-                BALANCE SHEET
+
+            <button onclick="openGPay()">
+
+                📱 GPAY STATEMENT
+
             </button>
 
 
-            <button
-                class="action-button"
-                onclick="goToPage('profit-loss.html')"
-            >
-                PROFIT & LOSS
+
+            <button onclick="openSettings()">
+
+                ⚙️ SETTINGS
+
             </button>
 
 
-            <button
-                class="action-button"
-                onclick="goToPage('add-category.html')"
-            >
-                ADD CATEGORY
-            </button>
 
+            <button onclick="refreshDashboard()">
 
-            <button
-                class="action-button"
-                onclick="goToPage('gpay.html')"
-            >
-                GPAY STATEMENT
-            </button>
+                🔄 REFRESH DASHBOARD
 
-
-            <button
-                class="action-button"
-                onclick="goToPage('reports.html')"
-            >
-                REPORTS
-            </button>
-
-
-            <button
-                class="action-button"
-                onclick="goToPage('settings.html')"
-            >
-                SETTINGS
             </button>
 
 
         </div>
-
-
-    </div>
-
-
-    <!-- RECENT TRANSACTIONS -->
-
-    <div class="recent-box">
-
-
-        <h2 class="section-title">
-            Recent Transactions
-        </h2>
-
-
-        <table class="recent-table">
-
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Date
-                    </th>
-
-                    <th>
-                        Particulars
-                    </th>
-
-                    <th>
-                        Category
-                    </th>
-
-                    <th
-                        style="text-align:right;"
-                    >
-                        Amount
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody
-                id="recentTransactions"
-            >
-
-                <tr>
-
-                    <td
-                        colspan="4"
-                        style="text-align:center;"
-                    >
-                        Loading...
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-
-        </table>
 
 
     </div>
@@ -668,361 +519,516 @@
 </div>
 
 
+
 <script>
 
 
-/* =====================================
-   FORMAT AMOUNT
-===================================== */
+/* =============================
+   GLOBAL VARIABLES
+============================= */
 
-function formatAmount(amount) {
+let currentUser = null;
 
-    return (
-        "₹" +
-        Number(amount || 0).toFixed(2)
-    );
+let accounts = [];
 
-}
+let transactions = [];
 
 
-/* =====================================
-   OPEN PAGE
-===================================== */
-
-function goToPage(page) {
-
-    window.location.href =
-        page;
-
-}
-
-
-/* =====================================
+/* =============================
    GET CURRENT USER
-===================================== */
+============================= */
 
 async function getCurrentUser() {
 
-    const { data, error } =
+
+    const {
+
+        data,
+
+        error
+
+    } =
         await supabaseClient
             .auth
             .getUser();
 
 
-    if (error || !data.user) {
+    if (
 
-        console.error(
-            "User not logged in",
-            error
-        );
+        error ||
+
+        !data.user
+
+    ) {
+
+
+        window.location.href =
+            "index.html";
+
 
         return null;
 
     }
 
 
-    return data.user;
+    currentUser =
+        data.user;
+
+
+    return currentUser;
 
 }
 
 
-/* =====================================
-   LOAD DASHBOARD
-===================================== */
+/* =============================
+   FORMAT MONEY
+============================= */
 
-async function loadDashboard() {
-
-
-    const recentBody =
-        document.getElementById(
-            "recentTransactions"
-        );
+function formatMoney(amount) {
 
 
-    try {
+    return "₹" +
+
+        Number(
+            amount || 0
+        )
+        .toFixed(2);
+
+}
 
 
-        const user =
-            await getCurrentUser();
+/* =============================
+   LOAD ACCOUNTS
+============================= */
+
+async function loadAccounts() {
 
 
-        if (!user) {
+    const {
 
-            recentBody.innerHTML = `
+        data,
 
-                <tr>
+        error
 
-                    <td
-                        colspan="4"
-                        style="text-align:center;"
-                    >
-                        Please login first.
-                    </td>
-
-                </tr>
-
-            `;
-
-            return;
-
-        }
-
-
-        const { data, error } =
-            await supabaseClient
-                .from("transactions")
-                .select("*")
-                .eq(
-                    "user_id",
-                    user.id
-                )
-                .order(
-                    "transaction_date",
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        if (error) {
-
-            console.error(
-                "Dashboard Error:",
-                error
+    } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "user_id",
+                currentUser.id
             );
 
 
-            recentBody.innerHTML = `
-
-                <tr>
-
-                    <td
-                        colspan="4"
-                        style="text-align:center;"
-                    >
-                        Error loading transactions
-                    </td>
-
-                </tr>
-
-            `;
-
-
-            return;
-
-        }
-
-
-        const transactions =
-            data || [];
-
-
-        let totalIncome =
-            0;
-
-
-        let totalExpense =
-            0;
-
-
-        /* CALCULATE TOTALS */
-
-        transactions.forEach(
-            function(transaction) {
-
-
-                const amount =
-                    Number(
-                        transaction.amount
-                    ) || 0;
-
-
-                if (
-                    transaction.entry_type ===
-                    "credit"
-                ) {
-
-                    totalIncome +=
-                        amount;
-
-                }
-
-                else if (
-                    transaction.entry_type ===
-                    "debit"
-                ) {
-
-                    totalExpense +=
-                        amount;
-
-                }
-
-
-            }
-        );
-
-
-        const netProfit =
-            totalIncome -
-            totalExpense;
-
-
-        /* SHOW SUMMARY */
-
-        document.getElementById(
-            "totalIncome"
-        ).innerText =
-            formatAmount(
-                totalIncome
-            );
-
-
-        document.getElementById(
-            "totalExpense"
-        ).innerText =
-            formatAmount(
-                totalExpense
-            );
-
-
-        document.getElementById(
-            "netProfit"
-        ).innerText =
-            formatAmount(
-                netProfit
-            );
-
-
-        document.getElementById(
-            "totalTransactions"
-        ).innerText =
-            transactions.length;
-
-
-        /* RECENT 5 TRANSACTIONS */
-
-        recentBody.innerHTML =
-            "";
-
-
-        const recentTransactions =
-            transactions.slice(
-                0,
-                5
-            );
-
-
-        if (
-            recentTransactions.length ===
-            0
-        ) {
-
-
-            recentBody.innerHTML = `
-
-                <tr>
-
-                    <td
-                        colspan="4"
-                        style="text-align:center;"
-                    >
-                        No transactions found
-                    </td>
-
-                </tr>
-
-            `;
-
-
-            return;
-
-        }
-
-
-        recentTransactions.forEach(
-            function(transaction) {
-
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${transaction.transaction_date || ""}
-                    </td>
-
-
-                    <td>
-                        ${
-                            transaction.description ||
-                            transaction.sub_category ||
-                            ""
-                        }
-                    </td>
-
-
-                    <td>
-                        ${transaction.category || ""}
-                    </td>
-
-
-                    <td class="amount">
-                        ${formatAmount(transaction.amount)}
-                    </td>
-
-                `;
-
-
-                recentBody.appendChild(
-                    row
-                );
-
-
-            }
-        );
-
-
-    }
-
-    catch (error) {
+    if (error) {
 
 
         console.error(
+            "Accounts Error:",
             error
         );
 
 
-        recentBody.innerHTML = `
+        accounts = [];
 
-            <tr>
 
-                <td
-                    colspan="4"
-                    style="text-align:center;"
-                >
-                    Something went wrong
-                </td>
-
-            </tr>
-
-        `;
-
+        return;
 
     }
 
 
+    accounts =
+        data || [];
+
 }
 
 
-/* =====================================
-   START
-===================================== */
+/* =============================
+   LOAD TRANSACTIONS
+============================= */
 
-loadDashboard();
+async function loadTransactions() {
+
+
+    const {
+
+        data,
+
+        error
+
+    } =
+        await supabaseClient
+            .from("transactions")
+            .select("*")
+            .eq(
+                "user_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+
+        console.error(
+            "Transactions Error:",
+            error
+        );
+
+
+        transactions = [];
+
+
+        return;
+
+    }
+
+
+    transactions =
+        data || [];
+
+}
+
+
+/* =============================
+   GET ACCOUNT BALANCE
+
+   Income  = +
+   Expense = -
+============================= */
+
+function getAccountBalance(accountId) {
+
+
+    let balance = 0;
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            if (
+
+                transaction.account_id !==
+                accountId
+
+            ) {
+
+                return;
+
+            }
+
+
+            const amount =
+                Number(
+                    transaction.amount || 0
+                );
+
+
+            const type =
+                (
+                    transaction.type ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            if (
+
+                type === "income"
+
+            ) {
+
+
+                balance += amount;
+
+            }
+
+
+            else if (
+
+                type === "expense"
+
+            ) {
+
+
+                balance -= amount;
+
+            }
+
+
+        }
+    );
+
+
+    return balance;
+
+}
+
+
+/* =============================
+   UPDATE SUMMARY
+============================= */
+
+function updateSummary() {
+
+
+    let income = 0;
+
+    let expense = 0;
+
+
+    /* TOTAL INCOME / EXPENSE */
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            const amount =
+                Number(
+                    transaction.amount || 0
+                );
+
+
+            const type =
+                (
+                    transaction.type ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            if (
+
+                type === "income"
+
+            ) {
+
+
+                income += amount;
+
+            }
+
+
+            else if (
+
+                type === "expense"
+
+            ) {
+
+
+                expense += amount;
+
+            }
+
+
+        }
+    );
+
+
+    /* CASH / BANK BALANCE */
+
+
+    let cash = 0;
+
+    let bank = 0;
+
+
+    accounts.forEach(
+        function(account) {
+
+
+            const balance =
+                getAccountBalance(
+                    account.id
+                );
+
+
+            const accountType =
+                (
+                    account.account_type ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            if (
+
+                accountType ===
+                "cash"
+
+            ) {
+
+
+                cash += balance;
+
+            }
+
+
+            else if (
+
+                accountType ===
+                "bank"
+
+            ) {
+
+
+                bank += balance;
+
+            }
+
+
+        }
+    );
+
+
+    /* DISPLAY */
+
+
+    document.getElementById(
+        "totalIncome"
+    ).innerText =
+        formatMoney(
+            income
+        );
+
+
+    document.getElementById(
+        "totalExpense"
+    ).innerText =
+        formatMoney(
+            expense
+        );
+
+
+    document.getElementById(
+        "cashBalance"
+    ).innerText =
+        formatMoney(
+            cash
+        );
+
+
+    document.getElementById(
+        "bankBalance"
+    ).innerText =
+        formatMoney(
+            bank
+        );
+
+}
+
+
+/* =============================
+   NAVIGATION
+============================= */
+
+
+function openLedger() {
+
+
+    window.location.href =
+        "ledger.html";
+
+}
+
+
+function openAccounts() {
+
+
+    window.location.href =
+        "add-account.html";
+
+}
+
+
+function openLoans() {
+
+
+    window.location.href =
+        "loan-account.html";
+
+}
+
+
+function openGPay() {
+
+
+    window.location.href =
+        "gpay.html";
+
+}
+
+
+function openSettings() {
+
+
+    window.location.href =
+        "settings.html";
+
+}
+
+
+/* =============================
+   REFRESH DASHBOARD
+============================= */
+
+async function refreshDashboard() {
+
+
+    await loadAccounts();
+
+
+    await loadTransactions();
+
+
+    updateSummary();
+
+}
+
+
+/* =============================
+   LOGOUT
+============================= */
+
+async function logout() {
+
+
+    await supabaseClient
+        .auth
+        .signOut();
+
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+/* =============================
+   START PAGE
+============================= */
+
+async function startPage() {
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+
+        return;
+
+    }
+
+
+    await refreshDashboard();
+
+}
+
+
+startPage();
 
 
 </script>
