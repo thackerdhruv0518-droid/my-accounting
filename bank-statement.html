@@ -5,18 +5,16 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Bank & Cash Statement - My Accounting</title>
+    <title>Cash & Bank Statement - My Accounting</title>
 
-    <link rel="stylesheet" href="style.css">
+    <!-- SUPABASE -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="supabase.js"></script>
+
 
     <style>
 
@@ -26,19 +24,30 @@
 
         body {
             margin: 0;
-            padding: 0;
             font-family: Arial, sans-serif;
             background: #f4f6f9;
             color: #222;
         }
 
         .page-container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: auto;
             padding: 25px;
         }
 
-        .header,
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
         .box {
             background: white;
             padding: 25px;
@@ -47,68 +56,71 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        .header {
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0;
-        }
-
-        .header h2 {
-            font-weight: normal;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        select {
-            width: 100%;
-            padding: 13px;
+        .account-card {
             border: 1px solid #ddd;
-            border-radius: 7px;
-            font-size: 15px;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 12px;
+        }
+
+        .account-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .account-info {
+            margin-top: 8px;
+            color: #555;
         }
 
         button {
             border: none;
             background: #222;
             color: white;
-            padding: 13px 20px;
+            padding: 12px 18px;
             border-radius: 7px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            background: #000;
+        }
+
+        .back-button {
+            width: 100%;
+        }
+
+        .hidden {
+            display: none;
         }
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
+            margin-bottom: 20px;
         }
 
         .summary-card {
-            background: #fafafa;
-            padding: 20px;
-            border-radius: 10px;
             border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
         }
 
         .summary-card h3 {
-            margin-top: 0;
             font-size: 14px;
+            margin: 0 0 10px;
         }
 
         .summary-card p {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 0;
+            margin: 0;
         }
 
-        .table-box {
+        .table-container {
             overflow-x: auto;
         }
 
@@ -120,12 +132,12 @@
         th {
             background: #222;
             color: white;
+            padding: 12px;
             text-align: left;
-            padding: 14px;
         }
 
         td {
-            padding: 13px;
+            padding: 12px;
             border-bottom: 1px solid #eee;
         }
 
@@ -133,18 +145,26 @@
             text-align: right;
         }
 
-        .back-button {
-            width: 100%;
+        @media (max-width: 800px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
         }
 
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
+
+            .page-container {
+                padding: 15px;
+            }
 
             .summary-grid {
                 grid-template-columns: 1fr;
             }
 
-            .page-container {
-                padding: 15px;
+            button {
+                width: 100%;
             }
 
         }
@@ -160,140 +180,133 @@
 <div class="page-container">
 
 
-    <!-- HEADER -->
-
     <div class="header">
 
         <h1>MY ACCOUNTING</h1>
 
-        <h2>Bank & Cash Statement</h2>
-
-        <p>
-            Opening Balance → Transactions → Closing Balance
-        </p>
+        <p>Cash & Bank Statements</p>
 
     </div>
 
 
+    <!-- ACCOUNT LIST -->
 
-    <!-- ACCOUNT SELECT -->
+    <div
+        class="box"
+        id="accountSection"
+    >
 
-    <div class="box">
+        <h2>Select Account</h2>
 
-        <label>Select Cash / Bank Account</label>
-
-        <select
-            id="accountSelect"
-            onchange="loadStatement()"
-        >
-            <option value="">
-                Loading Accounts...
-            </option>
-        </select>
-
-    </div>
-
-
-
-    <!-- SUMMARY -->
-
-    <div class="summary-grid">
-
-        <div class="summary-card">
-
-            <h3>OPENING BALANCE</h3>
-
-            <p id="openingBalance">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>TOTAL INCOME</h3>
-
-            <p id="totalIncome">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>TOTAL EXPENSE</h3>
-
-            <p id="totalExpense">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <h3>CLOSING BALANCE</h3>
-
-            <p id="closingBalance">
-                ₹0.00
-            </p>
-
+        <div id="accountList">
+            Loading accounts...
         </div>
 
     </div>
 
 
+    <!-- STATEMENT -->
 
-    <!-- TRANSACTIONS -->
+    <div
+        class="box hidden"
+        id="statementSection"
+    >
 
-    <div class="box table-box">
-
-        <h3>Account Transactions</h3>
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Date</th>
-
-                    <th>Particulars</th>
-
-                    <th>Ledger</th>
-
-                    <th>Income</th>
-
-                    <th>Expense</th>
-
-                    <th>Balance</th>
-
-                </tr>
-
-            </thead>
+        <button onclick="backToAccounts()">
+            ← BACK TO ACCOUNTS
+        </button>
 
 
-            <tbody id="statementBody">
+        <h2 id="statementTitle">
+            Account Statement
+        </h2>
 
-                <tr>
 
-                    <td
-                        colspan="6"
-                        style="text-align:center;"
-                    >
-                        Select an account
-                    </td>
+        <div class="summary-grid">
 
-                </tr>
 
-            </tbody>
+            <div class="summary-card">
 
-        </table>
+                <h3>OPENING BALANCE</h3>
+
+                <p id="openingBalance">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>TOTAL RECEIVED</h3>
+
+                <p id="totalReceived">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>TOTAL PAID</h3>
+
+                <p id="totalPaid">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>CLOSING BALANCE</h3>
+
+                <p id="closingBalance">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Particulars</th>
+
+                        <th>Ledger</th>
+
+                        <th>Debit / Paid</th>
+
+                        <th>Credit / Received</th>
+
+                        <th>Balance</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="statementBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
 
     </div>
-
 
 
     <button
@@ -307,49 +320,35 @@
 </div>
 
 
-
 <script>
 
 
-/* =====================================
-   GET CURRENT USER
-===================================== */
+/* =========================================
+   CURRENT USER
+========================================= */
 
 async function getCurrentUser() {
 
-    const {
-        data,
-        error
-    } =
+    const { data, error } =
         await supabaseClient
             .auth
             .getUser();
 
 
-    if (
-        error ||
-        !data.user
-    ) {
-
-        window.location.href =
-            "index.html";
-
+    if (error || !data.user) {
         return null;
-
     }
 
 
     return data.user;
-
 }
 
 
+/* =========================================
+   FORMAT MONEY
+========================================= */
 
-/* =====================================
-   FORMAT AMOUNT
-===================================== */
-
-function formatAmount(amount) {
+function formatMoney(amount) {
 
     return (
         "₹" +
@@ -359,12 +358,17 @@ function formatAmount(amount) {
 }
 
 
-
-/* =====================================
+/* =========================================
    LOAD ACCOUNTS
-===================================== */
+========================================= */
 
 async function loadAccounts() {
+
+
+    const list =
+        document.getElementById(
+            "accountList"
+        );
 
 
     const user =
@@ -373,33 +377,21 @@ async function loadAccounts() {
 
     if (!user) {
 
+        list.innerHTML =
+            "Please login first.";
+
         return;
 
     }
 
 
-    const select =
-        document.getElementById(
-            "accountSelect"
-        );
-
-
-    const {
-        data,
-        error
-    } =
+    const { data, error } =
         await supabaseClient
             .from("accounts")
             .select("*")
             .eq(
                 "user_id",
                 user.id
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
             );
 
 
@@ -407,47 +399,74 @@ async function loadAccounts() {
 
         console.error(error);
 
-        select.innerHTML =
-            '<option value="">Error Loading Accounts</option>';
+        list.innerHTML =
+            "Error loading accounts: " +
+            error.message;
 
         return;
 
     }
 
 
-    select.innerHTML =
-        '<option value="">Select Account</option>';
+    if (!data || data.length === 0) {
+
+        list.innerHTML =
+            "No accounts found.";
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
 
 
     data.forEach(
         function(account) {
 
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+            const card =
+                document.createElement("div");
 
 
-            option.value =
-                account.id;
+            card.className =
+                "account-card";
 
 
-            option.text =
+            const icon =
                 account.account_type === "cash"
-
-                    ? "💵 " + account.name
-
-                    : "🏦 " + account.name;
+                    ? "💵"
+                    : "🏦";
 
 
-            option.dataset.openingBalance =
-                account.opening_balance || 0;
+            card.innerHTML = `
+
+                <div class="account-name">
+
+                    ${icon}
+                    ${escapeHtml(account.name)}
+
+                </div>
+
+                <div class="account-info">
+
+                    Opening Balance:
+                    ${formatMoney(account.opening_balance)}
+
+                </div>
+
+                <button
+                    onclick="showStatement(
+                        '${account.id}'
+                    )"
+                >
+                    VIEW STATEMENT
+                </button>
+
+            `;
 
 
-            select.appendChild(
-                option
-            );
+            list.appendChild(card);
 
 
         }
@@ -457,22 +476,84 @@ async function loadAccounts() {
 }
 
 
+/* =========================================
+   SHOW STATEMENT
+========================================= */
 
-/* =====================================
-   LOAD STATEMENT
-===================================== */
-
-async function loadStatement() {
+async function showStatement(accountId) {
 
 
-    const accountSelect =
-        document.getElementById(
-            "accountSelect"
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+        return;
+    }
+
+
+    const { data: account, error: accountError } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "id",
+                accountId
+            )
+            .eq(
+                "user_id",
+                user.id
+            )
+            .single();
+
+
+    if (accountError) {
+
+        alert(
+            "Account not found: " +
+            accountError.message
         );
 
+        return;
 
-    const accountId =
-        accountSelect.value;
+    }
+
+
+    document.getElementById(
+        "accountSection"
+    ).classList.add(
+        "hidden"
+    );
+
+
+    document.getElementById(
+        "statementSection"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    document.getElementById(
+        "statementTitle"
+    ).innerText =
+        account.name +
+        " Statement";
+
+
+    let openingBalance =
+        Number(
+            account.opening_balance
+        ) || 0;
+
+
+    let runningBalance =
+        openingBalance;
+
+
+    document.getElementById(
+        "openingBalance"
+    ).innerText =
+        formatMoney(openingBalance);
 
 
     const body =
@@ -481,62 +562,32 @@ async function loadStatement() {
         );
 
 
-    if (!accountId) {
-
-        body.innerHTML = `
-            <tr>
-                <td colspan="6"
-                    style="text-align:center;"
-                >
-                    Select an account
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
-
-
-    const selectedOption =
-        accountSelect.selectedOptions[0];
-
-
-    const openingBalance =
-        Number(
-            selectedOption.dataset.openingBalance
-        ) || 0;
-
-
-    document.getElementById(
-        "openingBalance"
-    ).innerText =
-        formatAmount(
-            openingBalance
-        );
-
-
     body.innerHTML = `
+
         <tr>
-            <td colspan="6"
-                style="text-align:center;"
-            >
-                Loading...
+
+            <td colspan="6">
+                Loading transactions...
             </td>
+
         </tr>
+
     `;
 
 
-    const {
-        data,
-        error
-    } =
+    /* GET ONLY THIS ACCOUNT TRANSACTIONS */
+
+    const { data: transactions, error } =
         await supabaseClient
             .from("transactions")
             .select("*")
             .eq(
-                "account_id",
-                accountId
+                "user_id",
+                user.id
+            )
+            .eq(
+                "payment_account",
+                account.name
             )
             .order(
                 "transaction_date",
@@ -548,16 +599,19 @@ async function loadStatement() {
 
     if (error) {
 
-        console.error(error);
-
         body.innerHTML = `
+
             <tr>
-                <td colspan="6"
-                    style="text-align:center;"
-                >
-                    Error loading transactions
+
+                <td colspan="6">
+
+                    Error:
+                    ${escapeHtml(error.message)}
+
                 </td>
+
             </tr>
+
         `;
 
         return;
@@ -565,189 +619,208 @@ async function loadStatement() {
     }
 
 
-    let totalIncome =
-        0;
-
-    let totalExpense =
-        0;
-
-    let runningBalance =
-        openingBalance;
+    body.innerHTML = "";
 
 
-    body.innerHTML =
-        "";
+    let totalReceived = 0;
+
+    let totalPaid = 0;
 
 
     if (
-        !data ||
-        data.length === 0
+        !transactions ||
+        transactions.length === 0
     ) {
 
         body.innerHTML = `
+
             <tr>
-                <td colspan="6"
+
+                <td
+                    colspan="6"
                     style="text-align:center;"
                 >
-                    No transactions found
+
+                    No transactions found.
+
                 </td>
+
             </tr>
+
         `;
 
     }
 
 
-    else {
+    transactions.forEach(
+        function(transaction) {
 
 
-        data.forEach(
-            function(transaction) {
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
 
 
-                const amount =
-                    Number(
-                        transaction.amount
-                    ) || 0;
+            let debit =
+                0;
 
 
-                let income =
-                    0;
+            let credit =
+                0;
 
 
-                let expense =
-                    0;
+            if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+                debit =
+                    amount;
+
+                totalPaid +=
+                    amount;
+
+                runningBalance -=
+                    amount;
+
+            }
 
 
-                if (
-                    transaction.entry_type ===
-                    "credit"
-                ) {
+            if (
+                transaction.entry_type ===
+                "credit"
+            ) {
 
-                    income =
-                        amount;
+                credit =
+                    amount;
 
-                    totalIncome +=
-                        amount;
+                totalReceived +=
+                    amount;
 
-                    runningBalance +=
-                        amount;
+                runningBalance +=
+                    amount;
 
-                }
-
-
-                else if (
-                    transaction.entry_type ===
-                    "debit"
-                ) {
-
-                    expense =
-                        amount;
-
-                    totalExpense +=
-                        amount;
-
-                    runningBalance -=
-                        amount;
-
-                }
+            }
 
 
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${transaction.transaction_date || ""}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            transaction.description
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            transaction.ledger_name
-                        )}
-                    </td>
-
-                    <td class="amount">
-                        ${
-                            income > 0
-                                ? formatAmount(income)
-                                : "-"
-                        }
-                    </td>
-
-                    <td class="amount">
-                        ${
-                            expense > 0
-                                ? formatAmount(expense)
-                                : "-"
-                        }
-                    </td>
-
-                    <td class="amount">
-                        ${formatAmount(
-                            runningBalance
-                        )}
-                    </td>
-
-                `;
-
-
-                body.appendChild(
-                    row
+            const row =
+                document.createElement(
+                    "tr"
                 );
 
 
-            }
-        );
+            row.innerHTML = `
+
+                <td>
+
+                    ${transaction.transaction_date || ""}
+
+                </td>
 
 
-    }
+                <td>
+
+                    ${escapeHtml(
+                        transaction.description || ""
+                    )}
+
+                </td>
 
 
-    const closingBalance =
-        runningBalance;
+                <td>
+
+                    ${escapeHtml(
+                        transaction.ledger_name || ""
+                    )}
+
+                </td>
+
+
+                <td class="amount">
+
+                    ${
+                        debit > 0
+                            ? formatMoney(debit)
+                            : "-"
+                    }
+
+                </td>
+
+
+                <td class="amount">
+
+                    ${
+                        credit > 0
+                            ? formatMoney(credit)
+                            : "-"
+                    }
+
+                </td>
+
+
+                <td class="amount">
+
+                    ${formatMoney(runningBalance)}
+
+                </td>
+
+            `;
+
+
+            body.appendChild(row);
+
+
+        }
+    );
 
 
     document.getElementById(
-        "totalIncome"
+        "totalReceived"
     ).innerText =
-        formatAmount(
-            totalIncome
-        );
+        formatMoney(totalReceived);
 
 
     document.getElementById(
-        "totalExpense"
+        "totalPaid"
     ).innerText =
-        formatAmount(
-            totalExpense
-        );
+        formatMoney(totalPaid);
 
 
     document.getElementById(
         "closingBalance"
     ).innerText =
-        formatAmount(
-            closingBalance
-        );
+        formatMoney(runningBalance);
 
 
 }
 
 
+/* =========================================
+   BACK TO ACCOUNTS
+========================================= */
 
-/* =====================================
+function backToAccounts() {
+
+    document.getElementById(
+        "statementSection"
+    ).classList.add(
+        "hidden"
+    );
+
+
+    document.getElementById(
+        "accountSection"
+    ).classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================
    ESCAPE HTML
-===================================== */
+========================================= */
 
 function escapeHtml(text) {
 
@@ -766,10 +839,9 @@ function escapeHtml(text) {
 }
 
 
-
-/* =====================================
+/* =========================================
    DASHBOARD
-===================================== */
+========================================= */
 
 function goDashboard() {
 
@@ -779,16 +851,14 @@ function goDashboard() {
 }
 
 
-
-/* =====================================
+/* =========================================
    START
-===================================== */
+========================================= */
 
 loadAccounts();
 
 
 </script>
-
 
 </body>
 
