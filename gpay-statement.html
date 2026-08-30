@@ -13,6 +13,13 @@
     <title>GPay Statement - My Accounting</title>
 
 
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
+
     <!-- PDF.JS -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -30,9 +37,7 @@
             margin: 0;
             padding: 0;
 
-            font-family:
-                Arial,
-                sans-serif;
+            font-family: Arial, sans-serif;
 
             background: #f4f6f9;
             color: #222;
@@ -40,13 +45,9 @@
         }
 
 
-        /* =============================
-           PAGE
-        ============================= */
-
         .page-container {
 
-            max-width: 1000px;
+            max-width: 1100px;
 
             margin: auto;
 
@@ -54,10 +55,6 @@
 
         }
 
-
-        /* =============================
-           HEADER
-        ============================= */
 
         .header {
 
@@ -96,10 +93,6 @@
         }
 
 
-        /* =============================
-           UPLOAD BOX
-        ============================= */
-
         .box {
 
             background: white;
@@ -117,25 +110,34 @@
         }
 
 
+        label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-weight: bold;
+
+        }
+
+
+        select,
         input[type="file"] {
 
             width: 100%;
 
             padding: 12px;
 
-            border:
-                1px solid #ddd;
+            border: 1px solid #ddd;
 
             border-radius: 7px;
+
+            font-size: 15px;
 
             margin-bottom: 15px;
 
         }
 
-
-        /* =============================
-           BUTTON
-        ============================= */
 
         button {
 
@@ -169,32 +171,12 @@
         }
 
 
-        .delete-button {
-
-            background: #b71c1c;
-
-        }
-
-
-        .delete-button:hover {
-
-            background: #7f0000;
-
-        }
-
-
         .back-button {
 
             width: 100%;
 
-            margin-top: 10px;
-
         }
 
-
-        /* =============================
-           MESSAGE
-        ============================= */
 
         #gpayMessage {
 
@@ -207,62 +189,122 @@
         }
 
 
-        /* =============================
-           TRANSACTION
-        ============================= */
+        /* SUMMARY */
 
-        .transaction-card {
+        .summary-grid {
 
-            background: white;
+            display: grid;
 
-            padding: 20px;
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        .summary-card {
+
+            background: #f8f8f8;
+
+            padding: 18px;
 
             border-radius: 10px;
 
-            margin-bottom: 15px;
-
-            box-shadow:
-                0 2px 8px
-                rgba(0, 0, 0, 0.08);
+            border: 1px solid #ddd;
 
         }
 
 
-        .transaction-title {
+        .summary-card h3 {
 
-            font-size: 17px;
+            margin: 0 0 10px;
 
-            font-weight: bold;
-
-            margin-bottom: 12px;
+            font-size: 14px;
 
         }
 
 
-        .transaction-row {
+        .summary-card p {
 
-            margin-top: 7px;
+            margin: 0;
 
-        }
-
-
-        .income {
+            font-size: 20px;
 
             font-weight: bold;
 
         }
 
 
-        .expense {
+        /* TABLE */
+
+        .table-container {
+
+            overflow-x: auto;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th {
+
+            background: #222;
+
+            color: white;
+
+            padding: 12px;
+
+            text-align: left;
+
+        }
+
+
+        td {
+
+            padding: 12px;
+
+            border-bottom: 1px solid #eee;
+
+        }
+
+
+        .amount {
+
+            text-align: right;
 
             font-weight: bold;
 
         }
 
 
-        /* =============================
-           MOBILE
-        ============================= */
+        .balance {
+
+            text-align: right;
+
+            font-weight: bold;
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .summary-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
 
         @media (max-width: 600px) {
 
@@ -283,6 +325,13 @@
             .box {
 
                 padding: 18px;
+
+            }
+
+
+            .summary-grid {
+
+                grid-template-columns: 1fr;
 
             }
 
@@ -308,9 +357,7 @@
 <div class="page-container">
 
 
-    <!-- =============================
-         HEADER
-    ============================= -->
+    <!-- HEADER -->
 
     <div class="header">
 
@@ -319,25 +366,181 @@
         </h1>
 
         <p>
-            GPay Statement Reader
+            GPay / Bank Statement
         </p>
 
     </div>
 
 
-
-    <!-- =============================
-         UPLOAD
-    ============================= -->
+    <!-- SELECT ACCOUNT -->
 
     <div class="box">
 
         <h2>
-            Upload GPay Statement
+            Select GPay / Bank Account
         </h2>
 
+
+        <label>
+            Account
+        </label>
+
+
+        <select
+            id="accountSelect"
+            onchange="loadStatement()"
+        >
+
+            <option value="">
+                Loading Accounts...
+            </option>
+
+        </select>
+
+
+        <p id="gpayMessage"></p>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="box">
+
+        <h2>
+            Account Summary
+        </h2>
+
+
+        <div class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <h3>
+                    OPENING BALANCE
+                </h3>
+
+                <p id="openingBalance">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>
+                    TOTAL RECEIVED
+                </h3>
+
+                <p id="totalReceived">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>
+                    TOTAL PAID
+                </h3>
+
+                <p id="totalPaid">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>
+                    CLOSING BALANCE
+                </h3>
+
+                <p id="closingBalance">
+                    ₹0.00
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- STATEMENT -->
+
+    <div class="box">
+
+        <h2>
+            Account Statement
+        </h2>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Particulars</th>
+
+                        <th>Ledger</th>
+
+                        <th>Type</th>
+
+                        <th>Received</th>
+
+                        <th>Paid</th>
+
+                        <th>Balance</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="statementBody">
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            style="text-align:center;"
+                        >
+                            Select an account
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- PDF UPLOAD -->
+
+    <div class="box">
+
+        <h2>
+            Read GPay PDF
+        </h2>
+
+
         <p>
-            Select your GPay PDF statement.
+            Select your GPay PDF statement to read its text.
         </p>
 
 
@@ -348,43 +551,21 @@
         >
 
 
-        <button
-            onclick="uploadStatement()"
-        >
+        <button onclick="uploadStatement()">
             READ PDF
         </button>
 
 
-        <p id="gpayMessage"></p>
+        <div id="pdfTransactionList">
 
-    </div>
-
-
-
-    <!-- =============================
-         TRANSACTIONS
-    ============================= -->
-
-    <div class="box">
-
-        <h2>
-            Transactions
-        </h2>
-
-
-        <div id="transactionList">
-
-            No statement loaded.
+            No PDF loaded.
 
         </div>
 
     </div>
 
 
-
-    <!-- =============================
-         BACK
-    ============================= -->
+    <!-- BACK -->
 
     <button
         class="back-button"
@@ -397,20 +578,462 @@
 </div>
 
 
-
 <script>
 
 
 /* =====================================
-   TRANSACTIONS
+   FORMAT MONEY
 ===================================== */
 
-let gpayTransactions = [];
+function formatMoney(amount) {
+
+    return (
+        "₹" +
+        Number(amount || 0)
+            .toFixed(2)
+    );
+
+}
 
 
 
 /* =====================================
-   PDF WORKER
+   GET CURRENT USER
+===================================== */
+
+async function getCurrentUser() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (
+        error ||
+        !data.user
+    ) {
+
+        return null;
+
+    }
+
+
+    return data.user;
+
+}
+
+
+
+/* =====================================
+   LOAD ACCOUNTS
+===================================== */
+
+async function loadAccounts() {
+
+
+    const select =
+        document.getElementById(
+            "accountSelect"
+        );
+
+
+    const message =
+        document.getElementById(
+            "gpayMessage"
+        );
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+
+        select.innerHTML =
+            '<option value="">Please login first</option>';
+
+        message.innerText =
+            "User login not found.";
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        select.innerHTML =
+            '<option value="">Error Loading Accounts</option>';
+
+        message.innerText =
+            error.message;
+
+        return;
+
+    }
+
+
+    select.innerHTML =
+        '<option value="">Select Account</option>';
+
+
+    const accounts =
+        data || [];
+
+
+    accounts.forEach(
+        function(account) {
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                account.name;
+
+
+            option.text =
+                account.name +
+                " (" +
+                account.account_type +
+                ")";
+
+
+            option.dataset.opening =
+                account.opening_balance || 0;
+
+
+            select.appendChild(option);
+
+
+        }
+    );
+
+
+}
+
+
+
+/* =====================================
+   LOAD STATEMENT
+===================================== */
+
+async function loadStatement() {
+
+
+    const select =
+        document.getElementById(
+            "accountSelect"
+        );
+
+
+    const accountName =
+        select.value;
+
+
+    const body =
+        document.getElementById(
+            "statementBody"
+        );
+
+
+    if (!accountName) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    style="text-align:center;"
+                >
+                    Select an account
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    const selectedOption =
+        select.selectedOptions[0];
+
+
+    let openingBalance =
+        Number(
+            selectedOption.dataset.opening
+        ) || 0;
+
+
+    document.getElementById(
+        "openingBalance"
+    ).innerText =
+        formatMoney(openingBalance);
+
+
+    body.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="7"
+                style="text-align:center;"
+            >
+                Loading statement...
+            </td>
+
+        </tr>
+
+    `;
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("transactions")
+            .select("*")
+            .eq(
+                "payment_account",
+                accountName
+            )
+            .order(
+                "transaction_date",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    style="text-align:center;"
+                >
+                    Error: ${escapeHtml(error.message)}
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    const transactions =
+        data || [];
+
+
+    let totalReceived =
+        0;
+
+
+    let totalPaid =
+        0;
+
+
+    let runningBalance =
+        openingBalance;
+
+
+    body.innerHTML =
+        "";
+
+
+    if (
+        transactions.length === 0
+    ) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    style="text-align:center;"
+                >
+                    No transactions found.
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    transactions.forEach(
+        function(transaction) {
+
+
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
+
+
+            let received =
+                0;
+
+
+            let paid =
+                0;
+
+
+            if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+                received =
+                    amount;
+
+                totalReceived +=
+                    amount;
+
+                runningBalance +=
+                    amount;
+
+            }
+
+
+            else if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+                paid =
+                    amount;
+
+                totalPaid +=
+                    amount;
+
+                runningBalance -=
+                    amount;
+
+            }
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${transaction.transaction_date || ""}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        transaction.description || ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        transaction.ledger_name || ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        transaction.entry_type || ""
+                    )}
+                </td>
+
+                <td class="amount">
+                    ${
+                        received
+                            ? formatMoney(received)
+                            : "-"
+                    }
+                </td>
+
+                <td class="amount">
+                    ${
+                        paid
+                            ? formatMoney(paid)
+                            : "-"
+                    }
+                </td>
+
+                <td class="balance">
+                    ${formatMoney(runningBalance)}
+                </td>
+
+            `;
+
+
+            body.appendChild(row);
+
+
+        }
+    );
+
+
+    document.getElementById(
+        "totalReceived"
+    ).innerText =
+        formatMoney(totalReceived);
+
+
+    document.getElementById(
+        "totalPaid"
+    ).innerText =
+        formatMoney(totalPaid);
+
+
+    document.getElementById(
+        "closingBalance"
+    ).innerText =
+        formatMoney(runningBalance);
+
+
+}
+
+
+
+/* =====================================
+   PDF.JS WORKER
 ===================================== */
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -419,7 +1042,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
 
 /* =====================================
-   UPLOAD PDF
+   READ PDF
 ===================================== */
 
 async function uploadStatement() {
@@ -459,12 +1082,11 @@ async function uploadStatement() {
 
 
         const pdf =
-            await pdfjsLib.getDocument({
-
-                data:
-                    arrayBuffer
-
-            }).promise;
+            await pdfjsLib
+                .getDocument({
+                    data: arrayBuffer
+                })
+                .promise;
 
 
         let completeText =
@@ -472,13 +1094,9 @@ async function uploadStatement() {
 
 
         for (
-
             let pageNumber = 1;
-
             pageNumber <= pdf.numPages;
-
             pageNumber++
-
         ) {
 
 
@@ -492,19 +1110,30 @@ async function uploadStatement() {
                 await page.getTextContent();
 
 
-            const pageText =
+            completeText +=
                 content.items
                     .map(
                         item => item.str
                     )
-                    .join(" ");
-
-
-            completeText +=
-                pageText + "\n";
-
+                    .join(" ") +
+                "\n";
 
         }
+
+
+        document.getElementById(
+            "pdfTransactionList"
+        ).innerHTML = `
+
+            <h3>
+                PDF Text Read Successfully
+            </h3>
+
+            <p>
+                Check browser Console (F12) for extracted text.
+            </p>
+
+        `;
 
 
         console.log(
@@ -512,20 +1141,16 @@ async function uploadStatement() {
         );
 
 
-        parseGPayText(
-            completeText
-        );
+        message.innerText =
+            "PDF read successfully.";
 
 
     }
 
-
     catch (error) {
 
 
-        console.error(
-            error
-        );
+        console.error(error);
 
 
         message.innerText =
@@ -541,389 +1166,6 @@ async function uploadStatement() {
 
 
 /* =====================================
-   PARSE GPAY TEXT
-===================================== */
-
-function parseGPayText(text) {
-
-
-    gpayTransactions =
-        [];
-
-
-    const lines =
-        text
-            .split("\n")
-            .map(
-                line => line.trim()
-            )
-            .filter(
-                line => line !== ""
-            );
-
-
-    lines.forEach(
-        function(line, index) {
-
-
-            /* DATE */
-
-            const dateMatch =
-                line.match(
-
-                    /\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/
-
-                );
-
-
-            if (!dateMatch) {
-
-                return;
-
-            }
-
-
-            /* AMOUNT */
-
-            const amounts =
-                line.match(
-
-                    /₹\s?[\d,]+(?:\.\d{1,2})?/g
-
-                );
-
-
-            if (
-                !amounts ||
-                amounts.length === 0
-            ) {
-
-                return;
-
-            }
-
-
-            const amountText =
-                amounts[
-                    amounts.length - 1
-                ];
-
-
-            const amount =
-                Number(
-
-                    amountText
-                        .replace("₹", "")
-                        .replace(/,/g, "")
-                        .trim()
-
-                );
-
-
-            if (
-                isNaN(amount) ||
-                amount <= 0
-            ) {
-
-                return;
-
-            }
-
-
-            /* TYPE */
-
-            const lowerLine =
-                line.toLowerCase();
-
-
-            let type =
-                "Expense";
-
-
-            if (
-
-                lowerLine.includes(
-                    "received"
-                ) ||
-
-                lowerLine.includes(
-                    "credited"
-                ) ||
-
-                lowerLine.includes(
-                    "received from"
-                )
-
-            ) {
-
-                type =
-                    "Income";
-
-            }
-
-
-            /* DESCRIPTION */
-
-            let description =
-                line
-                    .replace(
-                        dateMatch[0],
-                        ""
-                    )
-                    .replace(
-                        amountText,
-                        ""
-                    )
-                    .trim();
-
-
-            if (!description) {
-
-                description =
-                    "GPay Transaction";
-
-            }
-
-
-            gpayTransactions.push({
-
-                id:
-                    index + 1,
-
-                date:
-                    dateMatch[0],
-
-                description:
-                    description,
-
-                amount:
-                    amount,
-
-                type:
-                    type
-
-            });
-
-
-        }
-    );
-
-
-    removeDuplicates();
-
-
-    showTransactions();
-
-
-    document.getElementById(
-        "gpayMessage"
-    ).innerText =
-
-        gpayTransactions.length +
-        " transaction(s) found.";
-
-
-}
-
-
-
-/* =====================================
-   REMOVE DUPLICATES
-===================================== */
-
-function removeDuplicates() {
-
-
-    const unique =
-        [];
-
-
-    const seen =
-        new Set();
-
-
-    gpayTransactions.forEach(
-        function(transaction) {
-
-
-            const key =
-
-                transaction.date +
-
-                "|" +
-
-                transaction.description +
-
-                "|" +
-
-                transaction.amount +
-
-                "|" +
-
-                transaction.type;
-
-
-            if (
-                !seen.has(key)
-            ) {
-
-                seen.add(key);
-
-                unique.push(
-                    transaction
-                );
-
-            }
-
-
-        }
-    );
-
-
-    gpayTransactions =
-        unique;
-
-
-}
-
-
-
-/* =====================================
-   SHOW TRANSACTIONS
-===================================== */
-
-function showTransactions() {
-
-
-    const list =
-        document.getElementById(
-            "transactionList"
-        );
-
-
-    list.innerHTML =
-        "";
-
-
-    if (
-        gpayTransactions.length === 0
-    ) {
-
-
-        list.innerHTML =
-            "<p>No transactions found in this PDF.</p>";
-
-
-        return;
-
-    }
-
-
-    gpayTransactions.forEach(
-        function(transaction) {
-
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "transaction-card";
-
-
-            card.innerHTML = `
-
-                <div class="transaction-title">
-
-                    ${escapeHtml(
-                        transaction.description
-                    )}
-
-                </div>
-
-
-                <div class="transaction-row">
-
-                    <strong>Date:</strong>
-
-                    ${transaction.date}
-
-                </div>
-
-
-                <div class="transaction-row">
-
-                    <strong>Type:</strong>
-
-                    ${transaction.type}
-
-                </div>
-
-
-                <div class="transaction-row">
-
-                    <strong>Amount:</strong>
-
-                    ₹${transaction.amount.toFixed(2)}
-
-                </div>
-
-
-                <button
-                    class="delete-button"
-                    onclick="deleteTransaction(
-                        ${transaction.id}
-                    )"
-                >
-                    DELETE
-                </button>
-
-            `;
-
-
-            list.appendChild(
-                card
-            );
-
-
-        }
-    );
-
-
-}
-
-
-
-/* =====================================
-   DELETE TRANSACTION
-===================================== */
-
-function deleteTransaction(id) {
-
-
-    gpayTransactions =
-        gpayTransactions.filter(
-            transaction =>
-                transaction.id !== id
-        );
-
-
-    showTransactions();
-
-
-    document.getElementById(
-        "gpayMessage"
-    ).innerText =
-        "Transaction deleted.";
-
-
-}
-
-
-
-/* =====================================
    ESCAPE HTML
 ===================================== */
 
@@ -931,9 +1173,7 @@ function escapeHtml(text) {
 
 
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     div.innerText =
@@ -948,17 +1188,23 @@ function escapeHtml(text) {
 
 
 /* =====================================
-   DASHBOARD
+   BACK
 ===================================== */
 
 function goDashboard() {
 
-
     window.location.href =
         "dashboard.html";
 
-
 }
+
+
+
+/* =====================================
+   START
+===================================== */
+
+loadAccounts();
 
 
 </script>
