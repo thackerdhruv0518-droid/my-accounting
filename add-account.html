@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Bank & Cash Accounts - My Accounting</title>
+    <title>Cash & Bank Accounts - My Accounting</title>
 
     <!-- SUPABASE -->
 
@@ -87,7 +87,6 @@
 
         .box h3 {
             margin-top: 0;
-            margin-bottom: 20px;
         }
 
 
@@ -96,8 +95,8 @@
         label {
             display: block;
             font-weight: bold;
-            margin-bottom: 8px;
             margin-top: 15px;
+            margin-bottom: 8px;
         }
 
 
@@ -127,7 +126,7 @@
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
 
@@ -139,9 +138,9 @@
         /* MESSAGE */
 
         #message {
-            margin-top: 15px;
             min-height: 20px;
             font-weight: bold;
+            margin-top: 15px;
         }
 
 
@@ -150,28 +149,41 @@
         .account-card {
             border: 1px solid #ddd;
             border-radius: 10px;
-            padding: 18px;
-            margin-top: 12px;
+            padding: 20px;
+            margin-top: 15px;
             background: #fafafa;
         }
 
 
         .account-name {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: bold;
         }
 
 
-        .account-balance {
+        .account-row {
             margin-top: 10px;
             color: #555;
         }
 
 
+        .current-balance {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+
         .account-buttons {
             display: flex;
-            gap: 10px;
             flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+
+        .account-buttons button {
+            margin-top: 0;
         }
 
 
@@ -185,13 +197,7 @@
         }
 
 
-        .statement-button {
-            background: #222;
-        }
-
-
         .cash-text {
-            display: inline-block;
             margin-top: 15px;
             font-weight: bold;
         }
@@ -225,6 +231,16 @@
                 font-size: 24px;
             }
 
+
+            .account-buttons {
+                flex-direction: column;
+            }
+
+
+            .account-buttons button {
+                width: 100%;
+            }
+
         }
 
     </style>
@@ -244,10 +260,10 @@
 
         <h1>MY ACCOUNTING</h1>
 
-        <h2>Bank & Cash Accounts</h2>
+        <h2>Cash & Bank Accounts</h2>
 
         <p>
-            Manage Cash on Hand and Bank Accounts
+            Manage your Cash and Bank Accounts
         </p>
 
     </div>
@@ -280,7 +296,9 @@
         >
 
 
-        <button onclick="addBank()">
+        <button
+            onclick="addBank()"
+        >
             ADD BANK ACCOUNT
         </button>
 
@@ -294,10 +312,12 @@
 
     <div class="box">
 
-        <h3>💰 Current Accounts</h3>
+        <h3>💰 Your Accounts</h3>
 
         <div id="accountList">
+
             Loading accounts...
+
         </div>
 
     </div>
@@ -347,13 +367,32 @@ async function getCurrentUser() {
 
 
 /* =====================================
+   FORMAT MONEY
+===================================== */
+
+function formatMoney(amount) {
+
+    return (
+        "₹" +
+        Number(amount || 0).toFixed(2)
+    );
+
+}
+
+
+/* =====================================
    SHOW MESSAGE
 ===================================== */
 
-function showMessage(text, isError = false) {
+function showMessage(
+    text,
+    isError = false
+) {
 
     const message =
-        document.getElementById("message");
+        document.getElementById(
+            "message"
+        );
 
 
     message.innerText =
@@ -394,7 +433,12 @@ async function loadAccounts() {
         "Loading accounts...";
 
 
-    const { data, error } =
+    /* LOAD ACCOUNTS */
+
+    const {
+        data: accounts,
+        error: accountsError
+    } =
         await supabaseClient
             .from("accounts")
             .select("*")
@@ -404,21 +448,20 @@ async function loadAccounts() {
             );
 
 
-    if (error) {
+    if (accountsError) {
 
-        console.error(error);
-
+        console.error(accountsError);
 
         list.innerHTML =
             "Error loading accounts: " +
-            error.message;
+            accountsError.message;
 
         return;
 
     }
 
 
-    if (!data || data.length === 0) {
+    if (!accounts || accounts.length === 0) {
 
         list.innerHTML =
             "No accounts found.";
@@ -428,15 +471,102 @@ async function loadAccounts() {
     }
 
 
+    /* LOAD ALL TRANSACTIONS */
+
+    const {
+        data: transactions,
+        error: transactionError
+    } =
+        await supabaseClient
+            .from("transactions")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            );
+
+
+    if (transactionError) {
+
+        console.error(transactionError);
+
+    }
+
+
     list.innerHTML = "";
 
 
-    data.forEach(
+    accounts.forEach(
         function(account) {
 
 
+            let openingBalance =
+                Number(
+                    account.opening_balance
+                ) || 0;
+
+
+            let currentBalance =
+                openingBalance;
+
+
+            /* CALCULATE ACCOUNT BALANCE */
+
+            if (transactions) {
+
+                transactions.forEach(
+                    function(transaction) {
+
+
+                        if (
+                            transaction.payment_account ===
+                            account.name
+                        ) {
+
+
+                            const amount =
+                                Number(
+                                    transaction.amount
+                                ) || 0;
+
+
+                            /* MONEY RECEIVED */
+
+                            if (
+                                transaction.entry_type ===
+                                "credit"
+                            ) {
+
+                                currentBalance +=
+                                    amount;
+
+                            }
+
+
+                            /* MONEY PAID */
+
+                            else if (
+                                transaction.entry_type ===
+                                "debit"
+                            ) {
+
+                                currentBalance -=
+                                    amount;
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+
+
             const card =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             card.className =
@@ -449,12 +579,6 @@ async function loadAccounts() {
                     : "🏦";
 
 
-            const balance =
-                Number(
-                    account.opening_balance || 0
-                ).toFixed(2);
-
-
             card.innerHTML = `
 
                 <div class="account-name">
@@ -465,10 +589,20 @@ async function loadAccounts() {
                 </div>
 
 
-                <div class="account-balance">
+                <div class="account-row">
 
                     Opening Balance:
-                    ₹${balance}
+
+                    ${formatMoney(openingBalance)}
+
+                </div>
+
+
+                <div class="current-balance">
+
+                    Current Balance:
+
+                    ${formatMoney(currentBalance)}
 
                 </div>
 
@@ -477,8 +611,9 @@ async function loadAccounts() {
 
 
                     <button
-                        class="statement-button"
-                        onclick="viewStatement('${account.id}')"
+                        onclick="viewStatement(
+                            '${account.id}'
+                        )"
                     >
                         VIEW STATEMENT
                     </button>
@@ -493,7 +628,9 @@ async function loadAccounts() {
 
                         <button
                             class="delete-button"
-                            onclick="deleteBank('${account.id}')"
+                            onclick="deleteBank(
+                                '${account.id}'
+                            )"
                         >
                             DELETE BANK
                         </button>
@@ -504,11 +641,11 @@ async function loadAccounts() {
 
                         `
 
-                        <span class="cash-text">
+                        <div class="cash-text">
 
                             Cash on Hand Account
 
-                        </span>
+                        </div>
 
                         `
 
@@ -520,11 +657,14 @@ async function loadAccounts() {
             `;
 
 
-            list.appendChild(card);
+            list.appendChild(
+                card
+            );
 
 
         }
     );
+
 
 }
 
@@ -571,7 +711,7 @@ async function addBank() {
     }
 
 
-    /* CHECK NUMBER OF BANKS */
+    /* CHECK BANK COUNT */
 
     const {
         data: banks,
@@ -602,7 +742,10 @@ async function addBank() {
     }
 
 
-    if (banks && banks.length >= 5) {
+    if (
+        banks &&
+        banks.length >= 5
+    ) {
 
         showMessage(
             "Maximum 5 Bank Accounts allowed.",
@@ -614,7 +757,7 @@ async function addBank() {
     }
 
 
-    /* INSERT BANK */
+    /* ADD BANK */
 
     const { error } =
         await supabaseClient
@@ -622,6 +765,7 @@ async function addBank() {
             .insert([
 
                 {
+
                     user_id:
                         user.id,
 
@@ -633,6 +777,7 @@ async function addBank() {
 
                     opening_balance:
                         openingBalance
+
                 }
 
             ]);
@@ -641,7 +786,6 @@ async function addBank() {
     if (error) {
 
         console.error(error);
-
 
         showMessage(
             "Error: " +
@@ -682,7 +826,9 @@ function viewStatement(accountId) {
 
     window.location.href =
         "bank-statement.html?account=" +
-        encodeURIComponent(accountId);
+        encodeURIComponent(
+            accountId
+        );
 
 }
 
@@ -705,7 +851,9 @@ async function deleteBank(id) {
     }
 
 
-    const { error } =
+    const {
+        error
+    } =
         await supabaseClient
             .from("accounts")
             .delete()
@@ -745,7 +893,9 @@ async function deleteBank(id) {
 function escapeHtml(text) {
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     div.innerText =
@@ -758,7 +908,7 @@ function escapeHtml(text) {
 
 
 /* =====================================
-   GO DASHBOARD
+   DASHBOARD
 ===================================== */
 
 function goDashboard() {
