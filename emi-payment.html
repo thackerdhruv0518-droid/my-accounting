@@ -2,17 +2,18 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Loan Accounts - My Accounting</title>
+    <title>EMI Payment - My Accounting</title>
 
-    <!-- SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -36,7 +37,7 @@
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .header {
@@ -51,10 +52,6 @@
             font-weight: normal;
         }
 
-        .header p {
-            color: #666;
-        }
-
         label {
             display: block;
             font-weight: bold;
@@ -62,7 +59,9 @@
             margin-bottom: 7px;
         }
 
-        input {
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -76,7 +75,6 @@
             color: white;
             padding: 13px 20px;
             border-radius: 7px;
-            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
@@ -86,33 +84,16 @@
             background: #000;
         }
 
-        .loan-card {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 18px;
-            margin-top: 15px;
-            background: #fafafa;
-        }
-
-        .loan-name {
-            font-size: 19px;
-            font-weight: bold;
-        }
-
-        .loan-row {
-            margin-top: 10px;
-        }
-
-        .delete-button {
-            background: #b71c1c;
-        }
-
-        .delete-button:hover {
-            background: #7f0000;
-        }
-
         .back-button {
             width: 100%;
+        }
+
+        .loan-info {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f4f6f9;
+            border-radius: 8px;
         }
 
         #message {
@@ -121,7 +102,25 @@
             font-weight: bold;
         }
 
-        @media (max-width: 600px) {
+        .payment-card {
+            padding: 18px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .payment-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .payment-row {
+            margin-top: 8px;
+        }
+
+        @media(max-width:600px) {
+
             .page-container {
                 padding: 15px;
             }
@@ -134,135 +133,160 @@
             button {
                 width: 100%;
             }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
 <div class="page-container">
 
     <div class="header">
+
         <h1>MY ACCOUNTING</h1>
-        <h2>Loan Accounts</h2>
-        <p>Manage your loans and outstanding balances</p>
+
+        <h2>EMI Payment</h2>
+
+        <p>Record your loan EMI payments</p>
+
     </div>
 
 
-    <!-- ADD LOAN -->
+    <!-- EMI FORM -->
 
     <div class="box">
 
-        <h3>🏦 Add Loan Account</h3>
-
-        <label>Loan Name</label>
-
-        <input
-            type="text"
-            id="loanName"
-            placeholder="Example: HDFC Personal Loan"
-        >
+        <h3>💰 Pay EMI</h3>
 
 
-        <label>Total Loan Amount</label>
+        <label>Payment Date</label>
 
-        <input
-            type="number"
-            id="loanAmount"
-            placeholder="₹ 0.00"
-            min="0"
-            step="0.01"
-        >
+        <input type="date" id="paymentDate">
 
 
-        <label>Current Outstanding Balance</label>
+        <label>Select Loan</label>
 
-        <input
-            type="number"
-            id="outstandingBalance"
-            placeholder="₹ 0.00"
-            min="0"
-            step="0.01"
-        >
+        <select id="loanSelect" onchange="showLoanInfo()">
+
+            <option value="">Loading Loans...</option>
+
+        </select>
+
+
+        <div class="loan-info" id="loanInfo"></div>
 
 
         <label>EMI Amount</label>
 
         <input
             type="number"
-            id="emiAmount"
+            id="paymentAmount"
             placeholder="₹ 0.00"
             min="0"
             step="0.01"
         >
 
 
-        <label>Interest Rate (%)</label>
+        <label>Paid From</label>
 
-        <input
-            type="number"
-            id="interestRate"
-            placeholder="Example: 10.50"
-            min="0"
-            step="0.01"
+        <select id="paymentAccount">
+
+            <option value="">Select Account</option>
+            <option value="Cash">💵 Cash</option>
+
+        </select>
+
+
+        <label>Notes</label>
+
+        <textarea
+            id="notes"
+            rows="3"
+            placeholder="Optional notes"
+        ></textarea>
+
+
+        <button
+            id="saveButton"
+            onclick="saveEMIPayment()"
         >
-
-
-        <button onclick="addLoan()">
-            ADD LOAN ACCOUNT
+            SAVE EMI PAYMENT
         </button>
+
 
         <p id="message"></p>
 
     </div>
 
 
-    <!-- LOAN LIST -->
+    <!-- PAYMENT HISTORY -->
 
     <div class="box">
 
-        <h3>💰 Current Loan Accounts</h3>
+        <h3>📋 EMI Payment History</h3>
 
-        <div id="loanList">
-            Loading loans...
+        <div id="paymentList">
+
+            Loading...
+
         </div>
 
     </div>
 
 
-    <!-- BACK -->
-
     <button
         class="back-button"
-        onclick="goDashboard()"
+        onclick="goBack()"
     >
-        BACK TO DASHBOARD
+        BACK TO LOAN ACCOUNTS
     </button>
+
 
 </div>
 
 
 <script>
 
-/* GET CURRENT USER */
+
+let currentUser = null;
+
+let loans = [];
+
+
+/* ===============================
+   CURRENT USER
+================================ */
 
 async function getCurrentUser() {
 
     const { data, error } =
-        await supabaseClient.auth.getUser();
+        await supabaseClient
+            .auth
+            .getUser();
 
     if (error || !data.user) {
 
-        window.location.href = "index.html";
+        window.location.href =
+            "index.html";
 
         return null;
+
     }
 
-    return data.user;
+    currentUser = data.user;
+
+    return currentUser;
+
 }
 
 
-/* SHOW MESSAGE */
+/* ===============================
+   MESSAGE
+================================ */
 
 function showMessage(text, isError = false) {
 
@@ -273,32 +297,52 @@ function showMessage(text, isError = false) {
 
     message.style.color =
         isError ? "#b71c1c" : "#2e7d32";
+
 }
 
 
-/* FORMAT MONEY */
+/* ===============================
+   MONEY FORMAT
+================================ */
 
 function formatMoney(amount) {
 
     return "₹" +
         Number(amount || 0)
             .toFixed(2);
+
 }
 
 
-/* LOAD LOANS */
+/* ===============================
+   TODAY DATE
+================================ */
+
+function setTodayDate() {
+
+    document.getElementById("paymentDate").value =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+}
+
+
+/* ===============================
+   LOAD LOANS
+================================ */
 
 async function loadLoans() {
 
     const user =
+        currentUser ||
         await getCurrentUser();
 
     if (!user) return;
 
-    const list =
-        document.getElementById("loanList");
 
-    list.innerHTML = "Loading loans...";
+    const select =
+        document.getElementById("loanSelect");
 
 
     const { data, error } =
@@ -310,260 +354,663 @@ async function loadLoans() {
 
     if (error) {
 
+        select.innerHTML =
+            '<option value="">Error loading loans</option>';
+
         console.error(error);
 
-        list.innerHTML =
-            "Error loading loans: " +
-            error.message;
-
         return;
+
     }
 
 
-    if (!data || data.length === 0) {
+    loans = data || [];
 
-        list.innerHTML =
-            "No Loan Accounts Found.";
+
+    select.innerHTML =
+        '<option value="">Select Loan</option>';
+
+
+    loans.forEach(function(loan) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = loan.id;
+
+        option.text =
+            loan.loan_name +
+            " - Outstanding: " +
+            formatMoney(
+                loan.outstanding_balance
+            );
+
+        select.appendChild(option);
+
+    });
+
+
+    /* AUTO SELECT LOAN FROM URL */
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const loanId =
+        params.get("loan_id");
+
+
+    if (loanId) {
+
+        select.value = loanId;
+
+        showLoanInfo();
+
+    }
+
+}
+
+
+/* ===============================
+   SHOW LOAN INFORMATION
+================================ */
+
+function showLoanInfo() {
+
+    const loanId =
+        document.getElementById(
+            "loanSelect"
+        ).value;
+
+
+    const info =
+        document.getElementById(
+            "loanInfo"
+        );
+
+
+    if (!loanId) {
+
+        info.style.display =
+            "none";
 
         return;
+
+    }
+
+
+    const loan =
+        loans.find(
+            loan => loan.id === loanId
+        );
+
+
+    if (!loan) return;
+
+
+    info.style.display =
+        "block";
+
+
+    info.innerHTML = `
+
+        <strong>${escapeHtml(
+            loan.loan_name
+        )}</strong>
+
+        <br><br>
+
+        Total Loan:
+        ${formatMoney(
+            loan.loan_amount
+        )}
+
+        <br>
+
+        Outstanding Balance:
+        ${formatMoney(
+            loan.outstanding_balance
+        )}
+
+        <br>
+
+        Monthly EMI:
+        ${formatMoney(
+            loan.emi_amount
+        )}
+
+    `;
+
+
+    if (
+        Number(loan.emi_amount) > 0
+    ) {
+
+        document.getElementById(
+            "paymentAmount"
+        ).value =
+            Number(
+                loan.emi_amount
+            ).toFixed(2);
+
+    }
+
+}
+
+
+/* ===============================
+   LOAD BANK ACCOUNTS
+================================ */
+
+async function loadBankAccounts() {
+
+    const user =
+        currentUser ||
+        await getCurrentUser();
+
+    if (!user) return;
+
+
+    const select =
+        document.getElementById(
+            "paymentAccount"
+        );
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq("user_id", user.id);
+
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+
+    (data || []).forEach(
+        function(account) {
+
+            /* CASH duplicate avoid */
+
+            if (
+                account.account_type &&
+                account.account_type
+                    .toLowerCase() === "cash"
+            ) {
+                return;
+            }
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                account.id;
+
+
+            option.text =
+                "🏦 " +
+                account.name;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* ===============================
+   SAVE EMI PAYMENT
+================================ */
+
+async function saveEMIPayment() {
+
+    const user =
+        currentUser ||
+        await getCurrentUser();
+
+    if (!user) return;
+
+
+    const loanId =
+        document.getElementById(
+            "loanSelect"
+        ).value;
+
+
+    const paymentDate =
+        document.getElementById(
+            "paymentDate"
+        ).value;
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "paymentAmount"
+            ).value
+        );
+
+
+    const paymentAccount =
+        document.getElementById(
+            "paymentAccount"
+        ).value;
+
+
+    const notes =
+        document.getElementById(
+            "notes"
+        ).value
+        .trim();
+
+
+    if (
+        !loanId ||
+        !paymentDate ||
+        !amount ||
+        amount <= 0 ||
+        !paymentAccount
+    ) {
+
+        showMessage(
+            "Please fill all required fields.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const loan =
+        loans.find(
+            loan => loan.id === loanId
+        );
+
+
+    if (!loan) {
+
+        showMessage(
+            "Loan not found.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const outstanding =
+        Number(
+            loan.outstanding_balance || 0
+        );
+
+
+    if (amount > outstanding) {
+
+        showMessage(
+            "Amount cannot be greater than Outstanding Balance.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "saveButton"
+        );
+
+
+    button.disabled = true;
+
+    button.innerText =
+        "SAVING...";
+
+
+    /* SAVE PAYMENT */
+
+    const { error: paymentError } =
+        await supabaseClient
+            .from("emi_payments")
+            .insert([{
+
+                user_id:
+                    user.id,
+
+                loan_id:
+                    loanId,
+
+                payment_date:
+                    paymentDate,
+
+                amount:
+                    amount,
+
+                payment_account:
+                    paymentAccount,
+
+                notes:
+                    notes || null
+
+            }]);
+
+
+    if (paymentError) {
+
+        console.error(paymentError);
+
+        showMessage(
+            paymentError.message,
+            true
+        );
+
+        button.disabled = false;
+
+        button.innerText =
+            "SAVE EMI PAYMENT";
+
+        return;
+
+    }
+
+
+    /* UPDATE OUTSTANDING BALANCE */
+
+    const newOutstanding =
+        outstanding - amount;
+
+
+    const { error: updateError } =
+        await supabaseClient
+            .from("loan_accounts")
+            .update({
+
+                outstanding_balance:
+                    newOutstanding
+
+            })
+            .eq("id", loanId)
+            .eq(
+                "user_id",
+                user.id
+            );
+
+
+    if (updateError) {
+
+        console.error(updateError);
+
+        showMessage(
+            "Payment saved but balance update failed!",
+            true
+        );
+
+    }
+
+    else {
+
+        showMessage(
+            "EMI Payment saved successfully!"
+        );
+
+    }
+
+
+    /* RESET */
+
+    document.getElementById(
+        "loanSelect"
+    ).value = "";
+
+
+    document.getElementById(
+        "paymentAmount"
+    ).value = "";
+
+
+    document.getElementById(
+        "paymentAccount"
+    ).value = "";
+
+
+    document.getElementById(
+        "notes"
+    ).value = "";
+
+
+    document.getElementById(
+        "loanInfo"
+    ).style.display =
+        "none";
+
+
+    await loadLoans();
+
+    await loadPaymentHistory();
+
+
+    button.disabled = false;
+
+    button.innerText =
+        "SAVE EMI PAYMENT";
+
+}
+
+
+/* ===============================
+   PAYMENT HISTORY
+================================ */
+
+async function loadPaymentHistory() {
+
+    const user =
+        currentUser ||
+        await getCurrentUser();
+
+    if (!user) return;
+
+
+    const list =
+        document.getElementById(
+            "paymentList"
+        );
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("emi_payments")
+            .select(`
+                *,
+                loan_accounts (
+                    loan_name
+                )
+            `)
+            .eq(
+                "user_id",
+                user.id
+            )
+            .order(
+                "payment_date",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        list.innerHTML =
+            "Error loading payments.";
+
+        return;
+
+    }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        list.innerHTML =
+            "No EMI payments yet.";
+
+        return;
+
     }
 
 
     list.innerHTML = "";
 
 
-    data.forEach(function(loan) {
+    data.forEach(
+        function(payment) {
 
-        const card =
-            document.createElement("div");
-
-        card.className = "loan-card";
-
-
-        card.innerHTML = `
-
-            <div class="loan-name">
-                🏦 ${escapeHtml(loan.loan_name)}
-            </div>
+            const card =
+                document.createElement(
+                    "div"
+                );
 
 
-            <div class="loan-row">
-                <strong>Total Loan:</strong>
-                ${formatMoney(loan.loan_amount)}
-            </div>
+            card.className =
+                "payment-card";
 
 
-            <div class="loan-row">
-                <strong>Outstanding Balance:</strong>
-                ${formatMoney(loan.outstanding_balance)}
-            </div>
+            card.innerHTML = `
+
+                <div class="payment-title">
+
+                    🏦 ${escapeHtml(
+                        payment.loan_accounts
+                            ?.loan_name ||
+                        "Loan"
+                    )}
+
+                </div>
 
 
-            <div class="loan-row">
-                <strong>EMI Amount:</strong>
-                ${formatMoney(loan.emi_amount)}
-            </div>
+                <div class="payment-row">
+
+                    <strong>Date:</strong>
+
+                    ${payment.payment_date}
+
+                </div>
 
 
-            <div class="loan-row">
-                <strong>Interest Rate:</strong>
-                ${Number(loan.interest_rate || 0).toFixed(2)}%
-            </div>
+                <div class="payment-row">
+
+                    <strong>Amount:</strong>
+
+                    ${formatMoney(
+                        payment.amount
+                    )}
+
+                </div>
 
 
-            <button
-                class="delete-button"
-                onclick="deleteLoan('${loan.id}')"
-            >
-                DELETE LOAN
-            </button>
+                <div class="payment-row">
 
-        `;
+                    <strong>Paid From:</strong>
 
-        list.appendChild(card);
+                    ${escapeHtml(
+                        payment.payment_account
+                    )}
 
-    });
-
-}
+                </div>
 
 
-/* ADD LOAN */
+                <div class="payment-row">
 
-async function addLoan() {
+                    <strong>Notes:</strong>
 
-    const user =
-        await getCurrentUser();
+                    ${escapeHtml(
+                        payment.notes || "-"
+                    )}
 
-    if (!user) return;
+                </div>
 
-
-    const loanName =
-        document.getElementById("loanName")
-            .value
-            .trim();
+            `;
 
 
-    const loanAmount =
-        Number(
-            document.getElementById("loanAmount").value
-        ) || 0;
+            list.appendChild(card);
 
-
-    const outstandingBalance =
-        Number(
-            document.getElementById("outstandingBalance").value
-        ) || 0;
-
-
-    const emiAmount =
-        Number(
-            document.getElementById("emiAmount").value
-        ) || 0;
-
-
-    const interestRate =
-        Number(
-            document.getElementById("interestRate").value
-        ) || 0;
-
-
-    if (!loanName) {
-
-        showMessage(
-            "Please enter Loan Name.",
-            true
-        );
-
-        return;
-    }
-
-
-    if (loanAmount <= 0) {
-
-        showMessage(
-            "Please enter Total Loan Amount.",
-            true
-        );
-
-        return;
-    }
-
-
-    const { error } =
-        await supabaseClient
-            .from("loan_accounts")
-            .insert([{
-
-                user_id: user.id,
-
-                loan_name: loanName,
-
-                loan_amount: loanAmount,
-
-                outstanding_balance:
-                    outstandingBalance || loanAmount,
-
-                emi_amount: emiAmount,
-
-                interest_rate: interestRate
-
-            }]);
-
-
-    if (error) {
-
-        console.error(error);
-
-        showMessage(
-            "Error: " + error.message,
-            true
-        );
-
-        return;
-    }
-
-
-    document.getElementById("loanName").value = "";
-    document.getElementById("loanAmount").value = "";
-    document.getElementById("outstandingBalance").value = "";
-    document.getElementById("emiAmount").value = "";
-    document.getElementById("interestRate").value = "";
-
-
-    showMessage(
-        "Loan Account added successfully!"
+        }
     );
 
-
-    loadLoans();
-
 }
 
 
-/* DELETE LOAN */
-
-async function deleteLoan(id) {
-
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this Loan Account?"
-        );
-
-    if (!confirmDelete) return;
-
-
-    const { error } =
-        await supabaseClient
-            .from("loan_accounts")
-            .delete()
-            .eq("id", id);
-
-
-    if (error) {
-
-        showMessage(
-            "Error: " + error.message,
-            true
-        );
-
-        return;
-    }
-
-
-    showMessage(
-        "Loan Account deleted successfully!"
-    );
-
-    loadLoans();
-
-}
-
-
-/* ESCAPE HTML */
+/* ===============================
+   ESCAPE HTML
+================================ */
 
 function escapeHtml(text) {
 
     const div =
         document.createElement("div");
 
-    div.innerText = text || "";
+    div.innerText =
+        text || "";
 
     return div.innerHTML;
+
 }
 
 
-/* DASHBOARD */
+/* ===============================
+   BACK
+================================ */
 
-function goDashboard() {
+function goBack() {
 
     window.location.href =
-        "dashboard.html";
+        "loan-account.html";
+
 }
 
 
-/* START */
+/* ===============================
+   START
+================================ */
 
-loadLoans();
+async function startPage() {
+
+    setTodayDate();
+
+    await getCurrentUser();
+
+    await loadLoans();
+
+    await loadBankAccounts();
+
+    await loadPaymentHistory();
+
+}
+
+
+startPage();
+
 
 </script>
 
