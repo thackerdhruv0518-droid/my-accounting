@@ -1,1 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Account Statement - My Accounting</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+
+        .page-container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 25px;
+        }
+
+
+        .header,
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        .header {
+            text-align: center;
+        }
+
+
+        .header h1 {
+            margin: 0;
+        }
+
+
+        .header p {
+            color: #666;
+        }
+
+
+        .balance-box {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+
+        th {
+            background: #222;
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+
+
+        .back-button {
+            width: 100%;
+            border: none;
+            background: #222;
+            color: white;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .page-container {
+                padding: 15px;
+            }
+
+
+            .header,
+            .box {
+                padding: 18px;
+            }
+
+
+            table {
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page-container">
+
+
+    <div class="header">
+
+        <h1>
+            MY ACCOUNTING
+        </h1>
+
+        <p id="accountName">
+            Loading Account...
+        </p>
+
+    </div>
+
+
+    <div class="box">
+
+        <div
+            id="openingBalance"
+            class="balance-box"
+        >
+            Opening Balance: ₹0.00
+        </div>
+
+
+        <div
+            id="currentBalance"
+            class="balance-box"
+        >
+            Current Balance: ₹0.00
+        </div>
+
+    </div>
+
+
+    <div class="box">
+
+        <h2>
+            Account Statement
+        </h2>
+
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Particulars</th>
+
+                        <th>Type</th>
+
+                        <th style="text-align:right;">
+                            Amount
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="statementBody">
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            style="text-align:center;"
+                        >
+                            Loading...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="back-button"
+        onclick="goBack()"
+    >
+        BACK TO ACCOUNTS
+    </button>
+
+
+</div>
+
+
+<script>
+
+
+/* =====================================
+   GET CURRENT USER
+===================================== */
+
+async function getCurrentUser() {
+
+    const { data, error } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (error || !data.user) {
+
+        window.location.href =
+            "index.html";
+
+        return null;
+
+    }
+
+
+    return data.user;
+
+}
+
+
+/* =====================================
+   FORMAT MONEY
+===================================== */
+
+function formatMoney(amount) {
+
+    return (
+        "₹" +
+        Number(amount || 0).toFixed(2)
+    );
+
+}
+
+
+/* =====================================
+   GET ACCOUNT ID FROM URL
+===================================== */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const accountId =
+    params.get("account");
+
+
+/* =====================================
+   LOAD STATEMENT
+===================================== */
+
+async function loadStatement() {
+
+
+    const body =
+        document.getElementById(
+            "statementBody"
+        );
+
+
+    if (!accountId) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Account not selected.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+        return;
+    }
+
+
+    /* LOAD ACCOUNT */
+
+    const {
+        data: account,
+        error: accountError
+    } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "id",
+                accountId
+            )
+            .eq(
+                "user_id",
+                user.id
+            )
+            .single();
+
+
+    if (accountError || !account) {
+
+        console.error(accountError);
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Account not found.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "accountName"
+    ).innerText =
+        account.name;
+
+
+    const opening =
+        Number(
+            account.opening_balance
+        ) || 0;
+
+
+    document.getElementById(
+        "openingBalance"
+    ).innerText =
+        "Opening Balance: " +
+        formatMoney(opening);
+
+
+    /* LOAD TRANSACTIONS */
+
+    const {
+        data: transactions,
+        error: transactionError
+    } =
+        await supabaseClient
+            .from("transactions")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            )
+            .eq(
+                "payment_account",
+                account.name
+            )
+            .order(
+                "transaction_date",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (transactionError) {
+
+        console.error(transactionError);
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    Error loading transactions.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    let currentBalance =
+        opening;
+
+
+    (transactions || []).forEach(
+        function(transaction) {
+
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
+
+
+            if (
+                transaction.entry_type ===
+                "credit"
+            ) {
+
+                currentBalance +=
+                    amount;
+
+            }
+
+            else if (
+                transaction.entry_type ===
+                "debit"
+            ) {
+
+                currentBalance -=
+                    amount;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "currentBalance"
+    ).innerText =
+        "Current Balance: " +
+        formatMoney(
+            currentBalance
+        );
+
+
+    body.innerHTML = "";
+
+
+    if (
+        !transactions ||
+        transactions.length === 0
+    ) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    style="text-align:center;"
+                >
+                    No transactions found.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    transactions.forEach(
+        function(transaction) {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${transaction.transaction_date || ""}
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        transaction.description ||
+                        transaction.ledger_name ||
+                        ""
+                    )}
+                </td>
+
+
+                <td>
+                    ${
+                        transaction.entry_type === "credit"
+                            ? "Credit (Received)"
+                            : "Debit (Paid)"
+                    }
+                </td>
+
+
+                <td class="amount">
+                    ${formatMoney(transaction.amount)}
+                </td>
+
+            `;
+
+
+            body.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   ESCAPE HTML
+===================================== */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.innerText =
+        text || "";
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =====================================
+   BACK
+===================================== */
+
+function goBack() {
+
+    window.location.href =
+        "add-account.html";
+
+}
+
+
+/* =====================================
+   START
+===================================== */
+
+loadStatement();
+
+
+</script>
+
+
+</body>
+
+</html>
