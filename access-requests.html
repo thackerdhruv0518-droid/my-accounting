@@ -3,957 +3,362 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<title>Access Requests - My Accounting</title>
 
-    <title>Add Category - My Accounting</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+<style>
 
-    <!-- SUPABASE -->
+* {
+    box-sizing: border-box;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
 
-    <script src="supabase.js"></script>
+.container {
+    max-width: 850px;
+    margin: auto;
+    padding: 25px;
+}
+
+.header,
+.box {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.request-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 15px;
+}
+
+.request-card h3 {
+    margin-top: 0;
+}
+
+button {
+    border: none;
+    padding: 12px 18px;
+    border-radius: 7px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-top: 10px;
+}
+
+.approve-button {
+    background: #2e7d32;
+}
+
+.reject-button {
+    background: #b71c1c;
+}
+
+.back-button {
+    background: #222;
+}
+
+#message {
+    font-weight: bold;
+}
+
+@media(max-width:600px) {
+
+    .container {
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+        margin-right: 0;
+    }
+
+}
+
+</style>
 
 </head>
 
 
 <body>
 
+<div class="container">
 
-<div class="tally-report">
+    <div class="header">
 
-
-    <!-- HEADER -->
-
-    <div class="report-header">
-
-        <h1>MY ACCOUNTING</h1>
-
-        <h2>Category Management</h2>
+        <h1>👥 ACCESS REQUESTS</h1>
 
         <p>
-            Main Category → Sub Category → Ledger Name
+            Approve or reject user access requests
         </p>
 
     </div>
 
 
+    <div class="box">
 
-    <!-- =========================
-         ADD MAIN CATEGORY
-    ========================== -->
+        <h2>Pending Requests</h2>
 
-    <div class="transaction-box">
+        <p id="message"></p>
 
-        <h3>Add Main Category</h3>
+        <div id="requestList">
 
-        <label>Main Category Name</label>
-
-        <input
-            type="text"
-            id="mainCategoryName"
-            placeholder="Example: Expenses"
-        >
-
-        <button onclick="addMainCategory()">
-            ADD MAIN CATEGORY
-        </button>
-
-    </div>
-
-
-
-    <!-- =========================
-         ADD SUB CATEGORY
-    ========================== -->
-
-    <div class="transaction-box">
-
-        <h3>Add Sub Category</h3>
-
-        <label>Main Category</label>
-
-        <select id="subMainCategory">
-
-            <option value="">
-                Loading Categories...
-            </option>
-
-        </select>
-
-
-        <label>Sub Category Name</label>
-
-        <input
-            type="text"
-            id="subCategoryName"
-            placeholder="Example: Office Expenses"
-        >
-
-
-        <button onclick="addSubCategory()">
-            ADD SUB CATEGORY
-        </button>
-
-    </div>
-
-
-
-    <!-- =========================
-         ADD LEDGER
-    ========================== -->
-
-    <div class="transaction-box">
-
-        <h3>Add Ledger Name</h3>
-
-
-        <label>Main Category</label>
-
-        <select
-            id="ledgerMainCategory"
-            onchange="loadLedgerSubCategories()"
-        >
-
-            <option value="">
-                Select Main Category
-            </option>
-
-        </select>
-
-
-        <label>Sub Category</label>
-
-        <select id="ledgerSubCategory">
-
-            <option value="">
-                Select Main Category First
-            </option>
-
-        </select>
-
-
-        <label>Ledger Name</label>
-
-        <input
-            type="text"
-            id="ledgerName"
-            placeholder="Example: Rent"
-        >
-
-
-        <button onclick="addLedger()">
-            ADD LEDGER
-        </button>
-
-    </div>
-
-
-
-    <!-- =========================
-         CURRENT CATEGORIES
-    ========================== -->
-
-    <div class="transaction-box">
-
-        <h3>Current Categories</h3>
-
-        <div id="categoryList">
-
-            Loading Categories...
+            Loading requests...
 
         </div>
 
     </div>
 
 
-
-    <!-- =========================
-         BACK BUTTON
-    ========================== -->
-
-    <div class="report-buttons">
-
-        <button onclick="goDashboard()">
-            BACK TO DASHBOARD
-        </button>
-
-    </div>
-
-
-    <p
-        id="categoryMessage"
-        class="transaction-message"
-    ></p>
-
+    <button
+        class="back-button"
+        onclick="goSettings()"
+    >
+        ← BACK TO SETTINGS
+    </button>
 
 </div>
 
 
-
 <script>
 
+const OWNER_EMAIL =
+    "thackerdhruv39@gmail.com";
 
-/* =====================================
-   MESSAGE
-===================================== */
+let currentUser = null;
 
-function showMessage(text) {
 
-    document.getElementById(
-        "categoryMessage"
-    ).innerText = text;
+/* MESSAGE */
+
+function showMessage(
+    text,
+    isError = false
+) {
+
+    const message =
+        document.getElementById("message");
+
+    message.innerText = text;
+
+    message.style.color =
+        isError
+            ? "#b71c1c"
+            : "#2e7d32";
+}
+
+
+/* GET USER + OWNER CHECK */
+
+async function checkOwner() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (
+        error ||
+        !data.user
+    ) {
+
+        window.location.href =
+            "index.html";
+
+        return false;
+
+    }
+
+
+    currentUser =
+        data.user;
+
+
+    /* EMAIL OWNER */
+
+    if (
+        currentUser.email &&
+        currentUser.email.toLowerCase() ===
+        OWNER_EMAIL.toLowerCase()
+    ) {
+
+        return true;
+
+    }
+
+
+    /* DATABASE OWNER CHECK */
+
+    const result =
+        await supabaseClient
+            .from("profiles")
+            .select("is_owner")
+            .eq(
+                "id",
+                currentUser.id
+            )
+            .maybeSingle();
+
+
+    if (
+        result.data &&
+        result.data.is_owner === true
+    ) {
+
+        return true;
+
+    }
+
+
+    alert(
+        "Only the owner can access this page."
+    );
+
+
+    window.location.href =
+        "dashboard.html";
+
+
+    return false;
 
 }
 
 
+/* LOAD REQUESTS */
 
-/* =====================================
-   LOAD MAIN CATEGORIES
-===================================== */
+async function loadRequests() {
 
-async function loadCategories() {
-
-
-    const subSelect =
+    const list =
         document.getElementById(
-            "subMainCategory"
+            "requestList"
         );
 
 
-    const ledgerSelect =
-        document.getElementById(
-            "ledgerMainCategory"
-        );
+    list.innerHTML =
+        "Loading requests...";
 
 
-    const { data, error } =
+    const {
+        data,
+        error
+    } =
         await supabaseClient
-            .from("categories")
+            .from("access_requests")
             .select("*")
-            .order("name");
+            .eq("status", "pending")
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
 
 
     if (error) {
 
         console.error(error);
 
-        showMessage(
-            "Error loading categories: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    subSelect.innerHTML =
-        '<option value="">Select Main Category</option>';
-
-
-    ledgerSelect.innerHTML =
-        '<option value="">Select Main Category</option>';
-
-
-    data.forEach(function(category) {
-
-
-        const option1 =
-            document.createElement("option");
-
-        option1.value =
-            category.id;
-
-        option1.text =
-            category.name;
-
-        subSelect.appendChild(
-            option1
-        );
-
-
-        const option2 =
-            document.createElement("option");
-
-        option2.value =
-            category.id;
-
-        option2.text =
-            category.name;
-
-        ledgerSelect.appendChild(
-            option2
-        );
-
-
-    });
-
-
-}
-
-
-
-/* =====================================
-   ADD MAIN CATEGORY
-===================================== */
-
-async function addMainCategory() {
-
-
-    const input =
-        document.getElementById(
-            "mainCategoryName"
-        );
-
-
-    const name =
-        input.value.trim();
-
-
-    if (!name) {
-
-        showMessage(
-            "Please enter Main Category name."
-        );
-
-        return;
-
-    }
-
-
-    const { error } =
-        await supabaseClient
-            .from("categories")
-            .insert([
-                {
-                    name: name
-                }
-            ]);
-
-
-    if (error) {
-
-        showMessage(
-            "Error: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    input.value = "";
-
-
-    showMessage(
-        "Main Category added successfully!"
-    );
-
-
-    loadCategories();
-
-    loadCategoryList();
-
-
-}
-
-
-
-/* =====================================
-   ADD SUB CATEGORY
-===================================== */
-
-async function addSubCategory() {
-
-
-    const categoryId =
-        document.getElementById(
-            "subMainCategory"
-        ).value;
-
-
-    const input =
-        document.getElementById(
-            "subCategoryName"
-        );
-
-
-    const name =
-        input.value.trim();
-
-
-    if (!categoryId || !name) {
-
-        showMessage(
-            "Select Main Category and enter Sub Category."
-        );
-
-        return;
-
-    }
-
-
-    const { error } =
-        await supabaseClient
-            .from("sub_categories")
-            .insert([
-                {
-                    category_id:
-                        categoryId,
-
-                    name:
-                        name
-                }
-            ]);
-
-
-    if (error) {
-
-        showMessage(
-            "Error: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    input.value = "";
-
-
-    showMessage(
-        "Sub Category added successfully!"
-    );
-
-
-    loadCategoryList();
-
-
-}
-
-
-
-/* =====================================
-   LOAD SUB CATEGORIES
-===================================== */
-
-async function loadLedgerSubCategories() {
-
-
-    const categoryId =
-        document.getElementById(
-            "ledgerMainCategory"
-        ).value;
-
-
-    const select =
-        document.getElementById(
-            "ledgerSubCategory"
-        );
-
-
-    if (!categoryId) {
-
-        select.innerHTML =
-            '<option value="">Select Main Category First</option>';
-
-        return;
-
-    }
-
-
-    select.innerHTML =
-        '<option value="">Loading...</option>';
-
-
-    const { data, error } =
-        await supabaseClient
-            .from("sub_categories")
-            .select("*")
-            .eq(
-                "category_id",
-                categoryId
-            )
-            .order("name");
-
-
-    if (error) {
-
-        showMessage(
-            "Error: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    select.innerHTML =
-        '<option value="">Select Sub Category</option>';
-
-
-    if (data.length === 0) {
-
-        select.innerHTML =
-            '<option value="">No Sub Categories Found</option>';
-
-        return;
-
-    }
-
-
-    data.forEach(function(subCategory) {
-
-
-        const option =
-            document.createElement("option");
-
-
-        option.value =
-            subCategory.id;
-
-
-        option.text =
-            subCategory.name;
-
-
-        select.appendChild(
-            option
-        );
-
-
-    });
-
-
-}
-
-
-
-/* =====================================
-   ADD LEDGER
-===================================== */
-
-async function addLedger() {
-
-
-    const subCategoryId =
-        document.getElementById(
-            "ledgerSubCategory"
-        ).value;
-
-
-    const input =
-        document.getElementById(
-            "ledgerName"
-        );
-
-
-    const name =
-        input.value.trim();
-
-
-    if (!subCategoryId || !name) {
-
-        showMessage(
-            "Select Sub Category and enter Ledger Name."
-        );
-
-        return;
-
-    }
-
-
-    const { error } =
-        await supabaseClient
-            .from("ledgers")
-            .insert([
-                {
-                    sub_category_id:
-                        subCategoryId,
-
-                    name:
-                        name
-                }
-            ]);
-
-
-    if (error) {
-
-        showMessage(
-            "Error: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    input.value = "";
-
-
-    showMessage(
-        "Ledger added successfully!"
-    );
-
-
-    loadCategoryList();
-
-
-}
-
-
-
-/* =====================================
-   LOAD CURRENT CATEGORY LIST
-===================================== */
-
-async function loadCategoryList() {
-
-
-    const list =
-        document.getElementById(
-            "categoryList"
-        );
-
-
-    list.innerHTML =
-        "Loading...";
-
-
-    const {
-
-        data: categories,
-
-        error: categoryError
-
-    } =
-        await supabaseClient
-            .from("categories")
-            .select("*")
-            .order("name");
-
-
-    if (categoryError) {
-
         list.innerHTML =
-            "Error loading categories.";
+            "Error: " +
+            error.message;
 
         return;
 
     }
 
 
-    if (categories.length === 0) {
-
-        list.innerHTML =
-            "<p>No categories found.</p>";
-
-        return;
-
-    }
-
-
-    list.innerHTML =
-        "";
-
-
-    for (
-        const category of categories
+    if (
+        !data ||
+        data.length === 0
     ) {
 
+        list.innerHTML =
+            "No pending access requests.";
 
-        const categoryBox =
-            document.createElement("div");
+        return;
 
-
-        categoryBox.style.marginTop =
-            "15px";
-
-
-        categoryBox.style.padding =
-            "15px";
+    }
 
 
-        categoryBox.style.border =
-            "1px solid #ddd";
+    list.innerHTML = "";
 
 
-        categoryBox.style.borderRadius =
-            "8px";
+    data.forEach(
+        function(request) {
 
-
-        categoryBox.innerHTML =
-
-            "<strong>Main Category: " +
-
-            category.name +
-
-            "</strong> " +
-
-            '<button onclick="deleteMainCategory(\'' +
-
-            category.id +
-
-            "')\">DELETE</button>";
-
-
-        list.appendChild(
-            categoryBox
-        );
-
-
-        const {
-
-            data: subCategories,
-
-            error: subError
-
-        } =
-            await supabaseClient
-                .from("sub_categories")
-                .select("*")
-                .eq(
-                    "category_id",
-                    category.id
-                )
-                .order("name");
-
-
-        if (subError) {
-
-            continue;
-
-        }
-
-
-        if (
-            subCategories.length === 0
-        ) {
-
-            const noSub =
-                document.createElement("p");
-
-
-            noSub.innerText =
-                "No Sub Categories";
-
-
-            categoryBox.appendChild(
-                noSub
-            );
-
-
-        }
-
-
-        for (
-            const subCategory of subCategories
-        ) {
-
-
-            const subBox =
+            const card =
                 document.createElement("div");
 
 
-            subBox.style.marginTop =
-                "10px";
+            card.className =
+                "request-card";
 
 
-            subBox.style.marginLeft =
-                "20px";
+            card.innerHTML = `
+
+                <h3>
+                    ${escapeHtml(request.name)}
+                </h3>
+
+                <p>
+                    <strong>Email:</strong>
+                    ${escapeHtml(request.email)}
+                </p>
+
+                <button
+                    class="approve-button"
+                    onclick="approveRequest('${request.id}')"
+                >
+                    ✓ APPROVE
+                </button>
+
+                <button
+                    class="reject-button"
+                    onclick="rejectRequest('${request.id}')"
+                >
+                    ✕ REJECT
+                </button>
+
+            `;
 
 
-            subBox.innerHTML =
-
-                "↳ <strong>Sub Category: " +
-
-                subCategory.name +
-
-                "</strong> " +
-
-                '<button onclick="deleteSubCategory(\'' +
-
-                subCategory.id +
-
-                "')\">DELETE</button>";
-
-
-            categoryBox.appendChild(
-                subBox
-            );
-
-
-            const {
-
-                data: ledgers,
-
-                error: ledgerError
-
-            } =
-                await supabaseClient
-                    .from("ledgers")
-                    .select("*")
-                    .eq(
-                        "sub_category_id",
-                        subCategory.id
-                    )
-                    .order("name");
-
-
-            if (ledgerError) {
-
-                continue;
-
-            }
-
-
-            if (
-                ledgers.length === 0
-            ) {
-
-                const noLedger =
-                    document.createElement("p");
-
-
-                noLedger.style.marginLeft =
-                    "20px";
-
-
-                noLedger.innerText =
-                    "No Ledgers";
-
-
-                subBox.appendChild(
-                    noLedger
-                );
-
-
-            }
-
-
-            ledgers.forEach(
-                function(ledger) {
-
-
-                    const ledgerBox =
-                        document.createElement("div");
-
-
-                    ledgerBox.style.marginTop =
-                        "8px";
-
-
-                    ledgerBox.style.marginLeft =
-                        "20px";
-
-
-                    ledgerBox.innerHTML =
-
-                        "↳ Ledger: <strong>" +
-
-                        ledger.name +
-
-                        "</strong> " +
-
-                        '<button onclick="deleteLedger(\'' +
-
-                        ledger.id +
-
-                        "')\">DELETE</button>";
-
-
-                    subBox.appendChild(
-                        ledgerBox
-                    );
-
-
-                }
-            );
-
+            list.appendChild(card);
 
         }
-
-
-    }
-
-
-}
-
-
-
-/* =====================================
-   DELETE LEDGER
-===================================== */
-
-async function deleteLedger(id) {
-
-
-    if (
-        !confirm(
-            "Delete this Ledger?"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const { error } =
-        await supabaseClient
-            .from("ledgers")
-            .delete()
-            .eq(
-                "id",
-                id
-            );
-
-
-    if (error) {
-
-        showMessage(
-            "Error deleting Ledger: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    showMessage(
-        "Ledger deleted successfully!"
     );
 
-
-    loadCategoryList();
-
-
 }
 
 
+/* APPROVE */
 
-/* =====================================
-   DELETE SUB CATEGORY
-===================================== */
-
-async function deleteSubCategory(id) {
-
+async function approveRequest(id) {
 
     if (
         !confirm(
-            "Delete this Sub Category and all its Ledgers?"
+            "Approve this user?"
         )
     ) {
 
@@ -961,108 +366,23 @@ async function deleteSubCategory(id) {
 
     }
 
-
-    /* DELETE LEDGERS FIRST */
-
-    const { error: ledgerError } =
-        await supabaseClient
-            .from("ledgers")
-            .delete()
-            .eq(
-                "sub_category_id",
-                id
-            );
-
-
-    if (ledgerError) {
-
-        showMessage(
-            "Error deleting Ledgers: " +
-            ledgerError.message
-        );
-
-        return;
-
-    }
-
-
-    /* DELETE SUB CATEGORY */
-
-    const { error } =
-        await supabaseClient
-            .from("sub_categories")
-            .delete()
-            .eq(
-                "id",
-                id
-            );
-
-
-    if (error) {
-
-        showMessage(
-            "Error deleting Sub Category: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    showMessage(
-        "Sub Category deleted successfully!"
-    );
-
-
-    loadCategoryList();
-
-
-}
-
-
-
-/* =====================================
-   DELETE MAIN CATEGORY
-===================================== */
-
-async function deleteMainCategory(id) {
-
-
-    if (
-        !confirm(
-            "Delete this Main Category, all Sub Categories and all Ledgers?"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    /* GET SUB CATEGORIES */
 
     const {
-
-        data: subCategories,
-
-        error: subError
-
+        data: request,
+        error: requestError
     } =
         await supabaseClient
-            .from("sub_categories")
-            .select("id")
-            .eq(
-                "category_id",
-                id
-            );
+            .from("access_requests")
+            .select("*")
+            .eq("id", id)
+            .single();
 
 
-    if (subError) {
+    if (requestError) {
 
         showMessage(
-            "Error loading Sub Categories: " +
-            subError.message
+            requestError.message,
+            true
         );
 
         return;
@@ -1070,79 +390,27 @@ async function deleteMainCategory(id) {
     }
 
 
-    /* DELETE ALL LEDGERS */
+    /* UPDATE REQUEST */
 
-    for (
-        const subCategory of subCategories
-    ) {
-
-
-        const { error: ledgerError } =
-            await supabaseClient
-                .from("ledgers")
-                .delete()
-                .eq(
-                    "sub_category_id",
-                    subCategory.id
-                );
-
-
-        if (ledgerError) {
-
-            showMessage(
-                "Error deleting Ledgers: " +
-                ledgerError.message
-            );
-
-            return;
-
-        }
-
-
-    }
-
-
-    /* DELETE SUB CATEGORIES */
-
-    const { error: deleteSubError } =
+    const {
+        error
+    } =
         await supabaseClient
-            .from("sub_categories")
-            .delete()
-            .eq(
-                "category_id",
-                id
-            );
+            .from("access_requests")
+            .update({
 
+                status:
+                    "approved"
 
-    if (deleteSubError) {
-
-        showMessage(
-            "Error deleting Sub Categories: " +
-            deleteSubError.message
-        );
-
-        return;
-
-    }
-
-
-    /* DELETE MAIN CATEGORY */
-
-    const { error } =
-        await supabaseClient
-            .from("categories")
-            .delete()
-            .eq(
-                "id",
-                id
-            );
+            })
+            .eq("id", id);
 
 
     if (error) {
 
         showMessage(
-            "Error deleting Main Category: " +
-            error.message
+            error.message,
+            true
         );
 
         return;
@@ -1151,44 +419,114 @@ async function deleteMainCategory(id) {
 
 
     showMessage(
-        "Main Category deleted successfully!"
+        "User approved successfully!"
     );
 
 
-    loadCategories();
-
-    loadCategoryList();
-
+    await loadRequests();
 
 }
 
 
+/* REJECT */
 
-/* =====================================
-   BACK TO DASHBOARD
-===================================== */
+async function rejectRequest(id) {
 
-function goDashboard() {
+    if (
+        !confirm(
+            "Reject this request?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("access_requests")
+            .update({
+
+                status:
+                    "rejected"
+
+            })
+            .eq("id", id);
+
+
+    if (error) {
+
+        showMessage(
+            error.message,
+            true
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Request rejected."
+    );
+
+
+    await loadRequests();
+
+}
+
+
+/* ESCAPE HTML */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.innerText =
+        text || "";
+
+    return div.innerHTML;
+
+}
+
+
+/* BACK */
+
+function goSettings() {
 
     window.location.href =
-        "dashboard.html";
+        "settings.html";
 
 }
 
 
+/* START */
 
-/* =====================================
-   START
-===================================== */
+async function startPage() {
 
-loadCategories();
+    const owner =
+        await checkOwner();
 
-loadCategoryList();
 
+    if (!owner) {
+
+        return;
+
+    }
+
+
+    await loadRequests();
+
+}
+
+
+startPage();
 
 </script>
 
-
 </body>
-
 </html>
