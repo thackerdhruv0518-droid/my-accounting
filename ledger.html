@@ -5,191 +5,280 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>Account Ledger - My Accounting</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <!-- SUPABASE -->
+    <title>Ledger - My Accounting</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="supabase.js"></script>
 
 
-    <!-- LEDGER EXTRA STYLE -->
-
     <style>
 
-        .ledger-summary {
+        * {
+            box-sizing: border-box;
+        }
 
-            display: grid;
 
-            grid-template-columns:
-                repeat(3, 1fr);
+        body {
 
-            gap: 15px;
-
-            margin:
-                20px 0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
 
         }
 
 
-        .ledger-card {
+        .page-container {
 
-            border:
-                1px solid #ccc;
-
-            border-radius:
-                8px;
-
-            padding:
-                15px;
-
-            text-align:
-                center;
-
-            background:
-                white;
+            max-width: 1000px;
+            margin: auto;
+            padding: 25px;
 
         }
 
 
-        .ledger-card h3 {
+        .header,
+        .box {
 
-            margin:
-                0 0 8px 0;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
 
-            font-size:
-                14px;
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.08);
 
         }
 
 
-        .ledger-card p {
+        .header {
+
+            text-align: center;
+
+        }
+
+
+        .header h1 {
 
             margin: 0;
 
-            font-size:
-                20px;
+        }
 
-            font-weight:
-                bold;
+
+        label {
+
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+            font-weight: bold;
 
         }
 
 
-        .ledger-account-name {
+        input,
+        select,
+        textarea {
 
-            text-align:
-                center;
+            width: 100%;
+            padding: 12px;
 
-            margin:
-                10px 0 20px 0;
+            border: 1px solid #ddd;
 
-            font-size:
-                18px;
+            border-radius: 7px;
 
-            font-weight:
-                bold;
-
-        }
-
-
-        .ledger-actions {
-
-            display:
-                flex;
-
-            justify-content:
-                center;
-
-            gap:
-                8px;
-
-            flex-wrap:
-                wrap;
+            font-size: 15px;
 
         }
 
 
-        .edit-btn {
+        textarea {
 
-            padding:
-                7px 12px;
-
-            cursor:
-                pointer;
-
-            border:
-                none;
-
-            border-radius:
-                5px;
-
-            font-size:
-                12px;
+            resize: vertical;
 
         }
 
 
-        .delete-btn {
+        button {
 
-            padding:
-                7px 12px;
+            border: none;
 
-            cursor:
-                pointer;
+            background: #222;
 
-            border:
-                none;
+            color: white;
 
-            border-radius:
-                5px;
+            padding: 12px 18px;
 
-            font-size:
-                12px;
+            border-radius: 7px;
 
-        }
+            font-weight: bold;
 
+            cursor: pointer;
 
-        .ledger-description {
+            margin-top: 15px;
 
-            font-weight:
-                500;
+            margin-right: 8px;
 
         }
 
 
-        @media (
-            max-width: 600px
-        ) {
+        button:hover {
 
-            .ledger-summary {
+            background: #000;
 
-                grid-template-columns:
-                    1fr;
+        }
+
+
+        .ledger-item {
+
+            padding: 15px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 8px;
+
+            margin-top: 10px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+        }
+
+
+        .ledger-item:hover {
+
+            background: #f4f6f9;
+
+        }
+
+
+        .ledger-item.active {
+
+            border: 2px solid #222;
+
+        }
+
+
+        .transaction-card {
+
+            border: 1px solid #ddd;
+
+            padding: 18px;
+
+            border-radius: 10px;
+
+            margin-top: 15px;
+
+            background: #fafafa;
+
+        }
+
+
+        .transaction-title {
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+        }
+
+
+        .transaction-row {
+
+            margin-top: 8px;
+
+        }
+
+
+        .income {
+
+            font-weight: bold;
+
+        }
+
+
+        .expense {
+
+            font-weight: bold;
+
+        }
+
+
+        .edit-button {
+
+            background: #1565c0;
+
+        }
+
+
+        .delete-button {
+
+            background: #b71c1c;
+
+        }
+
+
+        .back-button {
+
+            width: 100%;
+
+        }
+
+
+        #message {
+
+            margin-top: 15px;
+
+            font-weight: bold;
+
+            min-height: 20px;
+
+        }
+
+
+        #ledgerDetails {
+
+            display: none;
+
+        }
+
+
+        .selected-ledger {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+        }
+
+
+        @media(max-width:600px) {
+
+            .page-container {
+
+                padding: 15px;
 
             }
 
 
-            .pnl-table {
+            .header,
+            .box {
 
-                font-size:
-                    12px;
+                padding: 18px;
 
             }
 
 
-            .ledger-actions {
+            button {
 
-                flex-direction:
-                    column;
+                width: 100%;
+
+                margin-right: 0;
 
             }
 
@@ -203,195 +292,170 @@
 <body>
 
 
-<div class="tally-report">
+<div class="page-container">
 
 
     <!-- HEADER -->
 
-    <div class="report-header">
+    <div class="header">
 
         <h1>MY ACCOUNTING</h1>
 
-        <h2>
-            Account Ledger
-        </h2>
-
-        <p>
-            Detailed Account Transactions
-        </p>
+        <p>Ledger & Transactions</p>
 
     </div>
 
 
 
-    <!-- ACCOUNT NAME -->
+    <!-- LEDGER LIST -->
+
+    <div class="box">
+
+        <h2>📒 Ledgers</h2>
+
+        <div id="ledgerList">
+
+            Loading ledgers...
+
+        </div>
+
+    </div>
+
+
+
+    <!-- SELECTED LEDGER -->
 
     <div
-        id="accountTitle"
-        class="ledger-account-name"
-    >
-        Account Ledger
-    </div>
-
-
-
-    <!-- SUMMARY -->
-
-    <div class="ledger-summary">
-
-
-        <div class="ledger-card">
-
-            <h3>
-                TOTAL DEBIT
-            </h3>
-
-            <p id="summaryDebit">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-
-        <div class="ledger-card">
-
-            <h3>
-                TOTAL CREDIT
-            </h3>
-
-            <p id="summaryCredit">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-
-        <div class="ledger-card">
-
-            <h3>
-                BALANCE
-            </h3>
-
-            <p id="summaryBalance">
-                ₹0.00
-            </p>
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- LEDGER TABLE -->
-
-    <div
-        style="
-            overflow-x:auto;
-        "
+        class="box"
+        id="ledgerDetails"
     >
 
-        <table class="pnl-table">
+        <div
+            class="selected-ledger"
+            id="selectedLedgerName"
+        >
+        </div>
 
 
-            <thead>
+        <!-- ADD / EDIT TRANSACTION -->
 
-                <tr>
+        <h3 id="formTitle">
 
-                    <th>
-                        Date
-                    </th>
+            ➕ Add Transaction
 
-                    <th>
-                        Particulars
-                    </th>
-
-                    <th>
-                        Debit (Dr.)
-                    </th>
-
-                    <th>
-                        Credit (Cr.)
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
-                </tr>
-
-            </thead>
+        </h3>
 
 
+        <label>Date</label>
 
-            <tbody id="ledgerBody">
-
-                <tr>
-
-                    <td
-                        colspan="5"
-                        style="
-                            text-align:center;
-                            padding:20px;
-                        "
-                    >
-                        Loading Ledger...
-                    </td>
-
-                </tr>
-
-            </tbody>
+        <input
+            type="date"
+            id="transactionDate"
+        >
 
 
+        <label>Type</label>
 
-            <tfoot>
+        <select id="transactionType">
 
-                <tr>
+            <option value="Income">
 
-                    <th colspan="2">
-                        TOTAL
-                    </th>
+                💰 Income
 
-                    <th
-                        id="totalDebit"
-                        class="amount"
-                    >
-                        ₹0.00
-                    </th>
+            </option>
 
-                    <th
-                        id="totalCredit"
-                        class="amount"
-                    >
-                        ₹0.00
-                    </th>
+            <option value="Expense">
 
-                    <th>
-                        -
-                    </th>
+                💸 Expense
 
-                </tr>
+            </option>
 
-            </tfoot>
+        </select>
 
 
-        </table>
+        <label>Account</label>
 
-    </div>
+        <select id="accountSelect">
+
+            <option value="">
+
+                Loading accounts...
+
+            </option>
+
+        </select>
 
 
+        <label>Amount</label>
 
-    <!-- BUTTON -->
+        <input
+            type="number"
+            id="amount"
+            min="0"
+            step="0.01"
+            placeholder="₹ 0.00"
+        >
 
-    <div class="report-buttons">
 
-        <button onclick="goBack()">
-            BACK TO TRIAL BALANCE
+        <label>Description</label>
+
+        <textarea
+            id="description"
+            rows="3"
+            placeholder="Enter description"
+        ></textarea>
+
+
+        <button
+            id="saveButton"
+            onclick="saveTransaction()"
+        >
+
+            SAVE TRANSACTION
+
         </button>
 
+
+        <button
+            id="cancelEditButton"
+            onclick="cancelEdit()"
+            style="display:none;"
+        >
+
+            CANCEL EDIT
+
+        </button>
+
+
+        <p id="message"></p>
+
+
+        <!-- TRANSACTION LIST -->
+
+        <h3>📋 Transactions</h3>
+
+
+        <div id="transactionList">
+
+            No transactions loaded.
+
+        </div>
+
+
     </div>
+
+
+
+    <!-- BACK -->
+
+    <button
+        class="back-button"
+        onclick="goDashboard()"
+    >
+
+        BACK TO DASHBOARD
+
+    </button>
 
 
 </div>
@@ -401,166 +465,146 @@
 <script>
 
 
-/* =========================================
-   GET ACCOUNT NAME
-========================================= */
+let currentUser = null;
 
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+let selectedLedgerId = null;
 
+let selectedLedgerName = "";
 
-const accountName =
-    params.get("account");
+let editingTransactionId = null;
 
 
-document.getElementById(
-    "accountTitle"
-).innerText =
+/* ===============================
+   GET CURRENT USER
+================================ */
 
-    accountName
-        ? accountName + " Ledger"
-        : "Account Ledger";
+async function getCurrentUser() {
 
-
-
-/* =========================================
-   FORMAT DATE
-========================================= */
-
-function formatDate(dateString) {
+    const { data, error } =
+        await supabaseClient
+            .auth
+            .getUser();
 
 
-    if (!dateString) {
+    if (
+        error ||
+        !data.user
+    ) {
 
-        return "";
+        window.location.href =
+            "index.html";
+
+        return null;
 
     }
 
 
-    const date =
-        new Date(dateString);
+    currentUser =
+        data.user;
 
 
-    return date
-        .toLocaleDateString(
-            "en-GB"
-        );
-
+    return currentUser;
 
 }
 
 
 
-/* =========================================
-   LOAD LEDGER
-========================================= */
+/* ===============================
+   SET TODAY
+================================ */
 
-async function loadLedger() {
+function setToday() {
+
+    document.getElementById(
+        "transactionDate"
+    ).value =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+}
 
 
-    const body =
+
+/* ===============================
+   MESSAGE
+================================ */
+
+function showMessage(
+    text,
+    isError = false
+) {
+
+    const message =
         document.getElementById(
-            "ledgerBody"
+            "message"
         );
 
 
-    body.innerHTML = `
-
-        <tr>
-
-            <td
-                colspan="5"
-                style="
-                    text-align:center;
-                    padding:20px;
-                "
-            >
-                Loading Ledger...
-            </td>
-
-        </tr>
-
-    `;
+    message.innerText =
+        text;
 
 
-    if (!accountName) {
+    message.style.color =
+        isError
+            ? "#b71c1c"
+            : "#2e7d32";
+
+}
 
 
-        body.innerHTML = `
 
-            <tr>
+/* ===============================
+   MONEY FORMAT
+================================ */
 
-                <td
-                    colspan="5"
-                    style="
-                        text-align:center;
-                        padding:20px;
-                    "
-                >
-                    Account not selected
-                </td>
+function formatMoney(amount) {
 
-            </tr>
+    return "₹" +
+        Number(amount || 0)
+            .toFixed(2);
 
-        `;
+}
 
 
-        return;
 
-    }
+/* ===============================
+   LOAD LEDGERS
+================================ */
+
+async function loadLedgers() {
+
+    const user =
+        currentUser ||
+        await getCurrentUser();
 
 
-    const {
+    if (!user) return;
 
-        data,
 
-        error
-
-    } = await supabaseClient
-
-        .from("transactions")
-
-        .select("*")
-
-        .eq(
-            "sub_category",
-            accountName
-        )
-
-        .order(
-            "transaction_date",
-            {
-                ascending: false
-            }
+    const list =
+        document.getElementById(
+            "ledgerList"
         );
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("ledgers")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            );
 
 
     if (error) {
 
-
         console.error(error);
 
-
-        body.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    style="
-                        text-align:center;
-                        padding:20px;
-                    "
-                >
-                    Error loading ledger
-                </td>
-
-            </tr>
-
-        `;
-
+        list.innerHTML =
+            "Error loading ledgers: " +
+            error.message;
 
         return;
 
@@ -572,313 +616,758 @@ async function loadLedger() {
         data.length === 0
     ) {
 
-
-        body.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    style="
-                        text-align:center;
-                        padding:20px;
-                    "
-                >
-                    No transactions found
-                </td>
-
-            </tr>
-
-        `;
-
-
-        document.getElementById(
-            "totalDebit"
-        ).innerText =
-            "₹0.00";
-
-
-        document.getElementById(
-            "totalCredit"
-        ).innerText =
-            "₹0.00";
-
+        list.innerHTML =
+            "No Ledgers Found.";
 
         return;
 
     }
 
 
-    body.innerHTML = "";
-
-
-    let totalDebit = 0;
-
-    let totalCredit = 0;
+    list.innerHTML = "";
 
 
     data.forEach(
-        function(transaction) {
+        function(ledger) {
 
 
-            const amount =
-                Number(
-                    transaction.amount
-                ) || 0;
-
-
-            let debit = "";
-
-            let credit = "";
-
-
-            if (
-                transaction.entry_type ===
-                "debit"
-            ) {
-
-
-                debit =
-                    "₹" +
-                    amount.toFixed(2);
-
-
-                totalDebit +=
-                    amount;
-
-            }
-
-
-            else if (
-                transaction.entry_type ===
-                "credit"
-            ) {
-
-
-                credit =
-                    "₹" +
-                    amount.toFixed(2);
-
-
-                totalCredit +=
-                    amount;
-
-            }
-
-
-            const row =
+            const item =
                 document.createElement(
-                    "tr"
+                    "div"
                 );
 
 
-            row.innerHTML = `
-
-                <td>
-                    ${
-                        formatDate(
-                            transaction.transaction_date
-                        )
-                    }
-                </td>
+            item.className =
+                "ledger-item";
 
 
-                <td>
+            if (
+                ledger.id ===
+                selectedLedgerId
+            ) {
 
-                    <div
-                        class="ledger-description"
-                    >
+                item.classList.add(
+                    "active"
+                );
 
-                        ${
-                            transaction.description ||
-                            "-"
-                        }
-
-                    </div>
+            }
 
 
-                    ${
-                        transaction.notes
-
-                            ? `
-
-                                <small>
-
-                                    ${
-                                        transaction.notes
-                                    }
-
-                                </small>
-
-                            `
-
-                            : ""
-
-                    }
-
-                </td>
+            item.innerText =
+                "📒 " +
+                ledger.name;
 
 
-                <td
-                    class="amount"
-                >
-                    ${debit}
-                </td>
+            item.onclick =
+                function() {
+
+                    openLedger(
+                        ledger.id,
+                        ledger.name
+                    );
+
+                };
 
 
-                <td
-                    class="amount"
-                >
-                    ${credit}
-                </td>
-
-
-                <td>
-
-                    <div
-                        class="ledger-actions"
-                    >
-
-                        <button
-                            class="edit-btn"
-                            onclick="
-                                editTransaction(
-                                    '${transaction.id}'
-                                )
-                            "
-                        >
-                            EDIT
-                        </button>
-
-
-                        <button
-                            class="delete-btn"
-                            onclick="
-                                deleteTransaction(
-                                    '${transaction.id}'
-                                )
-                            "
-                        >
-                            DELETE
-                        </button>
-
-                    </div>
-
-                </td>
-
-            `;
-
-
-            body.appendChild(
-                row
+            list.appendChild(
+                item
             );
 
 
         }
     );
 
-
-
-    /* TOTALS */
-
-
-    document.getElementById(
-        "totalDebit"
-    ).innerText =
-
-        "₹" +
-        totalDebit.toFixed(2);
-
-
-    document.getElementById(
-        "totalCredit"
-    ).innerText =
-
-        "₹" +
-        totalCredit.toFixed(2);
+}
 
 
 
-    /* SUMMARY */
+/* ===============================
+   OPEN LEDGER
+================================ */
+
+async function openLedger(
+    ledgerId,
+    ledgerName
+) {
+
+    selectedLedgerId =
+        ledgerId;
 
 
-    document.getElementById(
-        "summaryDebit"
-    ).innerText =
+    selectedLedgerName =
+        ledgerName;
 
-        "₹" +
-        totalDebit.toFixed(2);
+
+    editingTransactionId =
+        null;
 
 
     document.getElementById(
-        "summaryCredit"
-    ).innerText =
-
-        "₹" +
-        totalCredit.toFixed(2);
-
-
-    const balance =
-        totalDebit -
-        totalCredit;
+        "ledgerDetails"
+    ).style.display =
+        "block";
 
 
     document.getElementById(
-        "summaryBalance"
+        "selectedLedgerName"
     ).innerText =
+        "📒 " +
+        ledgerName;
 
-        "₹" +
-        Math.abs(
-            balance
-        ).toFixed(2) +
 
-        (
-            balance > 0
+    cancelEdit();
 
-                ? " Dr."
 
-                : balance < 0
+    await loadLedgers();
 
-                    ? " Cr."
-
-                    : ""
-        );
-
+    await loadTransactions();
 
 }
 
 
 
-/* =========================================
+/* ===============================
+   LOAD ACCOUNTS
+================================ */
+
+async function loadAccounts() {
+
+    const user =
+        currentUser ||
+        await getCurrentUser();
+
+
+    if (!user) return;
+
+
+    const select =
+        document.getElementById(
+            "accountSelect"
+        );
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        select.innerHTML =
+            '<option value="">Error loading accounts</option>';
+
+        return;
+
+    }
+
+
+    select.innerHTML =
+        '<option value="">Select Account</option>';
+
+
+    data.forEach(
+        function(account) {
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                account.id;
+
+
+            option.text =
+                account.name;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+
+/* ===============================
+   LOAD TRANSACTIONS
+================================ */
+
+async function loadTransactions() {
+
+    if (!selectedLedgerId) {
+
+        return;
+
+    }
+
+
+    const list =
+        document.getElementById(
+            "transactionList"
+        );
+
+
+    list.innerHTML =
+        "Loading transactions...";
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("transactions")
+            .select(`
+                *,
+                accounts (
+                    name
+                )
+            `)
+            .eq(
+                "ledger_id",
+                selectedLedgerId
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .order(
+                "transaction_date",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        list.innerHTML =
+            "Error loading transactions: " +
+            error.message;
+
+        return;
+
+    }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        list.innerHTML =
+            "No transactions found for this Ledger.";
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    data.forEach(
+        function(transaction) {
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "transaction-card";
+
+
+            const accountName =
+                transaction.accounts
+                    ?.name ||
+                "-";
+
+
+            card.innerHTML = `
+
+                <div class="transaction-title">
+
+                    ${escapeHtml(
+                        transaction.description ||
+                        "Transaction"
+                    )}
+
+                </div>
+
+
+                <div class="transaction-row">
+
+                    <strong>Date:</strong>
+
+                    ${transaction.transaction_date}
+
+                </div>
+
+
+                <div class="transaction-row">
+
+                    <strong>Type:</strong>
+
+                    <span class="${
+                        transaction.type === "Income"
+                            ? "income"
+                            : "expense"
+                    }">
+
+                        ${transaction.type}
+
+                    </span>
+
+                </div>
+
+
+                <div class="transaction-row">
+
+                    <strong>Account:</strong>
+
+                    ${escapeHtml(
+                        accountName
+                    )}
+
+                </div>
+
+
+                <div class="transaction-row">
+
+                    <strong>Amount:</strong>
+
+                    ${formatMoney(
+                        transaction.amount
+                    )}
+
+                </div>
+
+
+                <button
+                    class="edit-button"
+                    onclick="editTransaction(
+                        '${transaction.id}'
+                    )"
+                >
+
+                    ✏️ EDIT
+
+                </button>
+
+
+                <button
+                    class="delete-button"
+                    onclick="deleteTransaction(
+                        '${transaction.id}'
+                    )"
+                >
+
+                    🗑️ DELETE
+
+                </button>
+
+            `;
+
+
+            list.appendChild(
+                card
+            );
+
+
+        }
+    );
+
+}
+
+
+
+/* ===============================
+   SAVE TRANSACTION
+================================ */
+
+async function saveTransaction() {
+
+    if (!selectedLedgerId) {
+
+        showMessage(
+            "Please select a Ledger first.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const user =
+        currentUser;
+
+
+    const transactionDate =
+        document.getElementById(
+            "transactionDate"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "transactionType"
+        ).value;
+
+
+    const accountId =
+        document.getElementById(
+            "accountSelect"
+        ).value;
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "amount"
+            ).value
+        );
+
+
+    const description =
+        document.getElementById(
+            "description"
+        )
+        .value
+        .trim();
+
+
+    if (
+        !transactionDate ||
+        !accountId ||
+        !amount ||
+        amount <= 0
+    ) {
+
+        showMessage(
+            "Please fill all required fields.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveButton"
+        );
+
+
+    saveButton.disabled =
+        true;
+
+
+    if (editingTransactionId) {
+
+        /* UPDATE */
+
+        const { error } =
+            await supabaseClient
+                .from("transactions")
+                .update({
+
+                    transaction_date:
+                        transactionDate,
+
+                    type:
+                        type,
+
+                    account_id:
+                        accountId,
+
+                    amount:
+                        amount,
+
+                    description:
+                        description || null
+
+                })
+                .eq(
+                    "id",
+                    editingTransactionId
+                )
+                .eq(
+                    "user_id",
+                    user.id
+                );
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                error.message,
+                true
+            );
+
+            saveButton.disabled =
+                false;
+
+            return;
+
+        }
+
+
+        showMessage(
+            "Transaction updated successfully!"
+        );
+
+    }
+
+    else {
+
+        /* INSERT */
+
+        const { error } =
+            await supabaseClient
+                .from("transactions")
+                .insert([{
+
+                    user_id:
+                        user.id,
+
+                    ledger_id:
+                        selectedLedgerId,
+
+                    transaction_date:
+                        transactionDate,
+
+                    type:
+                        type,
+
+                    account_id:
+                        accountId,
+
+                    amount:
+                        amount,
+
+                    description:
+                        description || null
+
+                }]);
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                error.message,
+                true
+            );
+
+            saveButton.disabled =
+                false;
+
+            return;
+
+        }
+
+
+        showMessage(
+            "Transaction saved successfully!"
+        );
+
+    }
+
+
+    saveButton.disabled =
+        false;
+
+
+    cancelEdit();
+
+    await loadTransactions();
+
+}
+
+
+
+/* ===============================
    EDIT TRANSACTION
-========================================= */
+================================ */
 
-function editTransaction(id) {
+async function editTransaction(id) {
+
+    const { data, error } =
+        await supabaseClient
+            .from("transactions")
+            .select("*")
+            .eq(
+                "id",
+                id
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .single();
 
 
-    window.location.href =
+    if (error) {
 
-        "add-transaction.html?id=" +
+        console.error(error);
 
-        encodeURIComponent(id) +
+        return;
 
-        "&account=" +
+    }
 
-        encodeURIComponent(
-            accountName
-        );
 
+    editingTransactionId =
+        id;
+
+
+    document.getElementById(
+        "transactionDate"
+    ).value =
+        data.transaction_date;
+
+
+    document.getElementById(
+        "transactionType"
+    ).value =
+        data.type;
+
+
+    document.getElementById(
+        "accountSelect"
+    ).value =
+        data.account_id;
+
+
+    document.getElementById(
+        "amount"
+    ).value =
+        data.amount;
+
+
+    document.getElementById(
+        "description"
+    ).value =
+        data.description || "";
+
+
+    document.getElementById(
+        "formTitle"
+    ).innerText =
+        "✏️ Edit Transaction";
+
+
+    document.getElementById(
+        "saveButton"
+    ).innerText =
+        "UPDATE TRANSACTION";
+
+
+    document.getElementById(
+        "cancelEditButton"
+    ).style.display =
+        "inline-block";
+
+
+    window.scrollTo({
+
+        top: document
+            .getElementById(
+                "ledgerDetails"
+            )
+            .offsetTop,
+
+        behavior:
+            "smooth"
+
+    });
 
 }
 
 
 
-/* =========================================
+/* ===============================
+   CANCEL EDIT
+================================ */
+
+function cancelEdit() {
+
+    editingTransactionId =
+        null;
+
+
+    document.getElementById(
+        "formTitle"
+    ).innerText =
+        "➕ Add Transaction";
+
+
+    document.getElementById(
+        "saveButton"
+    ).innerText =
+        "SAVE TRANSACTION";
+
+
+    document.getElementById(
+        "cancelEditButton"
+    ).style.display =
+        "none";
+
+
+    setToday();
+
+
+    document.getElementById(
+        "transactionType"
+    ).value =
+        "Income";
+
+
+    document.getElementById(
+        "accountSelect"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "amount"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "description"
+    ).value =
+        "";
+
+}
+
+
+
+/* ===============================
    DELETE TRANSACTION
-========================================= */
+================================ */
 
 async function deleteTransaction(id) {
-
 
     const confirmDelete =
         confirm(
@@ -893,76 +1382,102 @@ async function deleteTransaction(id) {
     }
 
 
-    const {
-
-        error
-
-    } = await supabaseClient
-
-        .from("transactions")
-
-        .delete()
-
-        .eq(
-            "id",
-            id
-        );
+    const { error } =
+        await supabaseClient
+            .from("transactions")
+            .delete()
+            .eq(
+                "id",
+                id
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            );
 
 
     if (error) {
 
-
         console.error(error);
 
-
-        alert(
-            "Error deleting transaction: " +
-            error.message
+        showMessage(
+            error.message,
+            true
         );
-
 
         return;
 
     }
 
 
-    alert(
+    showMessage(
         "Transaction deleted successfully!"
     );
 
 
-    loadLedger();
-
+    await loadTransactions();
 
 }
 
 
 
-/* =========================================
-   BACK
-========================================= */
+/* ===============================
+   ESCAPE HTML
+================================ */
 
-function goBack() {
+function escapeHtml(text) {
 
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.innerText =
+        text || "";
+
+
+    return div.innerHTML;
+
+}
+
+
+
+/* ===============================
+   BACK TO DASHBOARD
+================================ */
+
+function goDashboard() {
 
     window.location.href =
-        "trial-balance.html";
-
+        "dashboard.html";
 
 }
 
 
 
-/* =========================================
+/* ===============================
    START
-========================================= */
+================================ */
 
-loadLedger();
+async function startPage() {
+
+    setToday();
+
+    await getCurrentUser();
+
+    await loadAccounts();
+
+    await loadLedgers();
+
+}
+
+
+startPage();
 
 
 </script>
 
 
 </body>
-
 </html>
