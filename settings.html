@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -21,77 +20,55 @@
     <script src="supabase.js"></script>
 
 
-    <!-- SETTINGS CSS -->
-
     <style>
 
-
         * {
-
-            box-sizing:
-                border-box;
-
+            box-sizing: border-box;
         }
 
 
         body {
 
-            margin:
-                0;
+            margin: 0;
+            padding: 0;
 
-            padding:
-                0;
+            font-family: Arial, sans-serif;
 
-            font-family:
-                Arial,
-                sans-serif;
+            background: #f4f6f9;
 
-            background:
-                #f4f6f9;
-
-            color:
-                #222;
+            color: #222;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            MAIN
-        ===================================== */
+        ========================= */
 
         .settings-page {
 
-            max-width:
-                850px;
+            max-width: 850px;
 
-            margin:
-                auto;
+            margin: auto;
 
-            padding:
-                25px;
+            padding: 25px;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            HEADER
-        ===================================== */
+        ========================= */
 
         .settings-header {
 
-            background:
-                white;
+            background: white;
 
-            padding:
-                25px;
+            padding: 25px;
 
-            border-radius:
-                12px;
+            border-radius: 12px;
 
-            margin-bottom:
-                25px;
+            margin-bottom: 25px;
 
             box-shadow:
                 0 2px 10px
@@ -102,41 +79,33 @@
 
         .settings-header h1 {
 
-            margin:
-                0;
+            margin: 0;
 
-            font-size:
-                28px;
+            font-size: 28px;
 
         }
 
 
         .settings-header p {
 
-            margin:
-                8px 0 0;
+            margin: 8px 0 0;
 
-            color:
-                #666;
+            color: #666;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            SETTINGS BOX
-        ===================================== */
+        ========================= */
 
         .settings-box {
 
-            background:
-                white;
+            background: white;
 
-            padding:
-                25px;
+            padding: 25px;
 
-            border-radius:
-                12px;
+            border-radius: 12px;
 
             box-shadow:
                 0 2px 10px
@@ -147,201 +116,157 @@
 
         .settings-box h2 {
 
-            margin-top:
-                0;
+            margin-top: 0;
 
-            margin-bottom:
-                25px;
+            margin-bottom: 25px;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            FORM
-        ===================================== */
+        ========================= */
 
         .form-group {
 
-            margin-bottom:
-                20px;
+            margin-bottom: 20px;
 
         }
 
 
         label {
 
-            display:
-                block;
+            display: block;
 
-            margin-bottom:
-                8px;
+            margin-bottom: 8px;
 
-            font-weight:
-                bold;
+            font-weight: bold;
 
-            font-size:
-                14px;
+            font-size: 14px;
 
         }
 
 
         input {
 
-            width:
-                100%;
+            width: 100%;
 
-            padding:
-                13px;
+            padding: 13px;
 
-            border:
-                1px solid
-                #ddd;
+            border: 1px solid #ddd;
 
-            border-radius:
-                7px;
+            border-radius: 7px;
 
-            font-size:
-                15px;
+            font-size: 15px;
 
-            outline:
-                none;
+            outline: none;
 
         }
 
 
         input:focus {
 
-            border-color:
-                #222;
+            border-color: #222;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            BUTTONS
-        ===================================== */
+        ========================= */
 
         .button-group {
 
-            display:
-                flex;
+            display: flex;
 
-            gap:
-                15px;
+            gap: 15px;
 
-            margin-top:
-                30px;
+            margin-top: 30px;
 
         }
 
 
         button {
 
-            border:
-                none;
+            border: none;
 
-            padding:
-                14px 20px;
+            padding: 14px 20px;
 
-            border-radius:
-                8px;
+            border-radius: 8px;
 
-            cursor:
-                pointer;
+            cursor: pointer;
 
-            font-size:
-                14px;
+            font-size: 14px;
 
-            font-weight:
-                bold;
+            font-weight: bold;
 
-            background:
-                #222;
+            background: #222;
 
-            color:
-                white;
+            color: white;
 
         }
 
 
         button:hover {
 
-            background:
-                #000;
+            background: #000;
 
         }
 
 
         button:disabled {
 
-            opacity:
-                0.6;
+            opacity: 0.6;
 
-            cursor:
-                not-allowed;
+            cursor: not-allowed;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            MESSAGE
-        ===================================== */
+        ========================= */
 
         #message {
 
-            margin-top:
-                20px;
+            margin-top: 20px;
 
-            font-weight:
-                bold;
+            font-weight: bold;
 
         }
 
 
-
-        /* =====================================
+        /* =========================
            MOBILE
-        ===================================== */
+        ========================= */
 
-        @media (
-            max-width:
-            600px
-        ) {
+        @media(max-width: 600px) {
 
             .settings-page {
 
-                padding:
-                    15px;
+                padding: 15px;
 
             }
 
 
             .button-group {
 
-                flex-direction:
-                    column;
+                flex-direction: column;
 
             }
 
 
             button {
 
-                width:
-                    100%;
+                width: 100%;
 
             }
 
         }
 
-
     </style>
 
-
 </head>
-
 
 
 <body>
@@ -374,7 +299,6 @@
         <h2>
             Personal Settings
         </h2>
-
 
 
         <!-- NAME -->
@@ -488,9 +412,6 @@
         </div>
 
 
-
-        <!-- MESSAGE -->
-
         <p id="message"></p>
 
 
@@ -504,36 +425,88 @@
 <script>
 
 
-/* =====================================
+/* =============================
+   GLOBAL USER
+============================= */
+
+let currentUser = null;
+
+
+/* =============================
+   GET CURRENT USER
+============================= */
+
+async function getCurrentUser() {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .auth
+        .getUser();
+
+
+    if (
+        error ||
+        !data.user
+    ) {
+
+        window.location.href =
+            "index.html";
+
+        return null;
+
+    }
+
+
+    currentUser =
+        data.user;
+
+
+    return currentUser;
+
+}
+
+
+/* =============================
    LOAD SETTINGS
-===================================== */
+
+   ONLY CURRENT USER SETTINGS
+============================= */
 
 async function loadSettings() {
 
 
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
     const {
-
         data,
-
         error
-
     } = await supabaseClient
 
         .from("settings")
 
         .select("*")
 
+        .eq(
+            "user_id",
+            currentUser.id
+        )
+
         .limit(1);
 
 
     if (error) {
 
-
         console.error(
             "Load Settings Error:",
             error
         );
-
 
         return;
 
@@ -545,6 +518,12 @@ async function loadSettings() {
         data.length === 0
     ) {
 
+        /* FIRST TIME USER */
+
+        document.getElementById(
+            "email"
+        ).value =
+            currentUser.email || "";
 
         return;
 
@@ -558,47 +537,53 @@ async function loadSettings() {
     document.getElementById(
         "userName"
     ).value =
-        settings.user_name ||
-        "";
+        settings.user_name || "";
 
 
     document.getElementById(
         "mobile"
     ).value =
-        settings.mobile ||
-        "";
+        settings.mobile || "";
 
 
     document.getElementById(
         "email"
     ).value =
         settings.email ||
+        currentUser.email ||
         "";
 
 
     document.getElementById(
         "financialYearStart"
     ).value =
-        settings.financial_year_start ||
-        "";
+        settings.financial_year_start || "";
 
 
     document.getElementById(
         "financialYearEnd"
     ).value =
-        settings.financial_year_end ||
-        "";
-
+        settings.financial_year_end || "";
 
 }
 
 
-
-/* =====================================
+/* =============================
    SAVE SETTINGS
-===================================== */
+============================= */
 
 async function saveSettings() {
+
+
+    if (!currentUser) {
+
+        alert(
+            "Please login again."
+        );
+
+        return;
+
+    }
 
 
     const userName =
@@ -643,14 +628,10 @@ async function saveSettings() {
         );
 
 
-    if (
-        !userName
-    ) {
-
+    if (!userName) {
 
         message.innerText =
             "Please enter your name.";
-
 
         return;
 
@@ -672,37 +653,45 @@ async function saveSettings() {
     try {
 
 
-        /*
-           CHECK IF SETTINGS ALREADY EXIST
-        */
+        /* =============================
+           CHECK CURRENT USER SETTINGS
+        ============================= */
 
         const {
-
-            data:
-                existingSettings,
-
-            error:
-                checkError
-
+            data: existingSettings,
+            error: checkError
         } = await supabaseClient
 
             .from("settings")
 
             .select("id")
 
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+
             .limit(1);
 
 
-        if (
-            checkError
-        ) {
+        if (checkError) {
 
             throw checkError;
 
         }
 
 
+        /* =============================
+           SETTINGS DATA
+
+           IMPORTANT:
+           user_id INCLUDED
+        ============================= */
+
         const settingsData = {
+
+            user_id:
+                currentUser.id,
 
             user_name:
                 userName,
@@ -711,7 +700,7 @@ async function saveSettings() {
                 mobile || null,
 
             email:
-                email || null,
+                email || currentUser.email || null,
 
             financial_year_start:
                 financialYearStart || null,
@@ -722,13 +711,12 @@ async function saveSettings() {
         };
 
 
+        let saveError;
 
-        let error;
 
-
-        /*
-           UPDATE EXISTING SETTINGS
-        */
+        /* =============================
+           UPDATE
+        ============================= */
 
         if (
             existingSettings &&
@@ -736,69 +724,71 @@ async function saveSettings() {
         ) {
 
 
-            const result =
-                await supabaseClient
+            const {
+                error
+            } = await supabaseClient
 
-                    .from("settings")
+                .from("settings")
 
-                    .update(
-                        settingsData
-                    )
+                .update(
+                    settingsData
+                )
 
-                    .eq(
-                        "id",
-                        existingSettings[0].id
-                    );
+                .eq(
+                    "id",
+                    existingSettings[0].id
+                )
+
+                .eq(
+                    "user_id",
+                    currentUser.id
+                );
 
 
-            error =
-                result.error;
+            saveError =
+                error;
 
         }
 
 
-        /*
-           INSERT NEW SETTINGS
-        */
+        /* =============================
+           INSERT
+        ============================= */
 
         else {
 
 
-            const result =
-                await supabaseClient
+            const {
+                error
+            } = await supabaseClient
 
-                    .from("settings")
+                .from("settings")
 
-                    .insert([
-                        settingsData
-                    ]);
+                .insert(
+                    settingsData
+                );
 
 
-            error =
-                result.error;
+            saveError =
+                error;
 
         }
 
 
-        if (
-            error
-        ) {
+        if (saveError) {
 
-            throw error;
+            throw saveError;
 
         }
 
 
         message.innerText =
-            "Settings saved successfully!";
+            "✅ Settings saved successfully!";
 
 
     }
 
-
-    catch (
-        error
-    ) {
+    catch (error) {
 
 
         console.error(
@@ -808,11 +798,10 @@ async function saveSettings() {
 
 
         message.innerText =
-            "Error: " +
+            "❌ Error: " +
             error.message;
 
     }
-
 
     finally {
 
@@ -826,36 +815,49 @@ async function saveSettings() {
 
     }
 
-
 }
 
 
-
-/* =====================================
+/* =============================
    BACK TO DASHBOARD
-===================================== */
+============================= */
 
 function goDashboard() {
-
 
     window.location.href =
         "dashboard.html";
 
+}
+
+
+/* =============================
+   START PAGE
+============================= */
+
+async function startPage() {
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+
+        return;
+
+    }
+
+
+    await loadSettings();
 
 }
 
 
-
-/* =====================================
-   START
-===================================== */
-
-loadSettings();
+startPage();
 
 
 </script>
 
 
 </body>
-
 </html>
