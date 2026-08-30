@@ -1,373 +1,157 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Login - My Accounting</title>
-
-
-    <!-- SUPABASE -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script src="supabase.js"></script>
-
-
-    <!-- LOGIN PAGE CSS -->
-
-    <style>
-
-        * {
-
-            box-sizing:
-                border-box;
-
-        }
-
-
-        body {
-
-            margin:
-                0;
-
-            min-height:
-                100vh;
-
-            display:
-                flex;
-
-            justify-content:
-                center;
-
-            align-items:
-                center;
-
-            font-family:
-                Arial,
-                sans-serif;
-
-            background:
-                #f4f6f9;
-
-            color:
-                #222;
-
-        }
-
-
-        .login-container {
-
-            width:
-                100%;
-
-            max-width:
-                420px;
-
-            padding:
-                20px;
-
-        }
-
-
-        .login-box {
-
-            background:
-                #ffffff;
-
-            padding:
-                40px 35px;
-
-            border-radius:
-                15px;
-
-            box-shadow:
-                0 5px 25px
-                rgba(0, 0, 0, 0.12);
-
-        }
-
-
-        .login-header {
-
-            text-align:
-                center;
-
-            margin-bottom:
-                30px;
-
-        }
-
-
-        .login-header h1 {
-
-            margin:
-                0;
-
-            font-size:
-                30px;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #222;
-
-        }
-
-
-        .login-header p {
-
-            margin:
-                10px 0 0;
-
-            color:
-                #777;
-
-            font-size:
-                14px;
-
-        }
-
-
-        .form-group {
-
-            margin-bottom:
-                20px;
-
-        }
-
-
-        label {
-
-            display:
-                block;
-
-            margin-bottom:
-                8px;
-
-            font-size:
-                14px;
-
-            font-weight:
-                bold;
-
-            color:
-                #333;
-
-        }
-
-
-        input {
-
-            width:
-                100%;
-
-            padding:
-                14px;
-
-            border:
-                1px solid
-                #ddd;
-
-            border-radius:
-                8px;
-
-            font-size:
-                15px;
-
-            outline:
-                none;
-
-        }
-
-
-        input:focus {
-
-            border-color:
-                #222;
-
-        }
-
-
-        /* REMEMBER ME */
-
-        .remember-box {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                8px;
-
-            margin-bottom:
-                20px;
-
-        }
-
-
-        .remember-box input {
-
-            width:
-                auto;
-
-            padding:
-                0;
-
-            cursor:
-                pointer;
-
-        }
-
-
-        .remember-box label {
-
-            margin:
-                0;
-
-            font-size:
-                14px;
-
-            cursor:
-                pointer;
-
-        }
-
-
-        .login-button {
-
-            width:
-                100%;
-
-            border:
-                none;
-
-            padding:
-                15px;
-
-            background:
-                #222;
-
-            color:
-                white;
-
-            border-radius:
-                8px;
-
-            font-size:
-                15px;
-
-            font-weight:
-                bold;
-
-            cursor:
-                pointer;
-
-        }
-
-
-        .login-button:hover {
-
-            background:
-                #000;
-
-        }
-
-
-        .login-button:disabled {
-
-            opacity:
-                0.6;
-
-            cursor:
-                not-allowed;
-
-        }
-
-
-        #loginMessage {
-
-            text-align:
-                center;
-
-            margin-top:
-                18px;
-
-            margin-bottom:
-                0;
-
-            font-size:
-                14px;
-
-            min-height:
-                20px;
-
-            color:
-                #c62828;
-
-        }
-
-
-        @media (
-            max-width:
-            480px
-        ) {
-
-            .login-container {
-
-                padding:
-                    15px;
-
-            }
-
-
-            .login-box {
-
-                padding:
-                    30px 22px;
-
-            }
-
-
-            .login-header h1 {
-
-                font-size:
-                    25px;
-
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login - My Accounting</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 40px 35px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.login-header p {
+    margin-top: 10px;
+    color: #777;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #222;
+}
+
+.remember-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.remember-box input {
+    width: auto;
+}
+
+.remember-box label {
+    margin: 0;
+}
+
+.login-button,
+.request-button {
+    width: 100%;
+    border: none;
+    padding: 15px;
+    color: white;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-button {
+    background: #222;
+}
+
+.request-button {
+    background: #555;
+    margin-top: 12px;
+}
+
+.login-button:hover {
+    background: #000;
+}
+
+.request-button:hover {
+    background: #333;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#loginMessage {
+    text-align: center;
+    margin-top: 18px;
+    min-height: 20px;
+    font-size: 14px;
+}
+
+</style>
 
 </head>
 
 
 <body>
 
-
 <div class="login-container">
 
     <div class="login-box">
 
-
-        <!-- HEADER -->
-
         <div class="login-header">
 
-            <h1>
-                MY ACCOUNTING
-            </h1>
+            <h1>MY ACCOUNTING</h1>
 
             <p>
                 Login to your personal accounting system
@@ -376,13 +160,9 @@
         </div>
 
 
-        <!-- EMAIL -->
-
         <div class="form-group">
 
-            <label for="email">
-                Email Address
-            </label>
+            <label>Email Address</label>
 
             <input
                 type="email"
@@ -394,13 +174,9 @@
         </div>
 
 
-        <!-- PASSWORD -->
-
         <div class="form-group">
 
-            <label for="password">
-                Password
-            </label>
+            <label>Password</label>
 
             <input
                 type="password"
@@ -411,8 +187,6 @@
 
         </div>
 
-
-        <!-- REMEMBER ME -->
 
         <div class="remember-box">
 
@@ -429,8 +203,6 @@
         </div>
 
 
-        <!-- LOGIN BUTTON -->
-
         <button
             id="loginButton"
             class="login-button"
@@ -440,10 +212,15 @@
         </button>
 
 
-        <!-- MESSAGE -->
+        <button
+            class="request-button"
+            onclick="requestAccess()"
+        >
+            REQUEST ACCESS
+        </button>
+
 
         <p id="loginMessage"></p>
-
 
     </div>
 
@@ -452,59 +229,150 @@
 
 <script>
 
-
-/* =====================================
-   CHECK EXISTING LOGIN
-===================================== */
-
-async function checkLogin() {
+const OWNER_EMAIL =
+    "thackerdhruv39@gmail.com";
 
 
-    const {
+/* MESSAGE */
 
-        data,
+function showMessage(text, success = false) {
 
-        error
+    const message =
+        document.getElementById(
+            "loginMessage"
+        );
 
-    } = await supabaseClient.auth.getSession();
+    message.innerText = text;
+
+    message.style.color =
+        success
+            ? "#2e7d32"
+            : "#c62828";
+}
+
+
+/* CHECK USER ACCESS */
+
+async function checkUserAccess(user) {
+
+    if (!user) {
+        return false;
+    }
+
+
+    /* OWNER */
+
+    if (
+        user.email &&
+        user.email.toLowerCase() ===
+        OWNER_EMAIL.toLowerCase()
+    ) {
+        return true;
+    }
+
+
+    /* CHECK PROFILE */
+
+    const { data, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("is_approved")
+            .eq("id", user.id)
+            .maybeSingle();
 
 
     if (error) {
 
-        console.error(error);
-
-        return;
-
-    }
-
-
-    const rememberMe =
-        localStorage.getItem(
-            "rememberMe"
+        console.error(
+            "Access check error:",
+            error
         );
+
+        return false;
+    }
 
 
     if (
-        data.session &&
-        rememberMe === "true"
+        data &&
+        data.is_approved === true
     ) {
+        return true;
+    }
 
-        window.location.href =
-            "dashboard.html";
+
+    return false;
+}
+
+
+/* EXISTING LOGIN */
+
+async function checkLogin() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .auth
+                .getSession();
+
+
+        if (
+            error ||
+            !data.session
+        ) {
+            return;
+        }
+
+
+        const user =
+            data.session.user;
+
+
+        const allowed =
+            await checkUserAccess(
+                user
+            );
+
+
+        if (allowed) {
+
+            window.location.href =
+                "dashboard.html";
+
+        }
+
+        else {
+
+            await supabaseClient
+                .auth
+                .signOut();
+
+            localStorage.removeItem(
+                "rememberMe"
+            );
+
+        }
 
     }
 
+    catch (error) {
+
+        console.error(
+            "Session error:",
+            error
+        );
+
+    }
 
 }
 
 
-
-/* =====================================
-   LOGIN
-===================================== */
+/* LOGIN */
 
 async function login() {
-
 
     const email =
         document.getElementById(
@@ -524,12 +392,6 @@ async function login() {
         ).checked;
 
 
-    const message =
-        document.getElementById(
-            "loginMessage"
-        );
-
-
     const loginButton =
         document.getElementById(
             "loginButton"
@@ -541,57 +403,77 @@ async function login() {
         !password
     ) {
 
-        message.innerText =
-            "Please enter email and password.";
+        showMessage(
+            "Please enter email and password."
+        );
 
         return;
-
     }
 
 
-    loginButton.disabled =
-        true;
-
+    loginButton.disabled = true;
 
     loginButton.innerText =
         "LOGGING IN...";
 
 
-    message.innerText =
-        "";
-
-
     try {
 
-
         const {
-
             data,
-
             error
+        } =
+            await supabaseClient
+                .auth
+                .signInWithPassword({
 
-        } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
 
-            email:
-                email,
+                    password: password
 
-            password:
-                password
-
-        });
+                });
 
 
         if (error) {
 
-            message.innerText =
-                error.message;
+            showMessage(
+                error.message
+            );
 
             return;
-
         }
 
 
-        /* SAVE REMEMBER SETTING */
+        if (!data.user) {
+
+            showMessage(
+                "Login failed."
+            );
+
+            return;
+        }
+
+
+        const allowed =
+            await checkUserAccess(
+                data.user
+            );
+
+
+        if (!allowed) {
+
+            await supabaseClient
+                .auth
+                .signOut();
+
+
+            showMessage(
+                "Your account is not approved yet."
+            );
+
+            return;
+        }
+
 
         if (rememberMe) {
 
@@ -611,28 +493,21 @@ async function login() {
         }
 
 
-        if (data.user) {
-
-            message.style.color =
-                "#2e7d32";
-
-
-            message.innerText =
-                "Login successful!";
+        showMessage(
+            "Login successful!",
+            true
+        );
 
 
-            setTimeout(
-                function() {
+        setTimeout(
+            function() {
 
-                    window.location.href =
-                        "dashboard.html";
+                window.location.href =
+                    "dashboard.html";
 
-                },
-                500
-            );
-
-        }
-
+            },
+            500
+        );
 
     }
 
@@ -640,8 +515,9 @@ async function login() {
 
         console.error(error);
 
-        message.innerText =
-            "Something went wrong. Please try again.";
+        showMessage(
+            "Something went wrong."
+        );
 
     }
 
@@ -658,6 +534,16 @@ async function login() {
 }
 
 
+/* REQUEST ACCESS */
+
+function requestAccess() {
+
+    window.location.href =
+        "request-access.html";
+
+}
+
+
 /* ENTER KEY */
 
 document
@@ -669,23 +555,16 @@ document
             if (
                 event.key === "Enter"
             ) {
-
                 login();
-
             }
 
         }
     );
 
 
-/* START */
-
 checkLogin();
-
 
 </script>
 
-
 </body>
-
 </html>
