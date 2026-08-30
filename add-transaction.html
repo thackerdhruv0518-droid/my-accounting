@@ -5,21 +5,29 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Add Transaction - My Accounting</title>
 
     <link rel="stylesheet" href="style.css">
 
     <!-- SUPABASE -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="supabase.js"></script>
 
 </head>
 
+
 <body>
 
+
 <div class="tally-report">
+
 
     <!-- HEADER -->
 
@@ -114,11 +122,11 @@
             </option>
 
             <option value="debit">
-                Debit (Expense / Payment)
+                Debit (Money Paid)
             </option>
 
             <option value="credit">
-                Credit (Income / Received)
+                Credit (Money Received)
             </option>
 
         </select>
@@ -177,12 +185,16 @@
         </button>
 
 
-        <button onclick="clearForm()">
+        <button
+            onclick="clearForm()"
+        >
             CLEAR
         </button>
 
 
-        <button onclick="goDashboard()">
+        <button
+            onclick="goDashboard()"
+        >
             BACK TO DASHBOARD
         </button>
 
@@ -203,32 +215,21 @@
 
 
 /* =====================================
-   CURRENT USER
+   GET CURRENT USER
 ===================================== */
 
 async function getCurrentUser() {
 
-    const {
-
-        data,
-
-        error
-
-    } =
+    const { data, error } =
         await supabaseClient
             .auth
             .getUser();
 
 
-    if (
-        error ||
-        !data.user
-    ) {
+    if (error || !data.user) {
 
-        console.error(
-            "User Error:",
-            error
-        );
+        window.location.href =
+            "index.html";
 
         return null;
 
@@ -238,9 +239,6 @@ async function getCurrentUser() {
     return data.user;
 
 }
-
-
-
 
 
 /* =====================================
@@ -259,136 +257,11 @@ function setTodayDate() {
 }
 
 
-
-
-
-/* =====================================
-   LOAD ACCOUNTS
-===================================== */
-
-async function loadAccounts() {
-
-
-    const select =
-        document.getElementById(
-            "paymentAccount"
-        );
-
-
-    select.innerHTML =
-        '<option value="">Loading Accounts...</option>';
-
-
-    const user =
-        await getCurrentUser();
-
-
-    if (!user) {
-
-        select.innerHTML =
-            '<option value="">Please login first</option>';
-
-        return;
-
-    }
-
-
-    const {
-
-        data,
-
-        error
-
-    } =
-        await supabaseClient
-            .from("accounts")
-            .select("*")
-            .eq(
-                "user_id",
-                user.id
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Account Loading Error:",
-            error
-        );
-
-
-        select.innerHTML =
-            '<option value="">Error loading accounts</option>';
-
-        return;
-
-    }
-
-
-    select.innerHTML =
-        '<option value="">Select Cash / Bank Account</option>';
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        select.innerHTML +=
-            '<option value="">No accounts found</option>';
-
-        return;
-
-    }
-
-
-    data.forEach(
-        function(account) {
-
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                account.id;
-
-
-            const icon =
-                account.account_type === "cash"
-                    ? "💵"
-                    : "🏦";
-
-
-            option.text =
-                icon +
-                " " +
-                account.name;
-
-
-            select.appendChild(
-                option
-            );
-
-
-        }
-    );
-
-
-}
-
-
-
-
-
 /* =====================================
    LOAD MAIN CATEGORIES
 ===================================== */
 
 async function loadCategories() {
-
 
     const select =
         document.getElementById(
@@ -396,13 +269,7 @@ async function loadCategories() {
         );
 
 
-    const {
-
-        data,
-
-        error
-
-    } =
+    const { data, error } =
         await supabaseClient
             .from("categories")
             .select("*")
@@ -428,34 +295,23 @@ async function loadCategories() {
     data.forEach(
         function(category) {
 
-
             const option =
                 document.createElement(
                     "option"
                 );
 
-
             option.value =
                 category.id;
-
 
             option.text =
                 category.name;
 
-
-            select.appendChild(
-                option
-            );
-
+            select.appendChild(option);
 
         }
     );
 
-
 }
-
-
-
 
 
 /* =====================================
@@ -463,7 +319,6 @@ async function loadCategories() {
 ===================================== */
 
 async function loadSubCategories() {
-
 
     const categoryId =
         document.getElementById(
@@ -501,13 +356,7 @@ async function loadSubCategories() {
         '<option value="">Loading...</option>';
 
 
-    const {
-
-        data,
-
-        error
-
-    } =
+    const { data, error } =
         await supabaseClient
             .from("sub_categories")
             .select("*")
@@ -537,34 +386,23 @@ async function loadSubCategories() {
     data.forEach(
         function(subCategory) {
 
-
             const option =
                 document.createElement(
                     "option"
                 );
 
-
             option.value =
                 subCategory.id;
-
 
             option.text =
                 subCategory.name;
 
-
-            subSelect.appendChild(
-                option
-            );
-
+            subSelect.appendChild(option);
 
         }
     );
 
-
 }
-
-
-
 
 
 /* =====================================
@@ -572,7 +410,6 @@ async function loadSubCategories() {
 ===================================== */
 
 async function loadLedgers() {
-
 
     const subCategoryId =
         document.getElementById(
@@ -600,13 +437,7 @@ async function loadLedgers() {
         '<option value="">Loading...</option>';
 
 
-    const {
-
-        data,
-
-        error
-
-    } =
+    const { data, error } =
         await supabaseClient
             .from("ledgers")
             .select("*")
@@ -636,6 +467,88 @@ async function loadLedgers() {
     data.forEach(
         function(ledger) {
 
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                ledger.name;
+
+            option.text =
+                ledger.name;
+
+            ledgerSelect.appendChild(option);
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   LOAD CASH & BANK ACCOUNTS
+===================================== */
+
+async function loadAccounts() {
+
+    const select =
+        document.getElementById(
+            "paymentAccount"
+        );
+
+
+    const user =
+        await getCurrentUser();
+
+
+    if (!user) {
+        return;
+    }
+
+
+    select.innerHTML =
+        '<option value="">Loading Accounts...</option>';
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("accounts")
+            .select("*")
+            .eq(
+                "user_id",
+                user.id
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        select.innerHTML =
+            '<option value="">Error Loading Accounts</option>';
+
+        return;
+
+    }
+
+
+    select.innerHTML =
+        '<option value="">Select Cash / Bank Account</option>';
+
+
+    if (!data || data.length === 0) {
+
+        select.innerHTML =
+            '<option value="">No Accounts Found</option>';
+
+        return;
+
+    }
+
+
+    data.forEach(
+        function(account) {
 
             const option =
                 document.createElement(
@@ -643,27 +556,31 @@ async function loadLedgers() {
                 );
 
 
+            /*
+                IMPORTANT:
+
+                VALUE = ACTUAL ACCOUNT NAME
+
+                This allows Current Balance and
+                Statement to match transactions.
+            */
+
             option.value =
-                ledger.name;
+                account.name;
 
 
             option.text =
-                ledger.name;
+                account.account_type === "cash"
+                    ? "💵 " + account.name
+                    : "🏦 " + account.name;
 
 
-            ledgerSelect.appendChild(
-                option
-            );
-
+            select.appendChild(option);
 
         }
     );
 
-
 }
-
-
-
 
 
 /* =====================================
@@ -678,13 +595,7 @@ async function saveTransaction() {
 
 
     if (!user) {
-
-        alert(
-            "Please login again."
-        );
-
         return;
-
     }
 
 
@@ -697,8 +608,7 @@ async function saveTransaction() {
     const description =
         document.getElementById(
             "description"
-        ).value
-        .trim();
+        ).value.trim();
 
 
     const categorySelect =
@@ -754,8 +664,7 @@ async function saveTransaction() {
     const notes =
         document.getElementById(
             "notes"
-        ).value
-        .trim();
+        ).value.trim();
 
 
     const message =
@@ -795,59 +704,11 @@ async function saveTransaction() {
     saveButton.disabled =
         true;
 
-
     saveButton.innerText =
         "SAVING...";
 
 
-    /* GET ACCOUNT DETAILS */
-
-    const {
-
-        data: account,
-
-        error: accountError
-
-    } =
-        await supabaseClient
-            .from("accounts")
-            .select("*")
-            .eq(
-                "id",
-                paymentAccount
-            )
-            .single();
-
-
-    if (accountError) {
-
-        console.error(accountError);
-
-        message.innerText =
-            "Account error: " +
-            accountError.message;
-
-
-        saveButton.disabled =
-            false;
-
-
-        saveButton.innerText =
-            "SAVE TRANSACTION";
-
-
-        return;
-
-    }
-
-
-    /* SAVE TRANSACTION */
-
-    const {
-
-        error
-
-    } =
+    const { error } =
         await supabaseClient
             .from("transactions")
             .insert([
@@ -879,7 +740,7 @@ async function saveTransaction() {
                         amount,
 
                     payment_account:
-                        account.name,
+                        paymentAccount,
 
                     notes:
                         notes || null
@@ -901,10 +762,8 @@ async function saveTransaction() {
         saveButton.disabled =
             false;
 
-
         saveButton.innerText =
             "SAVE TRANSACTION";
-
 
         return;
 
@@ -921,15 +780,10 @@ async function saveTransaction() {
     saveButton.disabled =
         false;
 
-
     saveButton.innerText =
         "SAVE TRANSACTION";
 
-
 }
-
-
-
 
 
 /* =====================================
@@ -938,20 +792,17 @@ async function saveTransaction() {
 
 function clearForm() {
 
-
     setTodayDate();
 
 
     document.getElementById(
         "description"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "category"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
@@ -968,32 +819,24 @@ function clearForm() {
 
     document.getElementById(
         "entryType"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "amount"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "paymentAccount"
-    ).value =
-        "";
+    ).value = "";
 
 
     document.getElementById(
         "notes"
-    ).value =
-        "";
-
+    ).value = "";
 
 }
-
-
-
 
 
 /* =====================================
@@ -1008,9 +851,6 @@ function goDashboard() {
 }
 
 
-
-
-
 /* =====================================
    START
 ===================================== */
@@ -1023,6 +863,7 @@ loadAccounts();
 
 
 </script>
+
 
 </body>
 
